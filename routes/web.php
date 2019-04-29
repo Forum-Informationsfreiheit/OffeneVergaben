@@ -14,3 +14,15 @@
 Route::get('/', function () {
     return view('welcome');
 });
+
+Route::get('/test_timestamp', function () {
+    $testDate = "2019-04-01T07:17:33.997";
+
+    $original = \Carbon\Carbon::createFromTimeString($testDate);
+
+    dump($original);
+
+    $updated = $original->addHour();
+
+    dd($updated);
+});
