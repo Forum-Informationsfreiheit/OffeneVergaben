@@ -15,9 +15,10 @@ class CreateScraperResultsTable extends Migration
     {
         Schema::create('scraper_results', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('dataset_id');
+            $table->string('parent_reference_id',72);
+            $table->string('reference_id',72);
             $table->unsignedInteger('version');
-            $table->text('content');
+            $table->mediumText('content');
             $table->timestamps();
         });
     }

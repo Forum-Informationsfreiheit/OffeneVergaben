@@ -26,3 +26,38 @@ Route::get('/test_timestamp', function () {
 
     dd($updated);
 });
+
+Route::get('/test_version', function() {
+    $res = \Illuminate\Support\Facades\DB::table('scraper_results')->where('guid','123')->max('version');
+
+    dd($res);
+});
+
+Route::get('/test_xml', function() {
+    $xmlString = '<kdq xmlns="http://www.brz.gv.at/eproc/kdq/20180626">
+<header>
+<publisher>BMBWF</publisher>
+<contact-person>Vergabeadministration</contact-person>
+<contact-email>vergabe@bmbwf.gv.at</contact-email>
+</header>
+<item id="1" lastmod="2019-04-04T11:36:26Z">
+<url>
+https://extapp.noc-science.at/apex/shibb/api/vergabe/1
+</url>
+</item>
+</kdq>';
+
+    $xml = simplexml_load_string($xmlString);
+
+    // use json encode to transform to json
+    $json = json_encode($xml);
+
+    // use json decode to get an associative array
+    $array = json_decode($json,TRUE);
+
+    dump($array);
+
+    dump($array['item']);
+
+    dd(count($array['item']));
+});

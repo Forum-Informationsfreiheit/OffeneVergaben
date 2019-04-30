@@ -18,6 +18,8 @@ class Scrape
 
     protected $scraper;
 
+    protected $timestamp;
+
     /**
      * @param Scraper $scraper
      */
@@ -25,6 +27,9 @@ class Scrape
     {
         $this->scraper = $scraper;
         $this->scraper->useDbLog(true);
+
+        // use same timestamp for all requests
+        $this->timestamp = Carbon::now();
     }
 
     /**
@@ -44,6 +49,7 @@ class Scrape
     protected function handleOrigin($origin) {
 
         // step 1: scrape origin
+        dump('Checking origin: ' . $origin->name . ' (' . $origin->id . ')');
         $datasets = $this->scraper->scrapeOrigin($origin->url);
 
         if ($datasets == null) {
@@ -55,21 +61,32 @@ class Scrape
         }
 
         // keep current run timestamp on origin
-        $origin->last_scraped_at = Carbon::now();
+        $origin->last_scraped_at = $this->timestamp;
         $origin->save();
 
         // check for new / updated datasets, and return list of datasets
         // that need to be processed further
         $scrapeDetails = $this->manageDatasets($origin, $datasets);
 
-        dd($scrapeDetails);
+        dump(count($scrapeDetails) . ' datasets need to be updated. ');
+
+        $idx = 0;
 
         // step 2: scrape details
         foreach($scrapeDetails as $dataset) {
+            $idx++;
+            dump('('.$origin->id.') Scraping dataset: '.$dataset->reference_id);
 
-            $result = $this->scraper->scrapeDataset($origin, $dataset);
+            $version = $this->scraper->scrapeDataset($origin->reference_id, $dataset->reference_id, $dataset->url);
 
-            dd($result);
+            $this->manageUpdateDataset($dataset, $version);
+
+            // TODO this is just temporary
+            /*
+            if ($idx >= 2) {
+                break;
+            }
+            */
         }
     }
 
@@ -84,19 +101,17 @@ class Scrape
 
         foreach($datasets as $dataset) {
             $existing = Dataset::where('origin_id',$origin->id)
-                ->where('guid',$dataset['@attributes']['id'])->first();
+                ->where('reference_id',$dataset['@attributes']['id'])->first();
 
             // new dataset! create database record
             if (!$existing) {
-                $this->manageNewDataset($origin, $dataset);
-
                 // add dataset for further processing (scrape details)
-                $scrapeDetails[] = $dataset;
+                $scrapeDetails[] = $this->manageNewDataset($origin, $dataset);
             } else {
-                $scrapeIt = $this->manageExistingDataset($origin, $dataset, $existing);
+                $existing = $this->manageExistingDataset($origin, $dataset, $existing);
 
-                if ($scrapeIt) {
-                    $scrapeDetails[] = $dataset;
+                if ($existing) {
+                    $scrapeDetails[] = $existing;
                 }
             }
         }
@@ -107,7 +122,7 @@ class Scrape
     protected function manageNewDataset($origin, $dataset) {
 
         $obj = new Dataset();
-        $obj->guid = $dataset['@attributes']['id'];
+        $obj->reference_id = $dataset['@attributes']['id'];
         $obj->origin_id = $origin->id;
         $obj->url = $dataset['url'];
         $obj->last_modified_at = Carbon::createFromTimeString($dataset['@attributes']['lastmod']);
@@ -120,6 +135,8 @@ class Scrape
         $obj->last_scraped_at = Carbon::now()->subWeek()->subWeek();
 
         $obj->save();
+
+        return $obj;
     }
 
     /**
@@ -140,14 +157,26 @@ class Scrape
         // if for some reason (probably api endpoint down), dataset has never been scraped
         // --> do it now
         if ($existing->last_scraped_at == null) {
-            return true;
+            return $existing;
         }
 
         // has been scraped at least once, compare with last mod timestamp
         if ($lastMod->greaterThan($existing->last_scraped_at)) {
-            return true;
+            return $existing;
         }
 
-        return false;
+        return null;
+    }
+
+    /**
+     * @param $record
+     * @param $version
+     */
+    protected function manageUpdateDataset($record, $version) {
+        $record->version_scraped = $version;
+        $record->last_scraped_at = $this->timestamp;
+        $record->save();
+
+        return $record;
     }
 }

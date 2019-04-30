@@ -11,6 +11,8 @@ class Scraper
 {
     protected $client;
     protected $useDbLog = false;
+    protected $interval = 2;
+    protected $last_request_at = null;
 
     public function __construct(Client $client) {
         $this->client = $client;
@@ -21,12 +23,23 @@ class Scraper
     }
 
     /**
-     * Scrape a given origin url
+     * Set the interval in seconds for requests.
+     *
+     * E.g. an interval of 2 means that requests are send once every 2 seconds
+     *
+     * @param $interval
+     */
+    public function setInterval($interval) {
+        $this->interval = $interval;
+    }
+
+    /**
+     * Scrape a given origin url (Kerndaten-Quelle)
      *
      * @param $url
      * @return mixed|null
      */
-    public function scrapeOrigin($url) {
+    public function scrapeOrigin($url) {        // "scrape KerndatenQuelle"
 
         // send request
         $response = $this->makeRequest($url);
@@ -34,13 +47,78 @@ class Scraper
         if ($response) {
             $datasets = $this->processOriginResponse((string)$response->getBody());
 
-            // we only care about the item info, publisher info is already set in origin table
-            if (isset($datasets['item'])) {
+            if (!isset($datasets['item'])) {
+                return null; // todo error handling
+            }
+
+            // be careful about structure here, if there is only one item returned
+            // it is not wrapped in an array, do that manually
+            if (!isset($datasets['item']['@attributes'])) {
+                // default case: multiple items, first level is the wrapping array
                 return $datasets['item'];
             }
+
+            // exception: only one item was returned, wrap it
+            return [ $datasets['item'] ];
         }
 
         return null;
+    }
+
+    /**
+     * Scrape a given dataset url (Kerndaten-Satz)
+     *
+     * @param $parent_reference_id
+     * @param $reference_id
+     * @param $url
+     * @return int|mixed|null
+     */
+    public function scrapeDataset($parent_reference_id, $reference_id, $url) {        // "scrape KerndatenSatz"
+        $response = $this->makeRequest($url);
+
+        if ($response) {
+            $content = (string)$response->getBody();
+            $version = $this->insertIntoResultsTable($parent_reference_id, $reference_id,$content);
+
+            return $version;
+        }
+
+        return null;
+    }
+
+    protected function insertIntoResultsTable($parent_reference_id, $reference_id, $content) {
+        // first check against db to find the last version (integer)
+        $lastVersion = DB::table('scraper_results')
+            ->where('parent_reference_id',$parent_reference_id)
+            ->where('reference_id',$reference_id)
+            ->max('version');
+
+        if ($lastVersion) {
+            $last = DB::table('scraper_results')
+                ->where('parent_reference_id',$parent_reference_id)
+                ->where('reference_id',$reference_id)
+                ->where('version',$lastVersion)->first();
+
+            if ($last->content === $content) {
+                // nothing to do, we already have the exact same thing in our db
+                return $lastVersion;
+            }
+        } else {
+            $lastVersion = 0;
+        }
+
+        // do insert
+        DB::table('scraper_results')->insert([
+            [
+                'parent_reference_id' => $parent_reference_id,
+                'reference_id' => $reference_id,
+                'version' => ++$lastVersion,
+                'content' => $content,
+                'created_at' => Carbon::now(),
+            ],
+        ]);
+
+        return $lastVersion;
     }
 
     /**
@@ -50,11 +128,22 @@ class Scraper
      * @return bool|mixed|null|\Psr\Http\Message\ResponseInterface
      */
     protected function makeRequest($url) {
+        // check interval
+        if ($this->last_request_at) {
+            $threshold = $this->last_request_at->addSeconds($this->interval);
 
+            if ($threshold->greaterThan(Carbon::now())) {
+                $diff = Carbon::now()->diffInMicroseconds($threshold);
+                usleep($diff);
+            }
+        }
+
+        // make request
         $client = $this->client;
         $response = null;
 
         try {
+            $this->last_request_at = Carbon::now();
             $response = $client->request('GET', $url);
 
             $this->logRequest($url, $response);
@@ -120,6 +209,25 @@ class Scraper
 
         // use json decode to get an associative array
         $array = json_decode($json,TRUE);
+
+        return $array;
+    }
+
+    protected function processDatasetResponse($content) {
+        // use simplexml for parsing xml document
+        $xml = simplexml_load_string($content);
+
+        // todo terminology ?!
+        $type = $xml->getName(); // e.g. "KD_8_1_Z2"
+
+        // use json encode to transform to json
+        $json = json_encode($xml);
+
+        // use json decode to get an associative array
+        $array = json_decode($json,TRUE);
+
+        // add type to result, use prefix to prevent name collision
+        $array['FIF_TYPE'] = $type;
 
         return $array;
     }

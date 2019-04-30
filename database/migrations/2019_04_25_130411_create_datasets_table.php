@@ -16,6 +16,7 @@ class CreateDatasetsTable extends Migration
         Schema::create('datasets', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('origin_id');
+            $table->string('reference_id');
             $table->string('url',500);
             $table->unsignedInteger('version_scraped');
             $table->unsignedInteger('version');             // processed version

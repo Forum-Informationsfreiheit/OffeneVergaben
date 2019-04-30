@@ -17,7 +17,7 @@ class CreateScraperLogTable extends Migration
             $table->increments('id');
             $table->string('url',500);
             $table->unsignedSmallInteger('status_code')->default(0);
-            $table->text('response');
+            $table->mediumText('response');
             $table->text('headers')->nullable();
             $table->timestamps();
         });
