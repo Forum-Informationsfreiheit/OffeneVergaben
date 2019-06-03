@@ -61,3 +61,15 @@ https://extapp.noc-science.at/apex/shibb/api/vergabe/1
 
     dd(count($array['item']));
 });
+
+Route::get('/test_csv',function() {
+    $data = array ('aaa,bbb,ccc,dddd',
+        '123,456,789',
+        '"aaa","bbb"');
+    $fp = fopen(storage_path('data.csv'), 'w');
+    foreach($data as $line){
+        $val = explode(",",$line);
+        fputcsv($fp, $val);
+    }
+    fclose($fp);
+});
