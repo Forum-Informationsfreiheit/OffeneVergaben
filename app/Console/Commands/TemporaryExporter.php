@@ -54,7 +54,11 @@ class TemporaryExporter extends Command
         foreach($datasets as $dataset) {
             $idx++;
 
-            $this->results[] = $this->processOne($dataset);
+            $processed = $this->processOne($dataset, $idx);
+
+            if ($processed) {
+                $this->results[] = $processed;
+            }
         }
 
         $this->export();
@@ -62,12 +66,22 @@ class TemporaryExporter extends Command
         $this->info('Export job finished...');
     }
 
-    public function processOne($dataset) {
-        $origin = $dataset->origin;
+    public function processOne($dataset, $idx) {
 
-        $content = $this->xmlToArray($this->getContent($dataset)->content);
+        $result = null;
 
-        $result = $this->parseContent($dataset,$content);
+        try {
+            $content = $this->getContent($dataset)->content;
+
+            $asArray = $this->xmlToArray($content);
+
+            $result = $this->parseContent($dataset,$asArray);
+        } catch (\Exception $ex) {
+            $this->error('Unable to parse content for dataset ' . $dataset->id . '. Skipping.');
+            Log::error('Unable to parse content for dataset ' . $dataset->id . '. Skipping.');
+            Log::error($ex->getCode() .' '. $ex->getMessage());
+            Log::error($ex->getTraceAsString());
+        }
 
         return $result;
     }

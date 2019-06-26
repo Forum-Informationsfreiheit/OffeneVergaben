@@ -6,6 +6,7 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Exception\RequestException;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 
 class Scraper
 {
@@ -156,6 +157,7 @@ class Scraper
             // see https://stackoverflow.com/questions/38614534/how-to-check-if-endpoint-is-working-when-using-guzzlehttp/38622219#38622219
 
             //dump($e->getRequest());
+
             $this->logRequest($url, $e->getResponse());
         }
 
@@ -163,18 +165,32 @@ class Scraper
     }
 
     protected function logRequest($url, $response) {
-        if ($this->useDbLog) {
-            if ($response) {
-                $this->logRequestToDb(
-                    $url,
-                    $response->getStatusCode(),
-                    (string)$response->getBody(),
-                    $response->getHeaders()
-                );
-            } else {
-                // should never happen
-                $this->logRequestToDb($url, 0, '', '');
+        try {
+            if ($this->useDbLog) {
+                if ($response) {
+                    $this->logRequestToDb(
+                        $url,
+                        $response->getStatusCode(),
+                        (string)$response->getBody(),
+                        $response->getHeaders()
+                    );
+                } else {
+                    // should never happen
+                    $this->logRequestToDb($url, 0, '', '');
+                }
             }
+        } catch (\Exception $ex) {
+            // TODO should never happen, but it does, e.g. Wirtschaftskammer URLS
+            // like https://apppool.wko.at/data/ab/2/KD_685DE68E-0419-41CB-8FFE-0AED95045BBF.xml buttt why?
+
+            Log::error($ex->getMessage());
+            Log::error($ex->getTraceAsString());
+
+            dump($response);
+            if ($response) {
+                dump((string)$response->getBody());
+            }
+            dd('Scraper Error. Exit.');
         }
     }
 

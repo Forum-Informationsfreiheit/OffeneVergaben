@@ -39,7 +39,8 @@ class Scrape
      */
     public function handle()
     {
-        $origins = Origin::all();
+        // Get only active origins
+        $origins = Origin::active()->get();
 
         foreach($origins as $origin) {
             $this->handleOrigin($origin);
