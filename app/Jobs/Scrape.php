@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Dataset;
+use App\Datasource;
 use App\Origin;
 use App\Scraper;
 use Carbon\Carbon;
@@ -51,9 +51,9 @@ class Scrape
 
         // step 1: scrape origin
         dump('Checking origin: ' . $origin->name . ' (' . $origin->id . ')');
-        $datasets = $this->scraper->scrapeOrigin($origin->url);
+        $datasources = $this->scraper->scrapeOrigin($origin->url);
 
-        if ($datasets == null) {
+        if ($datasources == null) {
             // many possible errors here
             // most likely scraper could not reach the endpoint
             // todo error handling ???
@@ -65,22 +65,22 @@ class Scrape
         $origin->last_scraped_at = $this->timestamp;
         $origin->save();
 
-        // check for new / updated datasets, and return list of datasets
+        // check for new / updated datasources, and return list of datasources
         // that need to be processed further
-        $scrapeDetails = $this->manageDatasets($origin, $datasets);
+        $scrapeDetails = $this->manageDatasources($origin, $datasources);
 
-        dump(count($scrapeDetails) . ' datasets need to be updated. ');
+        dump(count($scrapeDetails) . ' datasources need to be updated. ');
 
         $idx = 0;
 
         // step 2: scrape details
-        foreach($scrapeDetails as $dataset) {
+        foreach($scrapeDetails as $datasource) {
             $idx++;
-            dump('('.$origin->id.') Scraping dataset: '.$dataset->reference_id);
+            dump('('.$origin->id.') Scraping datasource: '.$datasource->reference_id);
 
-            $version = $this->scraper->scrapeDataset($origin->reference_id, $dataset->reference_id, $dataset->url);
+            $version = $this->scraper->scrapeDatasource($origin->reference_id, $datasource->reference_id, $datasource->url);
 
-            $this->manageUpdateDataset($dataset, $version);
+            $this->manageUpdateDatasource($datasource, $version);
 
             // TODO this is just temporary
             /*
@@ -93,23 +93,23 @@ class Scrape
 
     /**
      * @param $origin
-     * @param $datasets
+     * @param $datasources
      * @return array
      */
-    protected function manageDatasets($origin, $datasets) {
+    protected function manageDatasources($origin, $datasources) {
 
         $scrapeDetails = [];
 
-        foreach($datasets as $dataset) {
-            $existing = Dataset::where('origin_id',$origin->id)
-                ->where('reference_id',$dataset['@attributes']['id'])->first();
+        foreach($datasources as $datasource) {
+            $existing = Datasource::where('origin_id',$origin->id)
+                ->where('reference_id',$datasource['@attributes']['id'])->first();
 
-            // new dataset! create database record
+            // new datasource! create database record
             if (!$existing) {
-                // add dataset for further processing (scrape details)
-                $scrapeDetails[] = $this->manageNewDataset($origin, $dataset);
+                // add datasource for further processing (scrape details)
+                $scrapeDetails[] = $this->manageNewDatasource($origin, $datasource);
             } else {
-                $existing = $this->manageExistingDataset($origin, $dataset, $existing);
+                $existing = $this->manageExistingDatasource($origin, $datasource, $existing);
 
                 if ($existing) {
                     $scrapeDetails[] = $existing;
@@ -120,13 +120,13 @@ class Scrape
         return $scrapeDetails;
     }
 
-    protected function manageNewDataset($origin, $dataset) {
+    protected function manageNewDatasource($origin, $datasource) {
 
-        $obj = new Dataset();
-        $obj->reference_id = $dataset['@attributes']['id'];
+        $obj = new Datasource();
+        $obj->reference_id = $datasource['@attributes']['id'];
         $obj->origin_id = $origin->id;
-        $obj->url = $dataset['url'];
-        $obj->last_modified_at = Carbon::createFromTimeString($dataset['@attributes']['lastmod']);
+        $obj->url = $datasource['url'];
+        $obj->last_modified_at = Carbon::createFromTimeString($datasource['@attributes']['lastmod']);
 
         // init version value with 0
         $obj->version = 0;
@@ -142,12 +142,12 @@ class Scrape
 
     /**
      * @param $origin
-     * @param $dataset
+     * @param $datasource
      * @param $existing
-     * @return bool | true if dataset should be scraped
+     * @return bool | true if datasource should be scraped
      */
-    protected function manageExistingDataset($origin, $dataset, $existing) {
-        $lastMod = Carbon::createFromTimeString($dataset['@attributes']['lastmod']);
+    protected function manageExistingDatasource($origin, $datasource, $existing) {
+        $lastMod = Carbon::createFromTimeString($datasource['@attributes']['lastmod']);
 
         // first step, touch record and update lastmod column
         if ($lastMod->greaterThan($existing->last_modified_at)) {
@@ -155,7 +155,7 @@ class Scrape
             $existing->save();
         }
 
-        // if for some reason (probably api endpoint down), dataset has never been scraped
+        // if for some reason (probably api endpoint down), datasource has never been scraped
         // --> do it now
         if ($existing->last_scraped_at == null) {
             return $existing;
@@ -173,7 +173,7 @@ class Scrape
      * @param $record
      * @param $version
      */
-    protected function manageUpdateDataset($record, $version) {
+    protected function manageUpdateDatasource($record, $version) {
         $record->version_scraped = $version;
         $record->last_scraped_at = $this->timestamp;
         $record->save();

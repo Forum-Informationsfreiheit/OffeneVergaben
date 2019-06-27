@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class Dataset extends Model
+class Datasource extends Model
 {
     public function origin() {
         return $this->belongsTo('App\Origin');

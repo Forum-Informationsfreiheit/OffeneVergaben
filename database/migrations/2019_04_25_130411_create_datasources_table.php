@@ -13,7 +13,7 @@ class CreateDatasetsTable extends Migration
      */
     public function up()
     {
-        Schema::create('datasets', function (Blueprint $table) {
+        Schema::create('datasources', function (Blueprint $table) {
             $table->increments('id');
             $table->unsignedInteger('origin_id');
             $table->string('reference_id');
@@ -36,6 +36,6 @@ class CreateDatasetsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('datasets');
+        Schema::dropIfExists('datasources');
     }
 }

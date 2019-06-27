@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Dataset;
+use App\Datasource;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +22,7 @@ class TemporaryExporter extends Command
      *
      * @var string
      */
-    protected $description = 'Temporary Export command for rough dataset output.';
+    protected $description = 'Temporary Export command for rough datasource output.';
 
     protected $results = [];
 
@@ -45,16 +45,16 @@ class TemporaryExporter extends Command
     {
         $this->info('Starting export job...');
 
-        $datasets = Dataset::all();
+        $datasources = Datasource::all();
 
-        $this->info('Found '.count($datasets). ' Datasets');
+        $this->info('Found '.count($datasources). ' Datasources');
 
         $idx = 0;
 
-        foreach($datasets as $dataset) {
+        foreach($datasources as $datasource) {
             $idx++;
 
-            $processed = $this->processOne($dataset, $idx);
+            $processed = $this->processOne($datasource, $idx);
 
             if ($processed) {
                 $this->results[] = $processed;
@@ -66,19 +66,19 @@ class TemporaryExporter extends Command
         $this->info('Export job finished...');
     }
 
-    public function processOne($dataset, $idx) {
+    public function processOne($datasource, $idx) {
 
         $result = null;
 
         try {
-            $content = $this->getContent($dataset)->content;
+            $content = $this->getContent($datasource)->content;
 
             $asArray = $this->xmlToArray($content);
 
-            $result = $this->parseContent($dataset,$asArray);
+            $result = $this->parseContent($datasource,$asArray);
         } catch (\Exception $ex) {
-            $this->error('Unable to parse content for dataset ' . $dataset->id . '. Skipping.');
-            Log::error('Unable to parse content for dataset ' . $dataset->id . '. Skipping.');
+            $this->error('Unable to parse content for datasource ' . $datasource->id . '. Skipping.');
+            Log::error('Unable to parse content for datasource ' . $datasource->id . '. Skipping.');
             Log::error($ex->getCode() .' '. $ex->getMessage());
             Log::error($ex->getTraceAsString());
         }
@@ -117,7 +117,7 @@ class TemporaryExporter extends Command
         fclose($fp);
     }
 
-    protected function parseContent($dataset,$content) {
+    protected function parseContent($datasource,$content) {
         $result = [];
 
         $result['TYPE'] = $content['FIF_TYPE'];
@@ -135,8 +135,8 @@ class TemporaryExporter extends Command
                 $result['CB_ADDRESS_CONTACT']      = isset($ADDRESS['CONTACT']) && !is_array($ADDRESS['CONTACT']) ? $ADDRESS['CONTACT'] : '';
 
             } else {
-                dump($dataset->origin->reference_id);
-                dump($dataset->reference_id);
+                dump($datasource->origin->reference_id);
+                dump($datasource->reference_id);
                 dump($CONTRACTING_BODY);
                 dd("POSSIBLY MULTIPLE CONTRACTING BODIES!!! NOT YET IMPLEMENTED");
             }
@@ -312,11 +312,11 @@ class TemporaryExporter extends Command
         return $array;
     }
 
-    protected function getContent($dataset) {
+    protected function getContent($datasource) {
         $content = DB::table('scraper_results')
-            ->where('parent_reference_id',$dataset->origin->reference_id)
-            ->where('reference_id',$dataset->reference_id)
-            ->where('version',$dataset->version_scraped)
+            ->where('parent_reference_id',$datasource->origin->reference_id)
+            ->where('reference_id',$datasource->reference_id)
+            ->where('version',$datasource->version_scraped)
             ->first();
 
         return $content;

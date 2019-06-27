@@ -46,35 +46,35 @@ class Scraper
         $response = $this->makeRequest($url);
 
         if ($response) {
-            $datasets = $this->processOriginResponse((string)$response->getBody());
+            $datasources = $this->processOriginResponse((string)$response->getBody());
 
-            if (!isset($datasets['item'])) {
+            if (!isset($datasources['item'])) {
                 return null; // todo error handling
             }
 
             // be careful about structure here, if there is only one item returned
             // it is not wrapped in an array, do that manually
-            if (!isset($datasets['item']['@attributes'])) {
+            if (!isset($datasources['item']['@attributes'])) {
                 // default case: multiple items, first level is the wrapping array
-                return $datasets['item'];
+                return $datasources['item'];
             }
 
             // exception: only one item was returned, wrap it
-            return [ $datasets['item'] ];
+            return [ $datasources['item'] ];
         }
 
         return null;
     }
 
     /**
-     * Scrape a given dataset url (Kerndaten-Satz)
+     * Scrape a given datasource url (Kerndaten-Satz)
      *
      * @param $parent_reference_id
      * @param $reference_id
      * @param $url
      * @return int|mixed|null
      */
-    public function scrapeDataset($parent_reference_id, $reference_id, $url) {        // "scrape KerndatenSatz"
+    public function scrapeDatasource($parent_reference_id, $reference_id, $url) {        // "scrape KerndatenSatz"
         $response = $this->makeRequest($url);
 
         if ($response) {
@@ -229,7 +229,12 @@ class Scraper
         return $array;
     }
 
-    protected function processDatasetResponse($content) {
+    /**
+     * @deprecated
+     * @param $content
+     * @return mixed
+     */
+    protected function processDatasourceResponse($content) {
         // use simplexml for parsing xml document
         $xml = simplexml_load_string($content);
 
