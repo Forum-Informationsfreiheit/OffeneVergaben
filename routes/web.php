@@ -84,3 +84,36 @@ Route::get('/test_nuts',function() {
 
     dd($nuts);
 });
+Route::get('/list_types',function() {
+    $types = [];
+
+    $datasources = \App\Datasource::all();
+
+    foreach($datasources as $datasource) {
+
+        // quick and dirty get xml for datasource and parse it, so we can read the type
+        $result = \Illuminate\Support\Facades\DB::table('scraper_results')
+            ->where('parent_reference_id',$datasource->origin->reference_id)
+            ->where('reference_id',$datasource->reference_id)
+            ->where('version',$datasource->version_scraped)
+            ->first();
+
+        // xml to array
+        $xml = simplexml_load_string($result->content);
+        $type = $xml->getName(); // e.g. "KD_8_1_Z2"
+
+        if (!isset($types[$type])) {
+            $types[$type] = [ 'name' => $type, 'count' => 1 ];
+        } else {
+            $types[$type]['count']++;
+        }
+
+    }
+
+    dd($types);
+});
+Route::get('/test_types',function() {
+    $types = \App\DatasetType::find("KD_7_2_Z2");
+
+    dd($types);
+});
