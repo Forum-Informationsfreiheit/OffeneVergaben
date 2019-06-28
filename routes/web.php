@@ -73,3 +73,9 @@ Route::get('/test_csv',function() {
     }
     fclose($fp);
 });
+
+Route::get('/test_cpv',function() {
+    $cpv = \App\CPV::find("03115100");
+
+    dd($cpv);
+});
