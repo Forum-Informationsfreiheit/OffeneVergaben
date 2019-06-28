@@ -79,3 +79,8 @@ Route::get('/test_cpv',function() {
 
     dd($cpv);
 });
+Route::get('/test_nuts',function() {
+    $nuts = \App\NUTS::find("AT111");
+
+    dd($nuts);
+});
