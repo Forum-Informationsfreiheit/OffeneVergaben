@@ -14,7 +14,7 @@ class CreateDatasetTypesTable extends Migration
     public function up()
     {
         Schema::create('dataset_types', function (Blueprint $table) {
-            $table->string('code')->length(15)->primaryKey();
+            $table->string('code')->length(15)->primary();
             $table->string('name');
             $table->string('description');
         });

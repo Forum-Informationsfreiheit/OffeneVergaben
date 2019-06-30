@@ -4,7 +4,7 @@ use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
 
-class CreateNutsTable extends Migration
+class CreateOrganizationsTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,11 +13,13 @@ class CreateNutsTable extends Migration
      */
     public function up()
     {
-        Schema::create('nuts', function (Blueprint $table) {
-            $table->string('code')->length(10)->primary();
-            $table->string('name');
-            $table->integer('level')->length(1);
-            $table->string('country_code')->length(10);
+        Schema::create('organizations', function (Blueprint $table) {
+            $table->bigIncrements('id');
+
+            $table->string('national_id')->length(50);
+            $table->string('type_code')->nullable();
+
+            $table->timestamps();
         });
     }
 
@@ -28,6 +30,6 @@ class CreateNutsTable extends Migration
      */
     public function down()
     {
-        Schema::dropIfExists('nuts');
+        Schema::dropIfExists('organizations');
     }
 }
