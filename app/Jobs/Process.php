@@ -2,6 +2,7 @@
 
 namespace App\Jobs;
 
+use App\Dataset;
 use App\Datasource;
 use App\DataSourcePreProcessor;
 use Carbon\Carbon;
@@ -10,6 +11,8 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
+use Monolog\Logger;
 
 class Process implements ShouldQueue
 {
@@ -43,6 +46,7 @@ class Process implements ShouldQueue
         $sources = Datasource::unprocessed()->get();
 
         //$sources = Datasource::where('id',1809)->get();  --> with contracting bodies
+        //$sources = Datasource::where('id',1344)->get();  --> FEHLER, falscher NUTS CODE
 
         dump($sources->count());
 
@@ -70,8 +74,8 @@ class Process implements ShouldQueue
 
         $data = $this->preProcessor->getData();
 
+        /*
         //dd($data);
-
         if ($data->awardContract && count($data->awardContract->contractors) > 1) {
             dd($data);
         }
@@ -82,6 +86,26 @@ class Process implements ShouldQueue
 
         if ($data->contractingBody->additional && count($data->contractingBody->additional) == 1) {
             //dd($data);
+        }
+        */
+
+        // write datasets ?!
+        try {
+            $dataset = new Dataset();
+            $dataset->datasource_id = $source->id;
+            $dataset->version = $source->version_scraped;
+
+            $dataset->type_code = $data->type;
+
+            $dataset->cpv_code = $data->objectContract->cpv;
+            $dataset->nuts_code = $data->objectContract->nuts;
+
+            $dataset->save();
+        } catch(\Exception $ex) {
+            Log::error($ex->getCode() . ' ' . $ex->getMessage());
+            Log::error($ex->getTraceAsString());
+
+            dump('Unable to write dataset for datasource with id '.$source->id.' to db.');
         }
     }
 }
