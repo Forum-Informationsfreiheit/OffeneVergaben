@@ -28,7 +28,14 @@ class CreateDatasetsTable extends Migration
             $table->string('nuts_code')->length(10)->nullable();
             $table->foreign('nuts_code')->references('code')->on('nuts')->onDelete('set null');
 
-            // TODO procedure_code
+            // DETAILS ----- COULD BE MOVED INTO OWN TABLE LATER ON
+            $table->string('url_document',500)->nullable();
+            $table->boolean('url_is_restricted')->nullable();
+            $table->string('url_participation',500)->nullable();
+
+            $table->string('contract_type',100)->nullable();
+            $table->string('title',1000)->nullable();
+            $table->text('description')->nullable();
 
             $table->timestamps();
         });

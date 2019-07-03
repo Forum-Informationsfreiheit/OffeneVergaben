@@ -80,22 +80,9 @@ class Process implements ShouldQueue
 
         $data = $this->preProcessor->getData();
 
-        /*
-        //dd($data);
-        if ($data->awardContract && count($data->awardContract->contractors) > 1) {
-            dd($data);
-        }
-
-        if ($data->modificationsContract && count($data->modificationsContract->contractors) > 1) {
-            dd($data);
-        }
-
-        if ($data->contractingBody->additional && count($data->contractingBody->additional) == 1) {
-            dd($data);
-        }
-        */
-
         // Validate foreign key values before attempting to write
+        $validationError = false;
+
         $checkCPVCode  = $data->objectContract->cpv  ? CPV::find($data->objectContract->cpv) : true;
         $checkNUTSCode = $data->objectContract->nuts ? NUTS::find($data->objectContract->nuts) : true;
 
@@ -103,15 +90,24 @@ class Process implements ShouldQueue
             dump('Failed validation for datasource (id:'.$source->id.') to db.');
             dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
             dump('Unknown CPV #'.$data->objectContract->cpv.'#');
+            $validationError = true;
         }
 
         if (!$checkNUTSCode) {
             dump('Failed validation for datasource (id:'.$source->id.') to db.');
             dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
             dump('Unknown NUTS #'.$data->objectContract->nuts.'#');
+            $validationError = true;
         }
 
-        if (!$checkCPVCode || !$checkNUTSCode) {
+        if ($data->contractingBody->urlDocumentIsRestricted && $data->contractingBody->urlDocumentIsFull) {
+            dump('Failed validation for datasource (id:'.$source->id.') to db.');
+            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
+            dump('Both Document Flags (RESTRICTED&FULL) set instead of one or none');
+            $validationError = true;
+        }
+
+        if ($validationError) {
             return;
         }
 
@@ -131,6 +127,17 @@ class Process implements ShouldQueue
             $dataset->cpv_code = $data->objectContract->cpv;
             $dataset->nuts_code = $data->objectContract->nuts;
 
+            $dataset->url_participation = $data->contractingBody->urlParticipation;
+            $dataset->url_document = $data->contractingBody->urlDocument;
+            $dataset->url_is_restricted = $data->contractingBody->urlDocumentIsRestricted ? 1 :
+                ($data->contractingBody->urlDocumentIsFull ? 0 : null); // put restricted OR full OR none info into one attribute
+
+            // data from object contract
+            $dataset->contract_type = $data->objectContract->type;
+            $dataset->title = $data->objectContract->title;
+            $dataset->description = $data->objectContract->description;
+
+
             $dataset->save();
 
             // Handle main offeror
@@ -143,6 +150,10 @@ class Process implements ShouldQueue
             $offeror->email = $data->contractingBody->email;
             $offeror->contact = $data->contractingBody->contact;
             $offeror->domain = $data->contractingBody->domain;
+
+            // store info with offeror, but get it from objectContract
+            $offeror->reference_number = $data->objectContract->refNumber;
+
             $offeror->save();
 
             // Handle additional offerors
@@ -157,6 +168,7 @@ class Process implements ShouldQueue
                     $offeror->email = $additional->email;
                     $offeror->contact = $additional->contact;
                     $offeror->domain = $additional->domain;
+                    $offeror->reference_number = $additional->refNumber;
                     $offeror->save();
                 }
             }

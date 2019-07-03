@@ -32,6 +32,7 @@ class CreateOfferorsTable extends Migration
             $table->string('phone',100)->nullable();
             $table->string('email',100)->nullable();
             $table->string('contact',500)->nullable();
+            $table->string('reference_number',255)->nullable();
 
             $table->timestamps();
         });

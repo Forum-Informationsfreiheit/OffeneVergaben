@@ -51,6 +51,9 @@ class DataSourcePreProcessor
 
     }
 
+    /**
+     * Process CONTRACTING_BODY
+     */
     protected function processContractingBody() {
         $data = $this->getContractingBody();
 
@@ -81,6 +84,7 @@ class DataSourcePreProcessor
                     $add->email        = $this->getField($additional,'E_MAIL');
                     $add->contact      = $this->getField($additional,'CONTACT');
                     $add->domain       = $this->getField($additional,'DOMAIN');
+                    $add->refNumber    = $this->getField($additional,'REFERENCE_NUMBER');
 
                     $cb->additional[] = $add;
                 }
@@ -89,11 +93,18 @@ class DataSourcePreProcessor
             }
         }
 
-        // TODO missing document, url document etc.
+        // URL_DOCUMENT, URL_PARTICIPATION, Flags [DOCUMENT_FULL, DOCUMENT_RESTRICTED]
+        $cb->urlDocument             = $this->getField($data,'URL_DOCUMENT');
+        $cb->urlParticipation        = $this->getField($data,'URL_PARTICIPATION');
+        $cb->urlDocumentIsRestricted = isset($data['DOCUMENT_RESTRICTED']);
+        $cb->urlDocumentIsFull       = isset($data['DOCUMENT_FULL']);
 
         $this->data->contractingBody = $cb;
     }
 
+    /**
+     * Process OBJECT_CONTRACT
+     */
     protected function processObjectContract() {
         $data = $this->getObjectContract();
 
@@ -101,8 +112,11 @@ class DataSourcePreProcessor
 
         $oc->cpv = $this->hasCpvMain() ? $this->getCpvMain() : null;
         $oc->nuts = $this->hasNutsCode() ? $this->getNutsCode() : null;
+        $oc->type = $this->hasContractType() ? $this->getContractType() : null;
+        $oc->refNumber = $this->getField($data,'REFERENCE_NUMBER');
 
-        // TODO title, etc.
+        $oc->title = isset($data['TITLE']) ? $this->getMultiLineText($data,'TITLE') : null;
+        $oc->description = isset($data['SHORT_DESCR']) ? $this->getMultiLineText($data,'SHORT_DESCR') : null;
 
         $this->data->objectContract = $oc;
     }
@@ -161,6 +175,16 @@ class DataSourcePreProcessor
         $this->data->modificationsContract = $mc;
     }
 
+    /**
+     * Retrieve a value (string) for a given $needle from the provided $hayStack
+     *
+     * Do NOT use this if you need to check for the existence of a given key.
+     * - in this case better just use isset()
+     *
+     * @param array $hayStack
+     * @param String $needle
+     * @return null|string
+     */
     protected function getField($hayStack, $needle) {
         if (!isset($hayStack[$needle])) {
             return null;
@@ -178,19 +202,80 @@ class DataSourcePreProcessor
             return $value;
         }
 
+        // gets a bit tricky here
         if (is_array($value)) {
-            // missing values are usually interpreted as an empty array by the xml/json parse sequence
+            // missing values are interpreted as an empty array by the xml/json parse sequence
+            // in the source xml string it looks like this: <TAG_NAME></TAG_NAME>
             if (!count($value)) {
                 return null;
+
+            // but if the source tag was something like <TAG_NAME>   </TAG_NAME>
+            // then this results in an array with 3 spaces as a value: ['   ']
+            // not useful --> return null
+            } else if(count($value) === 1) {
+                $val = trim($value[0]);
+                if (strlen($val) === 0) {
+                    // after trim no string left --> no value at all
+                    return null;
+                } else {
+                    // ???? should never happen
+                    dump("Field was interpreted as array with length 1. Why? Key: $needle",$value);
+                    dd('Exit PreProcessor');
+                }
             } else {
-                // should never happen
-                // but if it does: handle error
-                dump("Found multiple values while only expecting 0 or 1",$value);
+                // ???? should never happen
+                dump("Found multiple values while only expecting 0 or 1 for key '$needle'",$value);
                 dd('Exit PreProcessor');
             }
         }
 
         return $value;
+    }
+
+    /**
+     * Get text from multi paragraph text field
+     *
+     * @param $hayStack
+     * @param $needle
+     * @param $lineSeparator
+     * @return null
+     */
+    protected function getMultiLineText($hayStack,$needle,$lineSeparator = '\n') {
+        if (!isset($hayStack[$needle])) {
+            return null;
+        }
+
+        $text = $hayStack[$needle];
+
+        if (!isset($text['P'])) {
+            // should never happen ??? why ???
+            dump("Expected Paragraphs, found something else '$needle'",$text);
+            dd('Exit PreProcessor');
+        }
+
+        $ps = $text['P'];
+
+        $result = null;
+
+        if (is_array($ps)) {
+            $ps = array_filter($ps,function($i) {
+                // possible array problem, empty last line, filter out
+                return !is_array($i);
+            });
+            $result = join($lineSeparator,$ps);
+        } else if (is_string($ps)){
+            // should never happen ???? why ???
+            // dump("INFO: Text had P attribute but is not an array? key $needle",$text);
+
+            $val = trim($ps);
+            $result = strlen($val) > 0 ? $val : null;
+        } else {
+            // should never happen ????
+            dump("Unable to get MultiLine Text",$hayStack,$needle);
+            dd('Exit PreProcessor');
+        }
+
+        return $result;
     }
 
     protected function xmlToArray($xmlString) {
@@ -263,6 +348,24 @@ class DataSourcePreProcessor
             && isset($OC['CPV_MAIN']['CPV_CODE'])
             && isset($OC['CPV_MAIN']['CPV_CODE']['@attributes'])
             && isset($OC['CPV_MAIN']['CPV_CODE']['@attributes']['CODE']);
+    }
+
+    protected function getContractType() {
+        $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['TYPE_CONTRACT']['@attributes']['CTYPE'];
+        $value = trim($value);
+        return strlen($value) === 0 ? null : $value;
+    }
+
+    protected function hasContractType() {
+        if (!$this->hasObjectContract()) {
+            return false;
+        }
+
+        $OC = $this->simpleXmlArrayData['OBJECT_CONTRACT'];
+
+        return isset($OC['TYPE_CONTRACT'])
+            && isset($OC['TYPE_CONTRACT']['@attributes'])
+            && isset($OC['TYPE_CONTRACT']['@attributes']['CTYPE']);
     }
 
     protected function getNutsCode() {
