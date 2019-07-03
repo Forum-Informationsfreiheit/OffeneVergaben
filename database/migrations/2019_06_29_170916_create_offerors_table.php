@@ -26,12 +26,12 @@ class CreateOfferorsTable extends Migration
 
             // following are all data-input dependent, we don't know what we are going to get
             // so make everything nullable and let the app itself handle those null cases
-            $table->string('national_id')->length(50)->nullable();
-            $table->string('name')->nullable();
-            $table->string('domain')->nullable();
-            $table->string('phone')->nullable();
-            $table->string('email')->nullable();
-            $table->string('contact')->nullable();
+            $table->string('national_id',100)->nullable();
+            $table->string('name',500)->nullable();
+            $table->string('domain',100)->nullable();
+            $table->string('phone',100)->nullable();
+            $table->string('email',100)->nullable();
+            $table->string('contact',500)->nullable();
 
             $table->timestamps();
         });

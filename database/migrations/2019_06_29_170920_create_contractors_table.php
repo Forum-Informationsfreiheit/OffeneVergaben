@@ -22,12 +22,10 @@ class CreateContractorsTable extends Migration
             $table->unsignedBigInteger('organization_id')->nullable();
             $table->foreign('organization_id')->references('id')->on('organizations')->onDelete('set null');
 
-            $table->boolean('is_extra')->default(0);
-
             // following are all data-input dependent, we don't know what we are going to get
             // so make everything nullable and let the app itself handle those null cases
-            $table->string('national_id')->length(50)->nullable();
-            $table->string('name')->nullable();
+            $table->string('national_id',100)->nullable();
+            $table->string('name',500)->nullable();
 
             $table->timestamps();
         });

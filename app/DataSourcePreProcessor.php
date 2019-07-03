@@ -25,6 +25,7 @@ class DataSourcePreProcessor
         $this->simpleXmlArrayData = $this->xmlToArray($this->xmlString);
 
         $this->data = new \stdClass();
+
         $this->data->type = $this->simpleXmlArrayData['FIF_TYPE'];
         $this->data->contractingBody = null;
         $this->data->objectContract = null;
@@ -46,6 +47,8 @@ class DataSourcePreProcessor
         if ($this->hasModificationsContract()) {
             $this->processModificationsContract();
         }
+
+
     }
 
     protected function processContractingBody() {
@@ -61,6 +64,7 @@ class DataSourcePreProcessor
             $cb->phone        = $this->getField($adr,'PHONE');
             $cb->email        = $this->getField($adr,'E_MAIL');
             $cb->contact      = $this->getField($adr,'CONTACT');
+            $cb->domain       = $this->getField($adr,'DOMAIN');
 
             if ($this->hasAnyAdditionalContractingBodies()) {
                 $cb->additional = [];
@@ -76,6 +80,7 @@ class DataSourcePreProcessor
                     $add->phone        = $this->getField($additional,'PHONE');
                     $add->email        = $this->getField($additional,'E_MAIL');
                     $add->contact      = $this->getField($additional,'CONTACT');
+                    $add->domain       = $this->getField($additional,'DOMAIN');
 
                     $cb->additional[] = $add;
                 }
@@ -164,10 +169,26 @@ class DataSourcePreProcessor
         $value = $hayStack[$needle];
 
         if (is_string($value)) {
-            return trim($value);
+            $value = trim($value);
+
+            if (strlen($value) === 0) {
+                return null;
+            }
+
+            return $value;
         }
 
-        // what to do with arrays ?
+        if (is_array($value)) {
+            // missing values are usually interpreted as an empty array by the xml/json parse sequence
+            if (!count($value)) {
+                return null;
+            } else {
+                // should never happen
+                // but if it does: handle error
+                dump("Found multiple values while only expecting 0 or 1",$value);
+                dd('Exit PreProcessor');
+            }
+        }
 
         return $value;
     }
@@ -225,7 +246,10 @@ class DataSourcePreProcessor
     }
 
     protected function getCpvMain() {
-        return $this->simpleXmlArrayData['OBJECT_CONTRACT']['CPV_MAIN']['CPV_CODE']['@attributes']['CODE'];
+        $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['CPV_MAIN']['CPV_CODE']['@attributes']['CODE'];
+        $value = trim($value);
+
+        return strlen($value) === 0 ? null : $value;
     }
 
     protected function hasCpvMain() {
@@ -242,7 +266,10 @@ class DataSourcePreProcessor
     }
 
     protected function getNutsCode() {
-        return $this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']['NUTS']['@attributes']['CODE'];
+        $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']['NUTS']['@attributes']['CODE'];
+        $value = trim($value);
+
+        return strlen($value) === 0 ? null : $value;
     }
 
     protected function hasNutsCode() {
@@ -258,7 +285,7 @@ class DataSourcePreProcessor
             && isset($OC['OBJECT_DESCR']['NUTS']['@attributes']['CODE']);
     }
 
-    protected function hasAnyAdditionalContractingBodies() {
+    public function hasAnyAdditionalContractingBodies() {
         return $this->hasContractingBody() &&
         isset($this->simpleXmlArrayData['CONTRACTING_BODY']['ADDRESS_CONTRACTING_BODY_ADDITIONAL']);
     }
@@ -274,7 +301,7 @@ class DataSourcePreProcessor
         return count(array_filter(array_keys($array), 'is_string')) === 0;
     }
 
-    protected function hasAnyContractors($contract) {
+    public function hasAnyContractors($contract) {
         if ($contract == 'AWARD') {
             return $this->hasAwardContract()
                 && isset($this->simpleXmlArrayData['AWARD_CONTRACT'])
