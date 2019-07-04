@@ -110,10 +110,29 @@ class DataSourcePreProcessor
 
         $oc = new \stdClass();
 
-        $oc->cpv = $this->hasCpvMain() ? $this->getCpvMain() : null;
-        $oc->nuts = $this->hasNutsCode() ? $this->getNutsCode() : null;
-        $oc->type = $this->hasContractType() ? $this->getContractType() : null;
+        $oc->cpv       = $this->hasCpvMain() ? $this->getCpvMain() : null;
+        $oc->nuts      = $this->hasNutsCode() ? $this->getNutsCode() : null;
+        $oc->type      = $this->hasContractType() ? $this->getContractType() : null;
         $oc->refNumber = $this->getField($data,'REFERENCE_NUMBER');
+        $oc->additionalCpvs = null;
+
+        // Handle Object Description child
+        if ($this->hasObjectDescription()) {
+            if ($this->hasAnyAdditionalCpvs()) {
+                $oc->additionalCpvs = [];
+
+                $additionals = $this->hasMultipleAdditionalCpvs() ? $data['OBJECT_DESCR']['CPV_ADDITIONAL'] :
+                    [ $data['OBJECT_DESCR']['CPV_ADDITIONAL'] ];
+
+                foreach($additionals as $additional) {
+                    $cpvCode = $this->getCpvAdditional($additional);
+
+                    if ($cpvCode) {
+                        $oc->additionalCpvs[] = $cpvCode;
+                    }
+                }
+            }
+        }
 
         $oc->title = isset($data['TITLE']) ? $this->getMultiLineText($data,'TITLE') : null;
         $oc->description = isset($data['SHORT_DESCR']) ? $this->getMultiLineText($data,'SHORT_DESCR') : null;
@@ -316,6 +335,13 @@ class DataSourcePreProcessor
         return isset($this->simpleXmlArrayData['OBJECT_CONTRACT']);
     }
 
+    protected function getObjectDescription() {
+        return $this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR'];
+    }
+    protected function hasObjectDescription() {
+        return $this->hasObjectContract() && isset($this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']);
+    }
+
     protected function getAwardContract() {
         return $this->simpleXmlArrayData['AWARD_CONTRACT'];
     }
@@ -335,6 +361,19 @@ class DataSourcePreProcessor
         $value = trim($value);
 
         return strlen($value) === 0 ? null : $value;
+    }
+
+    protected function getCpvAdditional($hayStack) {
+        if(isset($hayStack['CPV_CODE']) && isset($hayStack['CPV_CODE']['@attributes'])
+              && isset($hayStack['CPV_CODE']['@attributes']['CODE'])) {
+
+            $value = $hayStack['CPV_CODE']['@attributes']['CODE'];
+            $value = trim($value);
+
+            return strlen($value) === 0 ? null : $value;
+        }
+
+        return null;
     }
 
     protected function hasCpvMain() {
@@ -388,6 +427,10 @@ class DataSourcePreProcessor
             && isset($OC['OBJECT_DESCR']['NUTS']['@attributes']['CODE']);
     }
 
+    protected function hasAnyAdditionalCpvs() {
+        return $this->hasObjectDescription() && isset($this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']['CPV_ADDITIONAL']);
+    }
+
     public function hasAnyAdditionalContractingBodies() {
         return $this->hasContractingBody() &&
         isset($this->simpleXmlArrayData['CONTRACTING_BODY']['ADDRESS_CONTRACTING_BODY_ADDITIONAL']);
@@ -401,6 +444,15 @@ class DataSourcePreProcessor
 
         // this is actually a test if the provided array contains numerical or string keys
         // or in other words if the provided array is (not) an 'associative' array
+        return count(array_filter(array_keys($array), 'is_string')) === 0;
+    }
+    protected function hasMultipleAdditionalCpvs() {
+        if (!$this->hasAnyAdditionalCpvs()) {
+            return false;
+        }
+
+        $array = $this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']['CPV_ADDITIONAL'];
+
         return count(array_filter(array_keys($array), 'is_string')) === 0;
     }
 

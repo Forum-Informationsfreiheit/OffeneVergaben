@@ -107,6 +107,19 @@ class Process implements ShouldQueue
             $validationError = true;
         }
 
+        if ($data->objectContract->additionalCpvs) {
+            $uniqueAdditionalCpvs = array_unique($data->objectContract->additionalCpvs);
+            $checkAddCpvs = CPV::whereIn('code',$data->objectContract->additionalCpvs)->get()->pluck('code')->all();
+
+            // Check if we could find all referenced in db, otherwise error
+            if (count($uniqueAdditionalCpvs) != count($checkAddCpvs)) {
+                dump('Failed validation for datasource (id:'.$source->id.') to db.');
+                dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
+                dump('At least one unknown additional cpv code.',$data->objectContract->additionalCpvs);
+                $validationError = true;
+            }
+        }
+
         if ($validationError) {
             return;
         }
@@ -137,8 +150,23 @@ class Process implements ShouldQueue
             $dataset->title = $data->objectContract->title;
             $dataset->description = $data->objectContract->description;
 
-
             $dataset->save();
+
+            // handle (additional) cpvs
+            $dataset->cpvs()->attach($dataset->cpv_code,['main' => 1]);
+
+            if ($data->objectContract->additionalCpvs) {
+                // make sure we only store unique additional cpv codes
+                // they have to be different from the main cpv code (which is already stored at this point)
+                $additionalCpvsFiltered = array_filter(array_unique($data->objectContract->additionalCpvs),
+                    function($elem) use($dataset) {
+                        return $elem != $dataset->cpv_code;
+                    });
+
+                foreach($additionalCpvsFiltered as $additionalCpv) {
+                    $dataset->cpvs()->attach($additionalCpv,['main' => 0]);
+                }
+            }
 
             // Handle main offeror
             $offeror = new Offeror();
