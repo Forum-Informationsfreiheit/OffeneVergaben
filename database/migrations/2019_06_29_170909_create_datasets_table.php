@@ -37,6 +37,12 @@ class CreateDatasetsTable extends Migration
             $table->string('title',1000)->nullable();
             $table->text('description')->nullable();
 
+            $table->date('date_start')->nullable();
+            $table->date('date_end')->nullable();
+            $table->unsignedInteger('duration')->nullable();
+
+            $table->boolean('is_lot')->nullable();
+
             $table->timestamps();
         });
     }

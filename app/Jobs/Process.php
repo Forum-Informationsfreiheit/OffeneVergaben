@@ -51,10 +51,12 @@ class Process implements ShouldQueue
         // TODO use block sized reading/writing of data (so we dont run into memory issues)
 
         // Get only unprocessed data sources
+        // TODO improve, this doesn't handle old unprocessed versions, only the current scraped one
         $sources = Datasource::unprocessed()->get();
 
-        //$sources = Datasource::where('id',1809)->get();  --> with contracting bodies
-        //$sources = Datasource::where('id',1344)->get();  --> FEHLER, falscher NUTS CODE
+        //$sources = Datasource::where('id',1809)->get(); // --> with contracting bodies
+        //$sources = Datasource::where('id',1344)->get(); // --> FEHLER, falscher NUTS CODE
+        //$sources = Datasource::where('id',155)->get(); //  --> DURATION missing data ????
 
         dump($sources->count());
 
@@ -62,7 +64,14 @@ class Process implements ShouldQueue
         $idx = 0;
 
         foreach($sources as $source) {
-            $this->processDataSource($source);
+            $content = $source->content;
+//dump($content);
+            $this->preProcessor->preProcess($content);
+
+            $data = $this->preProcessor->getData();
+//dump($data);
+            // todo temp deactivated
+            $this->process($source,$data);
 
             if (++$idx >= $stopAt) {
                 //break;
@@ -72,13 +81,7 @@ class Process implements ShouldQueue
         dd('Exit Processing');
     }
 
-    protected function processDataSource($source) {
-
-        $content = $source->content;
-
-        $this->preProcessor->preProcess($content);
-
-        $data = $this->preProcessor->getData();
+    protected function process($source,$data) {
 
         // Validate foreign key values before attempting to write
         $validationError = false;
@@ -104,6 +107,13 @@ class Process implements ShouldQueue
             dump('Failed validation for datasource (id:'.$source->id.') to db.');
             dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
             dump('Both Document Flags (RESTRICTED&FULL) set instead of one or none');
+            $validationError = true;
+        }
+
+        if ($data->objectContract->lot && $data->objectContract->noLot) {
+            dump('Failed validation for datasource (id:'.$source->id.') to db.');
+            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
+            dump('Both LOT Flags (LOT_DIVISION&NO_LOT_DIVISION) set instead of one or none');
             $validationError = true;
         }
 
@@ -149,6 +159,11 @@ class Process implements ShouldQueue
             $dataset->contract_type = $data->objectContract->type;
             $dataset->title = $data->objectContract->title;
             $dataset->description = $data->objectContract->description;
+            $dataset->date_start = $data->objectContract->dateStart;
+            $dataset->date_end = $data->objectContract->dateEnd;
+            $dataset->duration = $data->objectContract->duration;
+
+            $dataset->is_lot = $data->objectContract->lot ? 1 : ($data->objectContract->noLot ? 0 : null);
 
             $dataset->save();
 

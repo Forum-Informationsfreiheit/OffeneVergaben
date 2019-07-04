@@ -8,11 +8,15 @@
 namespace App;
 
 
+use Carbon\Carbon;
+
 class DataSourcePreProcessor
 {
     protected $xmlString;
 
     protected $simpleXmlArrayData;
+
+    protected $simpleXmlParsedData;
 
     // data
     protected $data;
@@ -22,7 +26,8 @@ class DataSourcePreProcessor
 
     public function preProcess($xmlString) {
         $this->xmlString = $xmlString;
-        $this->simpleXmlArrayData = $this->xmlToArray($this->xmlString);
+        $this->simpleXmlParsedData = simplexml_load_string($xmlString);
+        $this->simpleXmlArrayData = $this->xmlToArray($this->simpleXmlParsedData);
 
         $this->data = new \stdClass();
 
@@ -110,14 +115,28 @@ class DataSourcePreProcessor
 
         $oc = new \stdClass();
 
-        $oc->cpv       = $this->hasCpvMain() ? $this->getCpvMain() : null;
-        $oc->nuts      = $this->hasNutsCode() ? $this->getNutsCode() : null;
-        $oc->type      = $this->hasContractType() ? $this->getContractType() : null;
-        $oc->refNumber = $this->getField($data,'REFERENCE_NUMBER');
+        $oc->cpv         = $this->hasCpvMain() ? $this->getCpvMain() : null;
+        $oc->nuts        = $this->hasNutsCode() ? $this->getNutsCode() : null;
+        $oc->type        = $this->hasContractType() ? $this->getContractType() : null;
+        $oc->refNumber   = $this->getField($data,'REFERENCE_NUMBER');
+        $oc->title       = isset($data['TITLE']) ? $this->getMultiLineText($data,'TITLE') : null;
+        $oc->description = isset($data['SHORT_DESCR']) ? $this->getMultiLineText($data,'SHORT_DESCR') : null;
+        $oc->lot         = isset($data['LOT_DIVISION']);
+        $oc->noLot       = isset($data['NO_LOT_DIVISION']);
+
         $oc->additionalCpvs = null;
+        $oc->dateStart = null;
+        $oc->dateEnd = null;
+        $oc->duration = null;
 
         // Handle Object Description child
         if ($this->hasObjectDescription()) {
+
+            // for KD_8_1_Z3, KD_8_2_Z2 and (even though missing in schema description) KD_8_2_Z3
+            if (!$oc->description && isset($data['OBJECT_DESCR']['SHORT_DESCR'])) {
+                $oc->description = $this->getMultiLineText($data['OBJECT_DESCR'],'SHORT_DESCR');
+            }
+
             if ($this->hasAnyAdditionalCpvs()) {
                 $oc->additionalCpvs = [];
 
@@ -132,10 +151,12 @@ class DataSourcePreProcessor
                     }
                 }
             }
-        }
 
-        $oc->title = isset($data['TITLE']) ? $this->getMultiLineText($data,'TITLE') : null;
-        $oc->description = isset($data['SHORT_DESCR']) ? $this->getMultiLineText($data,'SHORT_DESCR') : null;
+            $oc->dateStart = $this->getDate($data['OBJECT_DESCR'],'DATE_START');
+            $oc->dateEnd   = $this->getDate($data['OBJECT_DESCR'],'DATE_END');
+
+            $oc->duration  = $this->getDuration();
+        }
 
         $this->data->objectContract = $oc;
     }
@@ -297,17 +318,15 @@ class DataSourcePreProcessor
         return $result;
     }
 
-    protected function xmlToArray($xmlString) {
-        // use simplexml for parsing xml document
-        $xml = simplexml_load_string($xmlString);
+    protected function xmlToArray($parsedXml) {
 
         // use json encode to transform to json
-        $json = json_encode($xml);
+        $json = json_encode($parsedXml);
 
         // use json decode to get an associative array
         $array = json_decode($json,TRUE);
 
-        $type = $xml->getName(); // e.g. "KD_8_1_Z2"
+        $type = $parsedXml->getName(); // e.g. "KD_8_1_Z2"
         // add type to result, use prefix to prevent name collision
         $array['FIF_TYPE'] = $type;
 
@@ -319,6 +338,10 @@ class DataSourcePreProcessor
 
     public function getData() {
         return $this->data;
+    }
+
+    public function getSimpleXmlArray() {
+        return $this->simpleXmlArrayData;
     }
 
     protected function getContractingBody() {
@@ -490,4 +513,62 @@ class DataSourcePreProcessor
         // or in other words if the provided array is (not) an 'associative' array
         return count(array_filter(array_keys($array), 'is_string')) === 0;
     }
+
+    protected function getDuration() {
+        if (!$this->hasObjectDescription()) {
+            return null;
+        }
+
+        $OD = $this->getObjectDescription();
+
+        if (!isset($OD['DURATION'])) {
+            return null;
+        }
+
+        // awkward... Duration seems to be the first field where the parsed array data from simple xml
+        // is insufficient. we actually need to revert back to the simple xml representation
+        // to get the type attribute of the duration field
+        $element = $this->simpleXmlParsedData->OBJECT_CONTRACT->OBJECT_DESCR->DURATION;
+
+        $value = (String)$element;
+
+        // Sanity check integer value
+        if (((String)intval($value)) != $value) {
+            dump('Possibly wrong integer value for DURATION provided',$value);
+        }
+
+        // Possibly convert value from MONTH duration type
+        if($element['TYPE']) {
+            if ($element['TYPE'] == 'MONTH') {
+                $value = intval($value) * 30;
+            } else if ($element['TYPE'] == 'DAY') {
+                $value = intval($value);
+            } else {
+                dump('Unknown type attribute provided for DURATION');
+                $value = null;
+            }
+        } else {
+            dump('No type attribute provided for DURATION');
+            $value = null;
+        }
+
+        return $value;
+    }
+
+    protected function getDate($hayStack,$needle) {
+        if (!isset($hayStack[$needle])) {
+            return null;
+        }
+
+        $date = null;
+
+        try {
+            $date = Carbon::parse($hayStack[$needle]);
+        } catch (\Exception $e) {
+            dump('Unable to parse date from provided value ',$hayStack[$needle]);
+        }
+
+        return $date;
+    }
+
 }
