@@ -53,7 +53,9 @@ class DataSourcePreProcessor
             $this->processModificationsContract();
         }
 
-
+        if ($this->hasAdditionalCoreData()) {
+            $this->processAdditionalCoreData();
+        }
     }
 
     /**
@@ -117,10 +119,10 @@ class DataSourcePreProcessor
 
         $oc->cpv         = $this->hasCpvMain() ? $this->getCpvMain() : null;
         $oc->nuts        = $this->hasNutsCode() ? $this->getNutsCode() : null;
-        $oc->type        = $this->hasContractType() ? $this->getContractType() : null;
+        $oc->type        = $this->hasTypeContract($data) ? $this->getTypeContract($data) : null;
         $oc->refNumber   = $this->getField($data,'REFERENCE_NUMBER');
-        $oc->title       = isset($data['TITLE']) ? $this->getMultiLineText($data,'TITLE') : null;
-        $oc->description = isset($data['SHORT_DESCR']) ? $this->getMultiLineText($data,'SHORT_DESCR') : null;
+        $oc->title       = $this->getMultiLineText($data,'TITLE');
+        $oc->description = $this->getMultiLineText($data,'SHORT_DESCR');
         $oc->lot         = isset($data['LOT_DIVISION']);
         $oc->noLot       = isset($data['NO_LOT_DIVISION']);
 
@@ -215,6 +217,64 @@ class DataSourcePreProcessor
         $this->data->modificationsContract = $mc;
     }
 
+    protected function processAdditionalCoreData() {
+        $data = $this->simpleXmlArrayData['ADDITIONAL_CORE_DATA'];
+
+        $acd = new \stdClass();
+        $acd->justification = $this->getMultiLineText($data,'D_JUSTIFICATION');
+        $acd->dateFirstPublication = $this->getDate($data,'DATE_FIRST_PUBLICATION');
+        $acd->dateTimeLastChange   = $this->getTimestamp($data,'DATETIME_LAST_CHANGE');
+        $acd->deadlineStandstill   = $this->getDate($data,'DEADLINE_STANDSTILL');
+        $acd->rdNotification = null;
+        $acd->nbSmeContractor = null;
+        $acd->objectContractModifications = null;
+        $acd->procedureDescription = $this->getMultiLineText($data,'PROCEDURE_SHORT_DESCRIPTION');
+        $acd->belowThreshold = isset($data['BELOWTHRESHOLD']);
+        $acd->aboveThreshold = isset($data['ABOVETHRESHOLD']);
+        $acd->urlRevocation = $this->getField($data,'URL_REVOCATION');
+        $acd->urlRevocationStatement = $this->getField($data,'URL_REVOCATION_STATEMENT');
+
+        if (isset($data['RD_NOTIFICATION'])) {
+            // at the moment of writing no exemplary data for this attribute available
+            // this is most likely a boolean FLAG, if its something else make notice
+            $acd->rdNotification = true;
+
+            if (is_array($data['RD_NOTIFICATION'])) {
+                dump('Unexpected array value for RD_NOTIFICATION');
+                dump($data['RD_NOTIFICATION']);
+            }
+
+            if (is_string($data['RD_NOTIFICATION'] && strlen(trim($data['RD_NOTIFICATION'])) > 0)) {
+                dump('Unexpected string value for RD_NOTIFICATION:'.$data['RD_NOTIFICATION']);
+            }
+        }
+
+        if (isset($data['NB_SME_CONTRACTOR'])) {
+            $nbSmeContractor = $this->getField($data,'NB_SME_CONTRACTOR');
+
+            if ($nbSmeContractor) {
+                if ($this->validatesAsInt($nbSmeContractor)) {
+                    $acd->nbSmeContractor = intval($nbSmeContractor);
+                } else {
+                    dump('Unexpected value (not an int???) for NB_SME_CONTRACTOR');
+                    dump($data['RD_NOTIFICATION']);
+                }
+            }
+        }
+
+        if (isset($data['OBJECT_CONTRACT_MODIFICATIONS'])) {
+            $ocm = new \stdClass();
+
+            $ocm->title = $this->getMultiLineText($data['OBJECT_CONTRACT_MODIFICATIONS'],'TITLE');
+            $ocm->type  = $this->hasTypeContract($data['OBJECT_CONTRACT_MODIFICATIONS']) ?
+                $this->getTypeContract($data['OBJECT_CONTRACT_MODIFICATIONS']) : null;
+
+            $acd->objectContractModifications = $ocm;
+        }
+
+        $this->data->additionalCoreData = $acd;
+    }
+
     /**
      * Retrieve a value (string) for a given $needle from the provided $hayStack
      *
@@ -223,7 +283,9 @@ class DataSourcePreProcessor
      *
      * @param array $hayStack
      * @param String $needle
-     * @return null|string
+     * @return null|string NULL if given $needle not found in haystack
+     *                     NULL if empty string
+     *
      */
     protected function getField($hayStack, $needle) {
         if (!isset($hayStack[$needle])) {
@@ -246,6 +308,7 @@ class DataSourcePreProcessor
         if (is_array($value)) {
             // missing values are interpreted as an empty array by the xml/json parse sequence
             // in the source xml string it looks like this: <TAG_NAME></TAG_NAME>
+            // or <TAG_NAME />
             if (!count($value)) {
                 return null;
 
@@ -268,6 +331,9 @@ class DataSourcePreProcessor
                 dd('Exit PreProcessor');
             }
         }
+
+        dump($value);
+        dd('what are you?');
 
         return $value;
     }
@@ -379,6 +445,13 @@ class DataSourcePreProcessor
         return isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']);
     }
 
+    protected function hasAdditionalCoreData() {
+        return isset($this->simpleXmlArrayData['ADDITIONAL_CORE_DATA']);
+    }
+    protected function getAdditionalCoreData() {
+        return $this->simpleXmlArrayData['ADDITIONAL_CORE_DATA'];
+    }
+
     protected function getCpvMain() {
         $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['CPV_MAIN']['CPV_CODE']['@attributes']['CODE'];
         $value = trim($value);
@@ -412,13 +485,27 @@ class DataSourcePreProcessor
             && isset($OC['CPV_MAIN']['CPV_CODE']['@attributes']['CODE']);
     }
 
-    protected function getContractType() {
-        $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['TYPE_CONTRACT']['@attributes']['CTYPE'];
+    protected function hasTypeContract($hayStack) {
+        if (!isset($hayStack['TYPE_CONTRACT'])) {
+            return false;
+        }
+
+        return isset($hayStack['TYPE_CONTRACT']['@attributes'])
+            && isset($hayStack['TYPE_CONTRACT']['@attributes']['CTYPE']);
+    }
+
+    protected function getTypeContract($hayStack) {
+        $value = $hayStack['TYPE_CONTRACT']['@attributes']['CTYPE'];
         $value = trim($value);
         return strlen($value) === 0 ? null : $value;
     }
 
-    protected function hasContractType() {
+    protected function getContractTypeOLD() {
+        $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['TYPE_CONTRACT']['@attributes']['CTYPE'];
+        $value = trim($value);
+        return strlen($value) === 0 ? null : $value;
+    }
+    protected function hasContractTypeOLD() {
         if (!$this->hasObjectContract()) {
             return false;
         }
@@ -555,6 +642,11 @@ class DataSourcePreProcessor
         return $value;
     }
 
+    protected function getTimestamp($hayStack,$needle) {
+        // carbon parses both...
+        return $this->getDate($hayStack,$needle);
+    }
+
     protected function getDate($hayStack,$needle) {
         if (!isset($hayStack[$needle])) {
             return null;
@@ -571,4 +663,8 @@ class DataSourcePreProcessor
         return $date;
     }
 
+    protected function validatesAsInt($number) {
+        $number = filter_var($number, FILTER_VALIDATE_INT);
+        return ($number !== FALSE);
+    }
 }

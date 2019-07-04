@@ -47,7 +47,6 @@ class Process implements ShouldQueue
      */
     public function handle()
     {
-
         // TODO use block sized reading/writing of data (so we dont run into memory issues)
 
         // Get only unprocessed data sources
@@ -117,6 +116,14 @@ class Process implements ShouldQueue
             $validationError = true;
         }
 
+        if ($data->additionalCoreData && $data->additionalCoreData->belowThreshold
+                && $data->additionalCoreData->aboveThreshold) {
+            dump('Failed validation for datasource (id:'.$source->id.') to db.');
+            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
+            dump('Both THRESHOLD Flags (ABOVE&BELOW) set instead of one or none');
+            $validationError = true;
+        }
+
         if ($data->objectContract->additionalCpvs) {
             $uniqueAdditionalCpvs = array_unique($data->objectContract->additionalCpvs);
             $checkAddCpvs = CPV::whereIn('code',$data->objectContract->additionalCpvs)->get()->pluck('code')->all();
@@ -164,6 +171,28 @@ class Process implements ShouldQueue
             $dataset->duration = $data->objectContract->duration;
 
             $dataset->is_lot = $data->objectContract->lot ? 1 : ($data->objectContract->noLot ? 0 : null);
+
+            // ADDITIONAL CORE DATA
+            if ($data->additionalCoreData) {
+                $dataset->justification = $data->additionalCoreData->justification;
+                $dataset->date_first_publication = $data->additionalCoreData->dateFirstPublication;
+                $dataset->datetime_last_change = $data->additionalCoreData->dateTimeLastChange;
+                $dataset->deadline_standstill = $data->additionalCoreData->deadlineStandstill;
+                $dataset->rd_notification = $data->additionalCoreData->rdNotification;
+                $dataset->nb_sme_contractor = $data->additionalCoreData->nbSmeContractor;
+
+                if ($data->additionalCoreData->objectContractModifications) {
+                    $dataset->ocm_title = $data->additionalCoreData->objectContractModifications->title;
+                    $dataset->ocm_contract_type = $data->additionalCoreData->objectContractModifications->type;
+                }
+
+                $dataset->nb_sme_contractor = $data->additionalCoreData->nbSmeContractor;
+                $dataset->procedure_description = $data->additionalCoreData->procedureDescription;
+                $dataset->threshold = $data->additionalCoreData->aboveThreshold ? 1 :
+                    ($data->additionalCoreData->belowThreshold ? 0 : null);
+                $dataset->url_revocation = $data->additionalCoreData->urlRevocation;
+                $dataset->url_revocation_statement = $data->additionalCoreData->urlRevocationStatement;
+            }
 
             $dataset->save();
 

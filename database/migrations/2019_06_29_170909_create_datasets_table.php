@@ -43,6 +43,20 @@ class CreateDatasetsTable extends Migration
 
             $table->boolean('is_lot')->nullable();
 
+            // additional core data
+            $table->text('justification')->nullable();
+            $table->date('date_first_publication')->nullable();
+            $table->timestamp('datetime_last_change')->nullable();
+            $table->date('deadline_standstill')->nullable();
+            $table->boolean('rd_notification')->nullable();
+            $table->unsignedInteger('nb_sme_contractor')->nullable();
+            $table->string('ocm_title',1000)->nullable();
+            $table->string('ocm_contract_type',100)->nullable();
+            $table->text('procedure_description')->nullable();
+            $table->boolean('threshold')->nullable();
+            $table->string('url_revocation',500)->nullable();
+            $table->string('url_revocation_statement',500)->nullable();
+
             $table->timestamps();
         });
     }
