@@ -26,6 +26,8 @@ class CreateDatasourcesTable extends Migration
             $table->timestamps();
 
             $table->foreign('origin_id')->references('id')->on('origins')->onDelete('cascade');
+
+            $table->unique(['origin_id','reference_id']);
         });
     }
 

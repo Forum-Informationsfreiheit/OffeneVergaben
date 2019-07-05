@@ -19,7 +19,8 @@ class CreateDatasetsTable extends Migration
             $table->unsignedInteger('datasource_id');
             $table->foreign('datasource_id')->references('id')->on('datasources')->onDelete('cascade');
             $table->unsignedInteger('version');
-            $table->unique(['datasource_id','version']);
+            $table->unsignedBigInteger('result_id')->nullable();
+            $table->foreign('result_id')->references('id')->on('scraper_results')->onDelete('set null');
 
             $table->string('type_code')->length(15)->nullable();
             $table->foreign('type_code')->references('code')->on('dataset_types')->onDelete('set null');
@@ -56,6 +57,8 @@ class CreateDatasetsTable extends Migration
             $table->boolean('threshold')->nullable();
             $table->string('url_revocation',500)->nullable();
             $table->string('url_revocation_statement',500)->nullable();
+
+            $table->unique(['datasource_id','version']);
 
             $table->timestamps();
         });

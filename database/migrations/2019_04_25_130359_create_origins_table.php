@@ -21,6 +21,8 @@ class CreateOriginsTable extends Migration
             $table->timestamp('last_scraped_at')->nullable();
             $table->timestamps();
             $table->timestamp('deleted_at')->nullable();
+
+            $table->unique('reference_id');
         });
     }
 

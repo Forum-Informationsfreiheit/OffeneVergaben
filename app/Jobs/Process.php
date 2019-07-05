@@ -27,6 +27,10 @@ class Process implements ShouldQueue
 
     protected $preProcessor;
 
+    protected $recordIds;
+
+    protected $touchedDatasources = [];
+
     /**
      * Create a new job instance.
      *
@@ -38,6 +42,8 @@ class Process implements ShouldQueue
         $this->timestamp = Carbon::now();
 
         $this->preProcessor = new DataSourcePreProcessor();
+
+        $this->recordIds = $this->getRecordIds();
     }
 
     /**
@@ -47,40 +53,41 @@ class Process implements ShouldQueue
      */
     public function handle()
     {
-        // TODO use block sized reading/writing of data (so we dont run into memory issues)
+        dump(count($this->recordIds)." to be processed...");
 
-        // Get only unprocessed data sources
-        // TODO improve, this doesn't handle old unprocessed versions, only the current scraped one
-        $sources = Datasource::unprocessed()->get();
+        // Use "block sized" processing to prevent any kind of memory issues
+        $blockSize = 200;
+        $index = 0;
+        $records = $this->getRecords(0, $blockSize);
 
-        //$sources = Datasource::where('id',1809)->get(); // --> with contracting bodies
-        //$sources = Datasource::where('id',1344)->get(); // --> FEHLER, falscher NUTS CODE
-        //$sources = Datasource::where('id',155)->get(); //  --> DURATION missing data ????
+        while(count($records) > 0) {
+            dump("processing blocked records, index:$index, records:".(count($records)));
 
-        dump($sources->count());
+            foreach($records as $record) {
+                // preprocess source xml
+                $this->preProcessor->preProcess($record->content);
 
-        $stopAt = 100;
-        $idx = 0;
-
-        foreach($sources as $source) {
-            $content = $source->content;
-//dump($content);
-            $this->preProcessor->preProcess($content);
-
-            $data = $this->preProcessor->getData();
-//dump($data);
-            // todo temp deactivated
-            $this->process($source,$data);
-
-            if (++$idx >= $stopAt) {
-                //break;
+                // actually do some processing
+                $data = $this->preProcessor->getData();
+                $this->process($record,$data);
             }
+
+            // prepare for next iteration
+            $index += count($records);
+            $records = $this->getRecords($index, $blockSize);
         }
 
-        dd('Exit Processing');
+        // finally do some housekeeping
+        // update the datasource table with info of the last processed version
+        dump("Finalizing...");
+        $this->updateDatasources();
     }
 
-    protected function process($source,$data) {
+    protected function process($record,$data) {
+
+        // fetch datasource for record
+        $source = Datasource::where('origin_id',$record->origin_id)
+            ->where('reference_id',$record->reference_id)->first();
 
         // Validate foreign key values before attempting to write
         $validationError = false;
@@ -149,8 +156,9 @@ class Process implements ShouldQueue
 
             // Handle root dataset
             $dataset = new Dataset();
+            $dataset->result_id = $record->id;
             $dataset->datasource_id = $source->id;
-            $dataset->version = $source->version_scraped;
+            $dataset->version = $record->version;
 
             $dataset->type_code = $data->type;
 
@@ -270,6 +278,11 @@ class Process implements ShouldQueue
 
             DB::commit();
 
+            // keep the information which datasources we processed
+            if (!isset($this->touchedDatasources[$source->id])) {
+                $this->touchedDatasources[$source->id] = 1;
+            }
+
         } catch(\Exception $ex) {
             Log::error($ex->getCode() . ' ' . $ex->getMessage());
             Log::error($ex->getTraceAsString());
@@ -280,5 +293,75 @@ class Process implements ShouldQueue
 
             DB::rollBack();
         }
+    }
+
+    /**
+     * Set the highest processed version on the datasource objects
+     */
+    protected function updateDatasources() {
+
+        $ids = array_keys($this->touchedDatasources);
+
+        foreach($ids as $id) {
+
+            // get the highest version number of processed datasets for a given datasource
+            $query = DB::table('datasets')
+                ->where('datasource_id',$id);
+
+            $version = $query->max('version');
+
+            // set the maximum version as the current version
+            $datasource = Datasource::find($id);
+            $datasource->version = $version;
+            $datasource->save();
+        }
+    }
+
+    /**
+     * Default: Get Record Ids of All Unprocessed records
+     *          (= no processed dataset exists for a given record id)
+     *
+     * Future:  NOT YET IMPLEMENTED
+     *          Handle parameterized record ids,
+     *          e.g. only process a single provided id, or a given array of ids
+     */
+    protected function getRecordIds() {
+
+        $getAllUnprocessedRecords = true;       // TODO parameterized ids
+
+        if ($getAllUnprocessedRecords) {
+            $query = DB::table('scraper_results AS res')
+                ->select('res.id as id')
+                ->leftJoin('datasets', 'res.id', '=', 'datasets.result_id')
+                ->where('datasets.id','=',null)
+                ->orderBy('res.id','asc');
+
+            return $query->pluck('id')->toArray();
+        }
+
+        return [];
+    }
+
+    public function getRecords($offset = null, $limit = null) {
+
+        $ids = array_slice($this->recordIds,$offset,$limit);
+
+        // get scraper results
+        // where no processed dataset exists
+
+        $select = [
+            'res.id','res.parent_reference_id','o.id as origin_id',
+            'res.reference_id', 'res.version','res.content'
+        ];
+
+        $query = DB::table('scraper_results AS res')
+            ->select($select)
+            ->join('origins AS o','res.parent_reference_id', '=', 'o.reference_id')
+            ->whereIn('res.id',$ids)
+            ->orderBy('res.id','asc');
+
+        $result = $query->get();
+
+        return $result;
     }
 }
