@@ -159,6 +159,14 @@ class Process implements ShouldQueue
             $validationError = true;
         }
 
+        if ($data->modificationsContract && $data->modificationsContract->additionalNeed
+            && $data->modificationsContract->unforeseenCircumstance) {
+            dump('Failed validation for datasource (id:'.$source->id.') to db.');
+            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
+            dump('Both INFO_MODIFICATIONS text fields are set (additional_need & unforeseen_circumstance) !!');
+            $validationError = true;
+        }
+
         if ($validationError) {
             return;
         }
@@ -233,6 +241,12 @@ class Process implements ShouldQueue
 
             if ($data->modificationsContract) {
                 $dataset->cpv_code = $data->modificationsContract->cpv; // validation makes sure we don't falsely overwrite
+                $dataset->val_total_before = convert_number_to_cents($data->modificationsContract->valTotalBefore);
+                $dataset->val_total_after = convert_number_to_cents($data->modificationsContract->valTotalAfter);
+                $dataset->info_modifications = $data->modificationsContract->additionalNeed ?
+                    $data->modificationsContract->additionalNeed :
+                    ($data->modificationsContract->unforeseenCircumstance ?
+                        $data->modificationsContract->unforeseenCircumstance : null);
             }
 
             $dataset->save();

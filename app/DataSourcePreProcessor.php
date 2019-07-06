@@ -214,6 +214,11 @@ class DataSourcePreProcessor
         $mc = new \stdClass();
         $mc->cpv = $this->hasCpvMain($data['DESCRIPTION_PROCUREMENT']) ?
             $this->getCpvMain($data['DESCRIPTION_PROCUREMENT']) : null;
+        $mc->contractors = null;
+        $mc->valTotalBefore = $this->getModificationsValue('VAL_TOTAL_BEFORE');
+        $mc->valTotalAfter = $this->getModificationsValue('VAL_TOTAL_AFTER');
+        $mc->additionalNeed = $this->getMultiLineText($data['INFO_MODIFICATIONS'],'ADDITIONAL_NEED');
+        $mc->unforeseenCircumstance = $this->getMultiLineText($data['INFO_MODIFICATIONS'],'UNFORESEEN_CIRCUMSTANCE');
 
         if ($this->hasAnyContractor('MODIFICATIONS')) {
             $mc->contractors = [];
@@ -230,8 +235,6 @@ class DataSourcePreProcessor
 
                 $mc->contractors[] = $con;
             }
-        } else {
-            $mc->contractors = null;
         }
 
         $this->data->modificationsContract = $mc;
@@ -413,6 +416,16 @@ class DataSourcePreProcessor
         return strlen($value) === 0 ? null : $value;
     }
 
+    protected function validateCurrency($element) {
+        if ($element['CURRENCY']) {
+            $curr = $element['CURRENCY'];
+
+            if (trim($curr) !== 'EUR') {
+                dump('Unexpected Currency attribute value received for VAL_PRIZE',$curr);
+            }
+        }
+    }
+
     protected function getPrize() {
         if (!$this->hasResults()) {
             return null;
@@ -429,13 +442,7 @@ class DataSourcePreProcessor
         $value = trim((String)$element);
 
         // currency == 'EUR' ???
-        if ($element['CURRENCY']) {
-            $curr = $element['CURRENCY'];
-
-            if (trim($curr) !== 'EUR') {
-                dump('Unexpected Currency attribute value received for VAL_PRIZE',$curr);
-            }
-        }
+        $this->validateCurrency($element);
 
         return $value;
     }
@@ -457,13 +464,56 @@ class DataSourcePreProcessor
         $value = trim((String)$element);
 
         // currency == 'EUR' ???
-        if ($element['CURRENCY']) {
-            $curr = $element['CURRENCY'];
+        $this->validateCurrency($element);
 
-            if (trim($curr) !== 'EUR') {
-                dump('Unexpected Currency attribute value received for VAL_PRIZE',$curr);
-            }
+        return $value;
+    }
+
+    protected function getModificationsValueBefore() {
+        if (!$this->hasModificationsContract()) {
+            return null;
         }
+
+        $data = $this->getModificationsContract();
+
+        if (!isset($data['INFO_MODIFICATIONS']) || !isset($data['INFO_MODIFICATIONS']['VAL_TOTAL_BEFORE'])) {
+            return null;
+        }
+
+        // need to make use of simpleXmlElements to check currency
+        $element = $this->simpleXmlParsedData->MODIFICATIONS_CONTRACT
+            ->INFO_MODIFICATIONS->VAL_TOTAL_BEFORE;
+        $value = trim((String)$element);
+
+        // currency == 'EUR' ???
+        $this->validateCurrency($element);
+
+        return $value;
+    }
+
+    protected function getModificationsValue($type) {
+        if (!in_array($type,['VAL_TOTAL_BEFORE','VAL_TOTAL_AFTER'])) {
+            dump("getModificationsValue: Invalid type value!");
+            return null;
+        }
+
+        if (!$this->hasModificationsContract()) {
+            return null;
+        }
+
+        $data = $this->getModificationsContract();
+
+        if (!isset($data['INFO_MODIFICATIONS']) || !isset($data['INFO_MODIFICATIONS'][$type])) {
+            return null;
+        }
+
+        // need to make use of simpleXmlElements to check currency
+        $element = $this->simpleXmlParsedData->MODIFICATIONS_CONTRACT
+            ->INFO_MODIFICATIONS->{$type};
+        $value = trim((String)$element);
+
+        // currency == 'EUR' ???
+        $this->validateCurrency($element);
 
         return $value;
     }

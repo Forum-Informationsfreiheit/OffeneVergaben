@@ -51,6 +51,11 @@ class CreateDatasetsTable extends Migration
             $table->unsignedInteger('nb_sme_contractor')->nullable();       // <-- wird auch von acd verwendet (leicht andere bedeutung)
             $table->unsignedBigInteger('val_total')->nullable();            // <-- wird auch von acd verwendet
 
+            // modifications contract
+            $table->unsignedBigInteger('val_total_before')->nullable();
+            $table->unsignedBigInteger('val_total_after')->nullable();
+            $table->text('info_modifications')->nullable();
+
             // additional core data
             $table->text('justification')->nullable();
             $table->date('date_first_publication')->nullable();
