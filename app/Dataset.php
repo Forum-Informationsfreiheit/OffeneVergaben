@@ -11,10 +11,15 @@ class Dataset extends Model
         'date_end',
         'date_first_publication',
         'deadline_standstill',
+        'datetime_receipt_tenders',
         'datetime_last_change'
     ];
 
     public function cpvs() {
         return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code');
+    }
+
+    public function procedures() {
+        return $this->belongsToMany('App\Procedure','dataset_procedure','dataset_id','procedure_code');
     }
 }

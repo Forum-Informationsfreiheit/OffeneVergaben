@@ -41,6 +41,7 @@ class CreateDatasetsTable extends Migration
             $table->date('date_start')->nullable();
             $table->date('date_end')->nullable();
             $table->unsignedInteger('duration')->nullable();
+            $table->dateTime('datetime_receipt_tenders')->nullable();
 
             $table->boolean('is_lot')->nullable();
 
@@ -59,7 +60,7 @@ class CreateDatasetsTable extends Migration
             // additional core data
             $table->text('justification')->nullable();
             $table->date('date_first_publication')->nullable();
-            $table->timestamp('datetime_last_change')->nullable();
+            $table->dateTime('datetime_last_change')->nullable();
             $table->date('deadline_standstill')->nullable();
             $table->boolean('rd_notification')->nullable();
             $table->string('ocm_title',1000)->nullable();

@@ -42,6 +42,7 @@ class DataSourcePreProcessor
 
         $this->data->type = $this->simpleXmlArrayData[self::FIF_TYPE];
         $this->data->contractingBody = null;
+        $this->data->procedures = null;
         $this->data->objectContract = null;
         $this->data->awardContract = null;
         $this->data->modificationsContract = null;
@@ -53,6 +54,10 @@ class DataSourcePreProcessor
 
         if ($this->hasObjectContract()) {
             $this->processObjectContract();
+        }
+
+        if ($this->hasProcedure()) {
+            $this->processProcedures();
         }
 
         if ($this->hasAwardContract()) {
@@ -175,6 +180,32 @@ class DataSourcePreProcessor
         }
 
         $this->data->objectContract = $oc;
+    }
+
+    protected function processProcedures() {
+        $data = $this->getProcedure();
+
+        $p = new \stdClass();
+        $p->dateTimeReceiptTenders = $this->getTimestamp($data,'DATETIME_RECEIPT_TENDERS');
+
+        $ps = [];
+
+        if (isset($data['PT_OPEN'])) { $ps[] = 'PT_OPEN'; }
+        if (isset($data['PT_RESTRICTED'])) { $ps[] = 'PT_RESTRICTED'; }
+        if (isset($data['PT_INVITED'])) { $ps[] = 'PT_INVITED'; }
+        if (isset($data['PT_WITH_PRIOR_NOTICE'])) { $ps[] = 'PT_WITH_PRIOR_NOTICE'; }
+        if (isset($data['PT_WITHOUT_PRIOR_NOTICE'])) { $ps[] = 'PT_WITHOUT_PRIOR_NOTICE'; }
+        if (isset($data['PT_COMPETITIVE_NEGOTIATION'])) { $ps[] = 'PT_COMPETITIVE_NEGOTIATION'; }
+        if (isset($data['PT_COMPETITIVE_DIALOGUE'])) { $ps[] = 'PT_COMPETITIVE_DIALOGUE'; }
+        if (isset($data['PT_INNOVATION_PARTNERSHIP'])) { $ps[] = 'PT_INNOVATION_PARTNERSHIP'; }
+        if (isset($data['PT_SPECIAL_SERVICE'])) { $ps[] = 'PT_SPECIAL_SERVICE'; }
+        if (isset($data['PT_DIRECT'])) { $ps[] = 'PT_DIRECT'; }
+        if (isset($data['PT_IMPLEMENTATION'])) { $ps[] = 'PT_IMPLEMENTATION'; }
+        if (isset($data['DPS'])) { $ps[] = 'DPS'; }
+
+        $p->procedures = count($ps) > 0 ? $ps : null;
+
+        $this->data->procedures = $p;
     }
 
     protected function processAwardContract() {
@@ -345,6 +376,9 @@ class DataSourcePreProcessor
     }
     protected function getObjectContract() {
         return $this->simpleXmlArrayData['OBJECT_CONTRACT'];
+    }
+    protected function getProcedure() {
+        return $this->simpleXmlArrayData['PROCEDURE'];
     }
     protected function getObjectDescription() {
         return $this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR'];
@@ -589,6 +623,9 @@ class DataSourcePreProcessor
     }
     protected function hasObjectContract() {
         return isset($this->simpleXmlArrayData['OBJECT_CONTRACT']);
+    }
+    protected function hasProcedure() {
+        return isset($this->simpleXmlArrayData['PROCEDURE']);
     }
     protected function hasAwardContract() {
         return isset($this->simpleXmlArrayData['AWARD_CONTRACT']);
