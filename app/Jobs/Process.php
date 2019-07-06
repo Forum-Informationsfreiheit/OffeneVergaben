@@ -151,6 +151,14 @@ class Process implements ShouldQueue
             $validationError = true;
         }
 
+        if ($data->modificationsContract && $data->modificationsContract->cpv && $data->objectContract->cpv
+                && $data->modificationsContract->cpv != $data->objectContract->cpv) {
+            dump('Failed validation for datasource (id:'.$source->id.') to db.');
+            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
+            dump('Differing CPV Codes in OBJECT_CONTRACT and MODIFICATIONS_CONTRACT !!');
+            $validationError = true;
+        }
+
         if ($validationError) {
             return;
         }
@@ -221,6 +229,10 @@ class Process implements ShouldQueue
                 $dataset->nb_sme_tender = $data->awardContract->nbSmeTender;
                 $dataset->nb_sme_contractor = $data->awardContract->nbSmeContractor;
                 $dataset->val_total = convert_number_to_cents($data->awardContract->valTotal);
+            }
+
+            if ($data->modificationsContract) {
+                $dataset->cpv_code = $data->modificationsContract->cpv; // validation makes sure we don't falsely overwrite
             }
 
             $dataset->save();

@@ -131,7 +131,7 @@ class DataSourcePreProcessor
 
         $oc = new \stdClass();
 
-        $oc->cpv         = $this->hasCpvMain() ? $this->getCpvMain() : null;
+        $oc->cpv         = $this->hasCpvMain($data) ? $this->getCpvMain($data) : null;
         $oc->nuts        = $this->hasNutsCode() ? $this->getNutsCode() : null;
         $oc->type        = $this->hasTypeContract($data) ? $this->getTypeContract($data) : null;
         $oc->refNumber   = $this->getField($data,'REFERENCE_NUMBER');
@@ -212,6 +212,8 @@ class DataSourcePreProcessor
         $data = $this->getModificationsContract();
 
         $mc = new \stdClass();
+        $mc->cpv = $this->hasCpvMain($data['DESCRIPTION_PROCUREMENT']) ?
+            $this->getCpvMain($data['DESCRIPTION_PROCUREMENT']) : null;
 
         if ($this->hasAnyContractor('MODIFICATIONS')) {
             $mc->contractors = [];
@@ -356,8 +358,16 @@ class DataSourcePreProcessor
     protected function getAdditionalCoreData() {
         return $this->simpleXmlArrayData['ADDITIONAL_CORE_DATA'];
     }
-    protected function getCpvMain() {
-        $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['CPV_MAIN']['CPV_CODE']['@attributes']['CODE'];
+
+    /**
+     * CPV_MAIN usually to be found in OBJECT_CONTRACT
+     * but it's possible that it is in MODIFICATIONS_CONTRACT
+     *
+     * @param $hayStack
+     * @return null|string
+     */
+    protected function getCpvMain($hayStack) {
+        $value = $hayStack['CPV_MAIN']['CPV_CODE']['@attributes']['CODE'];
         $value = trim($value);
 
         return strlen($value) === 0 ? null : $value;
@@ -548,17 +558,15 @@ class DataSourcePreProcessor
         && isset($this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']);
     }
 
-    protected function hasCpvMain() {
-        if (!$this->hasObjectContract()) {
+    protected function hasCpvMain($hayStack) {
+        if (!$hayStack) {
             return false;
         }
 
-        $OC = $this->simpleXmlArrayData['OBJECT_CONTRACT'];
-
-        return isset($OC['CPV_MAIN'])
-        && isset($OC['CPV_MAIN']['CPV_CODE'])
-        && isset($OC['CPV_MAIN']['CPV_CODE']['@attributes'])
-        && isset($OC['CPV_MAIN']['CPV_CODE']['@attributes']['CODE']);
+        return isset($hayStack['CPV_MAIN'])
+            && isset($hayStack['CPV_MAIN']['CPV_CODE'])
+            && isset($hayStack['CPV_MAIN']['CPV_CODE']['@attributes'])
+            && isset($hayStack['CPV_MAIN']['CPV_CODE']['@attributes']['CODE']);
     }
 
     protected function hasTypeContract($hayStack) {
