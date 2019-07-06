@@ -84,6 +84,29 @@ Route::get('/test_nuts',function() {
 
     dd($nuts);
 });
+Route::get('/test_decimals',function() {
+    echo "String Input:".'<br>';
+    echo '100 --> '.convert_number_to_cents("100").'<br>';
+    echo '100,0 --> '.convert_number_to_cents("100,0").'<br>';
+    echo '100.0 --> '.convert_number_to_cents("100.0").'<br>';
+    echo '100,5 --> '.convert_number_to_cents("100,5").'<br>';
+    echo '100.5 --> '.convert_number_to_cents("100.5").'<br>';
+    echo '100,55 --> '.convert_number_to_cents("100,55").'<br>';
+    echo '100.55 --> '.convert_number_to_cents("100.55").'<br>';
+    echo '100,555 --> '.convert_number_to_cents("100,555").'<br>';
+    echo '100.555 --> '.convert_number_to_cents("100.555").'<br>';
+
+    echo "Integer Input:".'<br>';
+    echo '100 --> '.convert_number_to_cents(100).'<br>';
+    echo '5000 --> '.convert_number_to_cents(5000).'<br>';
+    echo '90000 --> '.convert_number_to_cents(90000).'<br>';
+
+    echo "Float Input:".'<br>';
+    echo '100.12 --> '.convert_number_to_cents(100.12).'<br>';
+    echo '100.123 --> '.convert_number_to_cents(100.123).'<br>';
+    echo '0.12345 --> '.convert_number_to_cents(0.12345).'<br>';
+
+});
 Route::get('/list_types',function() {
     $types = [];
 

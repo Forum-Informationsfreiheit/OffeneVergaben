@@ -181,6 +181,12 @@ class DataSourcePreProcessor
         $data = $this->getAwardContract();
 
         $ac = new \stdClass();
+        $ac->dateConclusionContract = $this->getDate($data['AWARDED_CONTRACT'],'DATE_CONCLUSION_CONTRACT');
+        $ac->nbSmeTender = $this->getNumber($data['AWARDED_CONTRACT'],'NB_SME_TENDER');
+        $ac->nbSmeContractor = isset($data['AWARDED_CONTRACT']['NB_SME_CONTRACTOR']);
+        $ac->nbTendersReceived = $this->getNumber($data['AWARDED_CONTRACT'],'NB_TENDERS_RECEIVED');
+        $ac->valTotal = $this->getValueTotal();
+        $ac->contractors = null;
 
         if ($this->hasAnyContractor('AWARD')) {
             $ac->contractors = [];
@@ -197,8 +203,6 @@ class DataSourcePreProcessor
 
                 $ac->contractors[] = $con;
             }
-        } else {
-            $ac->contractors = null;
         }
 
         $this->data->awardContract = $ac;
@@ -242,10 +246,10 @@ class DataSourcePreProcessor
         $data = $results['AWARDED_PRIZE'];
 
         $ap = new \stdClass();
-        $ap->winners = null;
-        $ap->nbParticipants = null;
-        $ap->nbParticipantsSme = null;
+        $ap->nbParticipants = $this->getNumber($data,'NB_PARTICIPANTS');;
+        $ap->nbParticipantsSme = $this->getNumber($data,'NB_PARTICIPANTS_SME');
         $ap->valPrize = $this->getPrize();
+        $ap->winners = null;
 
         if ($this->hasAnyWinner()) {
             $ap->winners = [];
@@ -263,26 +267,6 @@ class DataSourcePreProcessor
             }
         }
 
-        $nbParticipants = $this->getField($data,'NB_PARTICIPANTS');
-        if ($nbParticipants) {
-            if ($this->validatesAsInt($nbParticipants)) {
-                $ap->nbParticipants = intval($nbParticipants);
-            } else {
-                dump('Unexpected value (not an int???) for NB_PARTICIPANTS');
-                dump($data['NB_PARTICIPANTS']);
-            }
-        }
-
-        $nbParticipantsSme = $this->getField($data,'NB_PARTICIPANTS_SME');
-        if ($nbParticipantsSme) {
-            if ($this->validatesAsInt($nbParticipantsSme)) {
-                $ap->nbParticipantsSme = intval($nbParticipantsSme);
-            } else {
-                dump('Unexpected value (not an int???) for NB_PARTICIPANTS_SME');
-                dump($data['NB_PARTICIPANTS_SME']);
-            }
-        }
-
         $this->data->awardedPrize = $ap;
     }
 
@@ -295,7 +279,7 @@ class DataSourcePreProcessor
         $acd->dateTimeLastChange   = $this->getTimestamp($data,'DATETIME_LAST_CHANGE');
         $acd->deadlineStandstill   = $this->getDate($data,'DEADLINE_STANDSTILL');
         $acd->rdNotification = null;
-        $acd->nbSmeContractor = null;
+        $acd->nbSmeContractor = $this->getNumber($data,'NB_SME_CONTRACTOR');
         $acd->objectContractModifications = null;
         $acd->procedureDescription = $this->getMultiLineText($data,'PROCEDURE_SHORT_DESCRIPTION');
         $acd->belowThreshold = isset($data['BELOWTHRESHOLD']);
@@ -315,19 +299,6 @@ class DataSourcePreProcessor
 
             if (is_string($data['RD_NOTIFICATION'] && strlen(trim($data['RD_NOTIFICATION'])) > 0)) {
                 dump('Unexpected string value for RD_NOTIFICATION:'.$data['RD_NOTIFICATION']);
-            }
-        }
-
-        if (isset($data['NB_SME_CONTRACTOR'])) {
-            $nbSmeContractor = $this->getField($data,'NB_SME_CONTRACTOR');
-
-            if ($nbSmeContractor) {
-                if ($this->validatesAsInt($nbSmeContractor)) {
-                    $acd->nbSmeContractor = intval($nbSmeContractor);
-                } else {
-                    dump('Unexpected value (not an int???) for NB_SME_CONTRACTOR');
-                    dump($data['NB_SME_CONTRACTOR']);
-                }
             }
         }
 
@@ -406,7 +377,10 @@ class DataSourcePreProcessor
     }
 
     /**
-     * @param $hayStack   TODO why not fixed?
+     * CPV_ADDITIONAL can be present in OBJECT_CONTRACT or MODIFICATIONS_CONTRACT
+     * Therefor the containing element is parameterized: $hayStack
+     *
+     * @param $hayStack
      * @return null|string
      */
     protected function getCpvAdditional($hayStack) {
@@ -442,14 +416,35 @@ class DataSourcePreProcessor
 
         // need to make use of simpleXmlElements to check currency
         $element = $this->simpleXmlParsedData->RESULTS->AWARDED_PRIZE->VAL_PRIZE;
-        $value = (String)$element;
+        $value = trim((String)$element);
 
-        // Sanity check integer value
-        if (!$this->validatesAsInt($value)) {
-            dump('Possibly wrong integer value for VAL_PRIZE provided',$value);
-        } else {
-            $value = intval($value);
+        // currency == 'EUR' ???
+        if ($element['CURRENCY']) {
+            $curr = $element['CURRENCY'];
+
+            if (trim($curr) !== 'EUR') {
+                dump('Unexpected Currency attribute value received for VAL_PRIZE',$curr);
+            }
         }
+
+        return $value;
+    }
+
+    // TODO this is basically a duplicate of getPrize (refactor!!)
+    protected function getValueTotal() {
+        if (!$this->hasAwardContract()) {
+            return null;
+        }
+
+        $data = $this->getAwardContract();
+
+        if (!isset($data['AWARDED_CONTRACT']) || !isset($data['AWARDED_CONTRACT']['VAL_TOTAL'])) {
+            return null;
+        }
+
+        // need to make use of simpleXmlElements to check currency
+        $element = $this->simpleXmlParsedData->AWARD_CONTRACT->AWARDED_CONTRACT->VAL_TOTAL;
+        $value = trim((String)$element);
 
         // currency == 'EUR' ???
         if ($element['CURRENCY']) {
@@ -482,7 +477,7 @@ class DataSourcePreProcessor
         $value = (String)$element;
 
         // Sanity check integer value
-        if (((String)intval($value)) != $value) {
+        if (!$this->validatesAsInt($value)) {
             dump('Possibly wrong integer value for DURATION provided',$value);
         }
 
@@ -737,6 +732,23 @@ class DataSourcePreProcessor
         dd('what are you?');
 
         return $value;
+    }
+
+    protected function getNumber($hayStack, $needle) {
+        $value = $this->getField($hayStack,$needle);
+
+        if (!$value) {
+            return null;
+        }
+
+        if ($this->validatesAsInt($value)) {
+            return intval($value);
+        }
+
+        dump('Unexpected value (not an int???) for '.$needle);
+        dump($hayStack);
+
+        return null;
     }
 
     /**

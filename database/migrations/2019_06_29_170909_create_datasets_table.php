@@ -44,13 +44,19 @@ class CreateDatasetsTable extends Migration
 
             $table->boolean('is_lot')->nullable();
 
+            // award contract
+            $table->date('date_conclusion_contract')->nullable();
+            $table->unsignedInteger('nb_tenders_received')->nullable();
+            $table->unsignedInteger('nb_sme_tender')->nullable();
+            $table->unsignedInteger('nb_sme_contractor')->nullable();       // <-- wird auch von acd verwendet (leicht andere bedeutung)
+            $table->unsignedBigInteger('val_total')->nullable();            // <-- wird auch von acd verwendet
+
             // additional core data
             $table->text('justification')->nullable();
             $table->date('date_first_publication')->nullable();
             $table->timestamp('datetime_last_change')->nullable();
             $table->date('deadline_standstill')->nullable();
             $table->boolean('rd_notification')->nullable();
-            $table->unsignedInteger('nb_sme_contractor')->nullable();
             $table->string('ocm_title',1000)->nullable();
             $table->string('ocm_contract_type',100)->nullable();
             $table->text('procedure_description')->nullable();
@@ -61,7 +67,6 @@ class CreateDatasetsTable extends Migration
             // awarded prize stuff
             $table->unsignedInteger('nb_participants')->nullable();
             $table->unsignedInteger('nb_participants_sme')->nullable();
-            $table->unsignedInteger('val_prize')->nullable();
 
             $table->unique(['datasource_id','version']);
 

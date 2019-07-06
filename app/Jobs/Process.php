@@ -143,6 +143,14 @@ class Process implements ShouldQueue
             }
         }
 
+        if ($data->additionalCoreData && $data->additionalCoreData->nbSmeContractor
+                && $data->awardContract && $data->awardContract->nbSmeContractor) {
+            dump('Failed validation for datasource (id:'.$source->id.') to db.');
+            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
+            dump('Both NB_SME_CONTRACTOR attributes are set (additional core data & award contract)!!');
+            $validationError = true;
+        }
+
         if ($validationError) {
             return;
         }
@@ -204,7 +212,15 @@ class Process implements ShouldQueue
             if ($data->awardedPrize) {
                 $dataset->nb_participants = $data->awardedPrize->nbParticipants;
                 $dataset->nb_participants_sme = $data->awardedPrize->nbParticipantsSme;
-                $dataset->val_prize = $data->awardedPrize->valPrize;
+                $dataset->val_total = convert_number_to_cents($data->awardedPrize->valPrize);
+            }
+
+            if ($data->awardContract) {
+                $dataset->date_conclusion_contract = $data->awardContract->dateConclusionContract;
+                $dataset->nb_tenders_received = $data->awardContract->nbTendersReceived;
+                $dataset->nb_sme_tender = $data->awardContract->nbSmeTender;
+                $dataset->nb_sme_contractor = $data->awardContract->nbSmeContractor;
+                $dataset->val_total = convert_number_to_cents($data->awardContract->valTotal);
             }
 
             $dataset->save();
