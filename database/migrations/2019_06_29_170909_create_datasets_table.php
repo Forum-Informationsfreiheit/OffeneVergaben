@@ -58,6 +58,11 @@ class CreateDatasetsTable extends Migration
             $table->string('url_revocation',500)->nullable();
             $table->string('url_revocation_statement',500)->nullable();
 
+            // awarded prize stuff
+            $table->unsignedInteger('nb_participants')->nullable();
+            $table->unsignedInteger('nb_participants_sme')->nullable();
+            $table->unsignedInteger('val_prize')->nullable();
+
             $table->unique(['datasource_id','version']);
 
             $table->timestamps();

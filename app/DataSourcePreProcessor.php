@@ -12,16 +12,25 @@ use Carbon\Carbon;
 
 class DataSourcePreProcessor
 {
+    /**
+     * Type is stored as the name attribute of the wrapping xml
+     * Use this FIF_TYPE as key for accessing it on the output data
+     */
+    const FIF_TYPE = 'FIF_TYPE';
+
     protected $xmlString;
-
     protected $simpleXmlArrayData;
-
     protected $simpleXmlParsedData;
-
-    // data
     protected $data;
 
-    public function __construct() {
+    public function __construct() { }
+
+    public function getData() {
+        return $this->data;
+    }
+
+    public function getSimpleXmlArray() {
+        return $this->simpleXmlArrayData;
     }
 
     public function preProcess($xmlString) {
@@ -31,11 +40,12 @@ class DataSourcePreProcessor
 
         $this->data = new \stdClass();
 
-        $this->data->type = $this->simpleXmlArrayData['FIF_TYPE'];
+        $this->data->type = $this->simpleXmlArrayData[self::FIF_TYPE];
         $this->data->contractingBody = null;
         $this->data->objectContract = null;
         $this->data->awardContract = null;
         $this->data->modificationsContract = null;
+        $this->data->awardedPrize = null;
 
         if ($this->hasContractingBody()) {
             $this->processContractingBody();
@@ -51,6 +61,10 @@ class DataSourcePreProcessor
 
         if ($this->hasModificationsContract()) {
             $this->processModificationsContract();
+        }
+
+        if ($this->hasResults()) {
+            $this->processResults();
         }
 
         if ($this->hasAdditionalCoreData()) {
@@ -139,7 +153,7 @@ class DataSourcePreProcessor
                 $oc->description = $this->getMultiLineText($data['OBJECT_DESCR'],'SHORT_DESCR');
             }
 
-            if ($this->hasAnyAdditionalCpvs()) {
+            if ($this->hasAnyAdditionalCpv()) {
                 $oc->additionalCpvs = [];
 
                 $additionals = $this->hasMultipleAdditionalCpvs() ? $data['OBJECT_DESCR']['CPV_ADDITIONAL'] :
@@ -168,7 +182,7 @@ class DataSourcePreProcessor
 
         $ac = new \stdClass();
 
-        if ($this->hasAnyContractors('AWARD')) {
+        if ($this->hasAnyContractor('AWARD')) {
             $ac->contractors = [];
 
             $contractors = $this->hasMultipleContractors('AWARD') ?
@@ -195,7 +209,7 @@ class DataSourcePreProcessor
 
         $mc = new \stdClass();
 
-        if ($this->hasAnyContractors('MODIFICATIONS')) {
+        if ($this->hasAnyContractor('MODIFICATIONS')) {
             $mc->contractors = [];
 
             $contractors = $this->hasMultipleContractors('MODIFICATIONS') ?
@@ -215,6 +229,61 @@ class DataSourcePreProcessor
         }
 
         $this->data->modificationsContract = $mc;
+    }
+
+    protected function processResults() {
+        $results = $this->getResults();
+
+        // all fields are within the enclosing <AWARDED_PRIZE> node
+        if (!isset($results['AWARDED_PRIZE'])) {
+            return;
+        }
+
+        $data = $results['AWARDED_PRIZE'];
+
+        $ap = new \stdClass();
+        $ap->winners = null;
+        $ap->nbParticipants = null;
+        $ap->nbParticipantsSme = null;
+        $ap->valPrize = $this->getPrize();
+
+        if ($this->hasAnyWinner()) {
+            $ap->winners = [];
+
+            $winners = $this->hasMultipleWinners() ? $data['WINNER']['ADDRESS_WINNER'] :
+                [ $data['WINNER']['ADDRESS_WINNER'] ];
+
+            foreach($winners as $winner) {
+                $win = new \stdClass();
+
+                $win->officialName = $this->getField($winner,'OFFICIALNAME');
+                $win->nationalId   = $this->getField($winner,'NATIONALID');
+
+                $ap->winners[] = $win;
+            }
+        }
+
+        $nbParticipants = $this->getField($data,'NB_PARTICIPANTS');
+        if ($nbParticipants) {
+            if ($this->validatesAsInt($nbParticipants)) {
+                $ap->nbParticipants = intval($nbParticipants);
+            } else {
+                dump('Unexpected value (not an int???) for NB_PARTICIPANTS');
+                dump($data['NB_PARTICIPANTS']);
+            }
+        }
+
+        $nbParticipantsSme = $this->getField($data,'NB_PARTICIPANTS_SME');
+        if ($nbParticipantsSme) {
+            if ($this->validatesAsInt($nbParticipantsSme)) {
+                $ap->nbParticipantsSme = intval($nbParticipantsSme);
+            } else {
+                dump('Unexpected value (not an int???) for NB_PARTICIPANTS_SME');
+                dump($data['NB_PARTICIPANTS_SME']);
+            }
+        }
+
+        $this->data->awardedPrize = $ap;
     }
 
     protected function processAdditionalCoreData() {
@@ -257,7 +326,7 @@ class DataSourcePreProcessor
                     $acd->nbSmeContractor = intval($nbSmeContractor);
                 } else {
                     dump('Unexpected value (not an int???) for NB_SME_CONTRACTOR');
-                    dump($data['RD_NOTIFICATION']);
+                    dump($data['NB_SME_CONTRACTOR']);
                 }
             }
         }
@@ -275,6 +344,337 @@ class DataSourcePreProcessor
         $this->data->additionalCoreData = $acd;
     }
 
+    protected function xmlToArray($parsedXml) {
+
+        // use json encode to transform to json
+        $json = json_encode($parsedXml);
+
+        // use json decode to get an associative array
+        $array = json_decode($json,TRUE);
+
+        $type = $parsedXml->getName(); // e.g. "KD_8_1_Z2"
+        // add type to result, use prefix to prevent name collision
+        $array[self::FIF_TYPE] = $type;
+
+        return $array;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Getters
+    // NOTE: check for existence first! ($this->hasXYZ()))
+    // -----------------------------------------------------------------------------------------------------------------
+
+    protected function getContractingBody() {
+        return $this->simpleXmlArrayData['CONTRACTING_BODY'];
+    }
+    protected function getObjectContract() {
+        return $this->simpleXmlArrayData['OBJECT_CONTRACT'];
+    }
+    protected function getObjectDescription() {
+        return $this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR'];
+    }
+    protected function getAwardContract() {
+        return $this->simpleXmlArrayData['AWARD_CONTRACT'];
+    }
+    protected function getModificationsContract() {
+        return $this->simpleXmlArrayData['MODIFICATIONS_CONTRACT'];
+    }
+    protected function getResults() {
+        return $this->simpleXmlArrayData['RESULTS'];
+    }
+    protected function getAdditionalCoreData() {
+        return $this->simpleXmlArrayData['ADDITIONAL_CORE_DATA'];
+    }
+    protected function getCpvMain() {
+        $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['CPV_MAIN']['CPV_CODE']['@attributes']['CODE'];
+        $value = trim($value);
+
+        return strlen($value) === 0 ? null : $value;
+    }
+
+    /**
+     * TYPE_CONTRACT is an attribute from Object-Contract and Object-Contract-Modifications
+     * Therefor the containing element is parameterized: $hayStack
+     *
+     * @param $hayStack
+     * @return null|string
+     */
+    protected function getTypeContract($hayStack) {
+        $value = $hayStack['TYPE_CONTRACT']['@attributes']['CTYPE'];
+        $value = trim($value);
+        return strlen($value) === 0 ? null : $value;
+    }
+
+    /**
+     * @param $hayStack   TODO why not fixed?
+     * @return null|string
+     */
+    protected function getCpvAdditional($hayStack) {
+        if(isset($hayStack['CPV_CODE']) && isset($hayStack['CPV_CODE']['@attributes'])
+            && isset($hayStack['CPV_CODE']['@attributes']['CODE'])) {
+
+            $value = $hayStack['CPV_CODE']['@attributes']['CODE'];
+            $value = trim($value);
+
+            return strlen($value) === 0 ? null : $value;
+        }
+
+        return null;
+    }
+
+    protected function getNutsCode() {
+        $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']['NUTS']['@attributes']['CODE'];
+        $value = trim($value);
+
+        return strlen($value) === 0 ? null : $value;
+    }
+
+    protected function getPrize() {
+        if (!$this->hasResults()) {
+            return null;
+        }
+
+        $results = $this->getResults();
+
+        if (!isset($results['AWARDED_PRIZE']) || !isset($results['AWARDED_PRIZE']['VAL_PRIZE'])) {
+            return null;
+        }
+
+        // need to make use of simpleXmlElements to check currency
+        $element = $this->simpleXmlParsedData->RESULTS->AWARDED_PRIZE->VAL_PRIZE;
+        $value = (String)$element;
+
+        // Sanity check integer value
+        if (!$this->validatesAsInt($value)) {
+            dump('Possibly wrong integer value for VAL_PRIZE provided',$value);
+        } else {
+            $value = intval($value);
+        }
+
+        // currency == 'EUR' ???
+        if ($element['CURRENCY']) {
+            $curr = $element['CURRENCY'];
+
+            if (trim($curr) !== 'EUR') {
+                dump('Unexpected Currency attribute value received for VAL_PRIZE',$curr);
+            }
+        }
+
+        return $value;
+    }
+
+    protected function getDuration() {
+        if (!$this->hasObjectDescription()) {
+            return null;
+        }
+
+        $OD = $this->getObjectDescription();
+
+        if (!isset($OD['DURATION'])) {
+            return null;
+        }
+
+        // awkward... Duration seems to be the first field where the parsed array data from simple xml
+        // is insufficient. we actually need to revert back to the simple xml representation
+        // to get the type attribute of the duration field
+        $element = $this->simpleXmlParsedData->OBJECT_CONTRACT->OBJECT_DESCR->DURATION;
+
+        $value = (String)$element;
+
+        // Sanity check integer value
+        if (((String)intval($value)) != $value) {
+            dump('Possibly wrong integer value for DURATION provided',$value);
+        }
+
+        // Possibly convert value from MONTH duration type
+        if($element['TYPE']) {
+            if ($element['TYPE'] == 'MONTH') {
+                $value = intval($value) * 30;
+            } else if ($element['TYPE'] == 'DAY') {
+                $value = intval($value);
+            } else {
+                dump('Unknown type attribute provided for DURATION');
+                $value = null;
+            }
+        } else {
+            dump('No type attribute provided for DURATION');
+            $value = null;
+        }
+
+        return $value;
+    }
+
+    protected function getDate($hayStack,$needle) {
+        if (!isset($hayStack[$needle])) {
+            return null;
+        }
+
+        $date = null;
+
+        try {
+            $date = Carbon::parse($hayStack[$needle]);
+        } catch (\Exception $e) {
+            dump('Unable to parse date from provided value ',$hayStack[$needle]);
+        }
+
+        return $date;
+    }
+
+    protected function getTimestamp($hayStack,$needle) {
+        // carbon parses both...
+        return $this->getDate($hayStack,$needle);
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Existence Checks
+    // -----------------------------------------------------------------------------------------------------------------
+
+    protected function hasContractingBody() {
+        return isset($this->simpleXmlArrayData['CONTRACTING_BODY']);
+    }
+    protected function hasObjectContract() {
+        return isset($this->simpleXmlArrayData['OBJECT_CONTRACT']);
+    }
+    protected function hasAwardContract() {
+        return isset($this->simpleXmlArrayData['AWARD_CONTRACT']);
+    }
+    protected function hasModificationsContract() {
+        return isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']);
+    }
+    protected function hasResults() {
+        return isset($this->simpleXmlArrayData['RESULTS']);
+    }
+    protected function hasAdditionalCoreData() {
+        return isset($this->simpleXmlArrayData['ADDITIONAL_CORE_DATA']);
+    }
+
+    protected function hasObjectDescription() {
+        return $this->hasObjectContract()
+        && isset($this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']);
+    }
+
+    protected function hasCpvMain() {
+        if (!$this->hasObjectContract()) {
+            return false;
+        }
+
+        $OC = $this->simpleXmlArrayData['OBJECT_CONTRACT'];
+
+        return isset($OC['CPV_MAIN'])
+        && isset($OC['CPV_MAIN']['CPV_CODE'])
+        && isset($OC['CPV_MAIN']['CPV_CODE']['@attributes'])
+        && isset($OC['CPV_MAIN']['CPV_CODE']['@attributes']['CODE']);
+    }
+
+    protected function hasTypeContract($hayStack) {
+        if (!isset($hayStack['TYPE_CONTRACT'])) {
+            return false;
+        }
+
+        return isset($hayStack['TYPE_CONTRACT']['@attributes'])
+        && isset($hayStack['TYPE_CONTRACT']['@attributes']['CTYPE']);
+    }
+
+    protected function hasNutsCode() {
+        if (!$this->hasObjectContract()) {
+            return false;
+        }
+
+        $OC = $this->simpleXmlArrayData['OBJECT_CONTRACT'];
+
+        return isset($OC['OBJECT_DESCR'])
+        && isset($OC['OBJECT_DESCR']['NUTS'])
+        && isset($OC['OBJECT_DESCR']['NUTS']['@attributes'])
+        && isset($OC['OBJECT_DESCR']['NUTS']['@attributes']['CODE']);
+    }
+
+    protected function hasAnyAdditionalCpv() {
+        return $this->hasObjectDescription() && isset($this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']['CPV_ADDITIONAL']);
+    }
+
+    protected function hasAnyAdditionalContractingBodies() {
+        return $this->hasContractingBody() &&
+            isset($this->simpleXmlArrayData['CONTRACTING_BODY']['ADDRESS_CONTRACTING_BODY_ADDITIONAL']);
+    }
+
+    public function hasAnyContractor($contract) {
+        if ($contract == 'AWARD') {
+            return $this->hasAwardContract()
+            && isset($this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT'])
+            && isset($this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT']['CONTRACTOR'])
+            && isset($this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT']['CONTRACTOR']['ADDRESS_CONTRACTOR']);
+        }
+        if ($contract == 'MODIFICATIONS') {
+            return $this->hasModificationsContract()
+            && isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT'])
+            && isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT']['CONTRACTOR'])
+            && isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT']['CONTRACTOR']['ADDRESS_CONTRACTOR']);
+        }
+
+        return false;
+    }
+
+    public function hasAnyWinner() {
+        return $this->hasResults()
+            && isset($this->simpleXmlArrayData['RESULTS']['AWARDED_PRIZE'])
+            && isset($this->simpleXmlArrayData['RESULTS']['AWARDED_PRIZE']['WINNER'])
+            && isset($this->simpleXmlArrayData['RESULTS']['AWARDED_PRIZE']['WINNER']['ADDRESS_WINNER']);
+    }
+
+    protected function hasMultipleAdditionalContractingBodies() {
+        if (!$this->hasAnyAdditionalContractingBodies()) {
+            return false;
+        }
+
+        $array = $this->simpleXmlArrayData['CONTRACTING_BODY']['ADDRESS_CONTRACTING_BODY_ADDITIONAL'];
+
+        // this is actually a test if the provided array contains numerical or string keys
+        // or in other words if the provided array is (not) an 'associative' array
+        return count(array_filter(array_keys($array), 'is_string')) === 0;
+    }
+
+    protected function hasMultipleAdditionalCpvs() {
+        if (!$this->hasAnyAdditionalCpv()) {
+            return false;
+        }
+
+        $array = $this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']['CPV_ADDITIONAL'];
+
+        return count(array_filter(array_keys($array), 'is_string')) === 0;
+    }
+
+    public function hasMultipleWinners() {
+        if (!$this->hasAnyWinner()) {
+            return false;
+        }
+
+        $array = $this->simpleXmlArrayData['RESULTS']['AWARDED_PRIZE']['WINNER']['ADDRESS_WINNER'];
+
+        return count(array_filter(array_keys($array), 'is_string')) === 0;
+    }
+
+    protected function hasMultipleContractors($contract) {
+        if (!$this->hasAnyContractor($contract)) {
+            return false;
+        }
+
+        if ($contract == 'AWARD') {
+            $array = $this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT']['CONTRACTOR']['ADDRESS_CONTRACTOR'];
+        } else if ($contract == 'MODIFICATIONS') {
+            $array = $this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT']['CONTRACTOR']['ADDRESS_CONTRACTOR'];
+        } else {
+            return false;
+        }
+
+        // this is actually a test if the provided array contains numerical or string keys
+        // or in other words if the provided array is (not) an 'associative' array
+        return count(array_filter(array_keys($array), 'is_string')) === 0;
+    }
+
+    // -----------------------------------------------------------------------------------------------------------------
+    // Utilities
+    // -----------------------------------------------------------------------------------------------------------------
+
     /**
      * Retrieve a value (string) for a given $needle from the provided $hayStack
      *
@@ -285,6 +685,7 @@ class DataSourcePreProcessor
      * @param String $needle
      * @return null|string NULL if given $needle not found in haystack
      *                     NULL if empty string
+     *                     String otherwise
      *
      */
     protected function getField($hayStack, $needle) {
@@ -312,9 +713,9 @@ class DataSourcePreProcessor
             if (!count($value)) {
                 return null;
 
-            // but if the source tag was something like <TAG_NAME>   </TAG_NAME>
-            // then this results in an array with 3 spaces as a value: ['   ']
-            // not useful --> return null
+                // but if the source tag was something like <TAG_NAME>   </TAG_NAME>
+                // then this results in an array with 3 spaces as a value: ['   ']
+                // not useful --> return null
             } else if(count($value) === 1) {
                 $val = trim($value[0]);
                 if (strlen($val) === 0) {
@@ -332,7 +733,7 @@ class DataSourcePreProcessor
             }
         }
 
-        dump($value);
+        dump($hayStack,$value);
         dd('what are you?');
 
         return $value;
@@ -384,285 +785,12 @@ class DataSourcePreProcessor
         return $result;
     }
 
-    protected function xmlToArray($parsedXml) {
-
-        // use json encode to transform to json
-        $json = json_encode($parsedXml);
-
-        // use json decode to get an associative array
-        $array = json_decode($json,TRUE);
-
-        $type = $parsedXml->getName(); // e.g. "KD_8_1_Z2"
-        // add type to result, use prefix to prevent name collision
-        $array['FIF_TYPE'] = $type;
-
-        return $array;
-    }
-
-
-    // GETTERS / UTILITIES
-
-    public function getData() {
-        return $this->data;
-    }
-
-    public function getSimpleXmlArray() {
-        return $this->simpleXmlArrayData;
-    }
-
-    protected function getContractingBody() {
-        return $this->simpleXmlArrayData['CONTRACTING_BODY'];
-    }
-    protected function hasContractingBody() {
-        return isset($this->simpleXmlArrayData['CONTRACTING_BODY']);
-    }
-
-    protected function getObjectContract() {
-        return $this->simpleXmlArrayData['OBJECT_CONTRACT'];
-    }
-    protected function hasObjectContract() {
-        return isset($this->simpleXmlArrayData['OBJECT_CONTRACT']);
-    }
-
-    protected function getObjectDescription() {
-        return $this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR'];
-    }
-    protected function hasObjectDescription() {
-        return $this->hasObjectContract() && isset($this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']);
-    }
-
-    protected function getAwardContract() {
-        return $this->simpleXmlArrayData['AWARD_CONTRACT'];
-    }
-    protected function hasAwardContract() {
-        return isset($this->simpleXmlArrayData['AWARD_CONTRACT']);
-    }
-
-    protected function getModificationsContract() {
-        return $this->simpleXmlArrayData['MODIFICATIONS_CONTRACT'];
-    }
-    protected function hasModificationsContract() {
-        return isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']);
-    }
-
-    protected function hasAdditionalCoreData() {
-        return isset($this->simpleXmlArrayData['ADDITIONAL_CORE_DATA']);
-    }
-    protected function getAdditionalCoreData() {
-        return $this->simpleXmlArrayData['ADDITIONAL_CORE_DATA'];
-    }
-
-    protected function getCpvMain() {
-        $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['CPV_MAIN']['CPV_CODE']['@attributes']['CODE'];
-        $value = trim($value);
-
-        return strlen($value) === 0 ? null : $value;
-    }
-
-    protected function getCpvAdditional($hayStack) {
-        if(isset($hayStack['CPV_CODE']) && isset($hayStack['CPV_CODE']['@attributes'])
-              && isset($hayStack['CPV_CODE']['@attributes']['CODE'])) {
-
-            $value = $hayStack['CPV_CODE']['@attributes']['CODE'];
-            $value = trim($value);
-
-            return strlen($value) === 0 ? null : $value;
-        }
-
-        return null;
-    }
-
-    protected function hasCpvMain() {
-        if (!$this->hasObjectContract()) {
-            return false;
-        }
-
-        $OC = $this->simpleXmlArrayData['OBJECT_CONTRACT'];
-
-        return isset($OC['CPV_MAIN'])
-            && isset($OC['CPV_MAIN']['CPV_CODE'])
-            && isset($OC['CPV_MAIN']['CPV_CODE']['@attributes'])
-            && isset($OC['CPV_MAIN']['CPV_CODE']['@attributes']['CODE']);
-    }
-
-    protected function hasTypeContract($hayStack) {
-        if (!isset($hayStack['TYPE_CONTRACT'])) {
-            return false;
-        }
-
-        return isset($hayStack['TYPE_CONTRACT']['@attributes'])
-            && isset($hayStack['TYPE_CONTRACT']['@attributes']['CTYPE']);
-    }
-
-    protected function getTypeContract($hayStack) {
-        $value = $hayStack['TYPE_CONTRACT']['@attributes']['CTYPE'];
-        $value = trim($value);
-        return strlen($value) === 0 ? null : $value;
-    }
-
-    protected function getContractTypeOLD() {
-        $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['TYPE_CONTRACT']['@attributes']['CTYPE'];
-        $value = trim($value);
-        return strlen($value) === 0 ? null : $value;
-    }
-    protected function hasContractTypeOLD() {
-        if (!$this->hasObjectContract()) {
-            return false;
-        }
-
-        $OC = $this->simpleXmlArrayData['OBJECT_CONTRACT'];
-
-        return isset($OC['TYPE_CONTRACT'])
-            && isset($OC['TYPE_CONTRACT']['@attributes'])
-            && isset($OC['TYPE_CONTRACT']['@attributes']['CTYPE']);
-    }
-
-    protected function getNutsCode() {
-        $value = $this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']['NUTS']['@attributes']['CODE'];
-        $value = trim($value);
-
-        return strlen($value) === 0 ? null : $value;
-    }
-
-    protected function hasNutsCode() {
-        if (!$this->hasObjectContract()) {
-            return false;
-        }
-
-        $OC = $this->simpleXmlArrayData['OBJECT_CONTRACT'];
-
-        return isset($OC['OBJECT_DESCR'])
-            && isset($OC['OBJECT_DESCR']['NUTS'])
-            && isset($OC['OBJECT_DESCR']['NUTS']['@attributes'])
-            && isset($OC['OBJECT_DESCR']['NUTS']['@attributes']['CODE']);
-    }
-
-    protected function hasAnyAdditionalCpvs() {
-        return $this->hasObjectDescription() && isset($this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']['CPV_ADDITIONAL']);
-    }
-
-    public function hasAnyAdditionalContractingBodies() {
-        return $this->hasContractingBody() &&
-        isset($this->simpleXmlArrayData['CONTRACTING_BODY']['ADDRESS_CONTRACTING_BODY_ADDITIONAL']);
-    }
-    protected function hasMultipleAdditionalContractingBodies() {
-        if (!$this->hasAnyAdditionalContractingBodies()) {
-            return false;
-        }
-
-        $array = $this->simpleXmlArrayData['CONTRACTING_BODY']['ADDRESS_CONTRACTING_BODY_ADDITIONAL'];
-
-        // this is actually a test if the provided array contains numerical or string keys
-        // or in other words if the provided array is (not) an 'associative' array
-        return count(array_filter(array_keys($array), 'is_string')) === 0;
-    }
-    protected function hasMultipleAdditionalCpvs() {
-        if (!$this->hasAnyAdditionalCpvs()) {
-            return false;
-        }
-
-        $array = $this->simpleXmlArrayData['OBJECT_CONTRACT']['OBJECT_DESCR']['CPV_ADDITIONAL'];
-
-        return count(array_filter(array_keys($array), 'is_string')) === 0;
-    }
-
-    public function hasAnyContractors($contract) {
-        if ($contract == 'AWARD') {
-            return $this->hasAwardContract()
-                && isset($this->simpleXmlArrayData['AWARD_CONTRACT'])
-                && isset($this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT'])
-                && isset($this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT']['CONTRACTOR'])
-                && isset($this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT']['CONTRACTOR']['ADDRESS_CONTRACTOR']);
-        }
-        if ($contract == 'MODIFICATIONS') {
-            return $this->hasModificationsContract()
-                && isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT'])
-                && isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT'])
-                && isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT']['CONTRACTOR'])
-                && isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT']['CONTRACTOR']['ADDRESS_CONTRACTOR']);
-        }
-
-        return false;
-    }
-
-    protected function hasMultipleContractors($contract) {
-        if (!$this->hasAnyContractors($contract)) {
-            return false;
-        }
-
-        if ($contract == 'AWARD') {
-            $array = $this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT']['CONTRACTOR']['ADDRESS_CONTRACTOR'];
-        } else if ($contract == 'MODIFICATIONS') {
-            $array = $this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT']['CONTRACTOR']['ADDRESS_CONTRACTOR'];
-        }
-
-        // this is actually a test if the provided array contains numerical or string keys
-        // or in other words if the provided array is (not) an 'associative' array
-        return count(array_filter(array_keys($array), 'is_string')) === 0;
-    }
-
-    protected function getDuration() {
-        if (!$this->hasObjectDescription()) {
-            return null;
-        }
-
-        $OD = $this->getObjectDescription();
-
-        if (!isset($OD['DURATION'])) {
-            return null;
-        }
-
-        // awkward... Duration seems to be the first field where the parsed array data from simple xml
-        // is insufficient. we actually need to revert back to the simple xml representation
-        // to get the type attribute of the duration field
-        $element = $this->simpleXmlParsedData->OBJECT_CONTRACT->OBJECT_DESCR->DURATION;
-
-        $value = (String)$element;
-
-        // Sanity check integer value
-        if (((String)intval($value)) != $value) {
-            dump('Possibly wrong integer value for DURATION provided',$value);
-        }
-
-        // Possibly convert value from MONTH duration type
-        if($element['TYPE']) {
-            if ($element['TYPE'] == 'MONTH') {
-                $value = intval($value) * 30;
-            } else if ($element['TYPE'] == 'DAY') {
-                $value = intval($value);
-            } else {
-                dump('Unknown type attribute provided for DURATION');
-                $value = null;
-            }
-        } else {
-            dump('No type attribute provided for DURATION');
-            $value = null;
-        }
-
-        return $value;
-    }
-
-    protected function getTimestamp($hayStack,$needle) {
-        // carbon parses both...
-        return $this->getDate($hayStack,$needle);
-    }
-
-    protected function getDate($hayStack,$needle) {
-        if (!isset($hayStack[$needle])) {
-            return null;
-        }
-
-        $date = null;
-
-        try {
-            $date = Carbon::parse($hayStack[$needle]);
-        } catch (\Exception $e) {
-            dump('Unable to parse date from provided value ',$hayStack[$needle]);
-        }
-
-        return $date;
-    }
-
+    /**
+     * Check if a given String validates as an actual Integer
+     *
+     * @param $number
+     * @return bool
+     */
     protected function validatesAsInt($number) {
         $number = filter_var($number, FILTER_VALIDATE_INT);
         return ($number !== FALSE);

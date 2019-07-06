@@ -32,9 +32,7 @@ class Process implements ShouldQueue
     protected $touchedDatasources = [];
 
     /**
-     * Create a new job instance.
      *
-     * @return void
      */
     public function __construct()
     {
@@ -69,6 +67,7 @@ class Process implements ShouldQueue
 
                 // actually do some processing
                 $data = $this->preProcessor->getData();
+
                 $this->process($record,$data);
             }
 
@@ -202,6 +201,12 @@ class Process implements ShouldQueue
                 $dataset->url_revocation_statement = $data->additionalCoreData->urlRevocationStatement;
             }
 
+            if ($data->awardedPrize) {
+                $dataset->nb_participants = $data->awardedPrize->nbParticipants;
+                $dataset->nb_participants_sme = $data->awardedPrize->nbParticipantsSme;
+                $dataset->val_prize = $data->awardedPrize->valPrize;
+            }
+
             $dataset->save();
 
             // handle (additional) cpvs
@@ -274,7 +279,16 @@ class Process implements ShouldQueue
                     $contractor->save();
                 }
             }
-            // , and "Winners" TODO! PREPROCESSOR!!!!
+            // AWARDED PRIZE winners (=contractors)~
+            if ($data->awardedPrize && $data->awardedPrize->winners) {
+                foreach($data->awardedPrize->winners as $w) {
+                    $contractor = new Contractor();
+                    $contractor->dataset_id = $dataset->id;
+                    $contractor->national_id = $w->nationalId;
+                    $contractor->name = $w->officialName;
+                    $contractor->save();
+                }
+            }
 
             DB::commit();
 
