@@ -3,9 +3,12 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Dataset extends Model
 {
+    protected $xml;
+
     protected $casts = [
         'is_current_version' => 'boolean',
     ];
@@ -72,6 +75,19 @@ class Dataset extends Model
         }
 
         return $this->formatMoney($this->val_total_after);
+    }
+    public function getXmlAttribute() {
+        if (!$this->xml) {
+            $this->xml = DB::table('scraper_results')
+                ->select(['content'])
+                ->where('id',$this->result_id)->pluck('content')->first();
+        }
+        return $this->xml;
+    }
+    public function getOtherVersionsAttribute() {
+        $others = $this->datasource->datasets()->where('version','!=',$this->version)->orderBy('version','asc')->get();
+
+        return count($others) ? $others : null;
     }
 
     protected function formatMoney($value) {

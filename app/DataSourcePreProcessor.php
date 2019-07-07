@@ -213,12 +213,20 @@ class DataSourcePreProcessor
         $data = $this->getAwardContract();
 
         $ac = new \stdClass();
-        $ac->dateConclusionContract = $this->getDate($data['AWARDED_CONTRACT'],'DATE_CONCLUSION_CONTRACT');
-        $ac->nbSmeTender = $this->getNumber($data['AWARDED_CONTRACT'],'NB_SME_TENDER');
-        $ac->nbSmeContractor = isset($data['AWARDED_CONTRACT']['NB_SME_CONTRACTOR']);
-        $ac->nbTendersReceived = $this->getNumber($data['AWARDED_CONTRACT'],'NB_TENDERS_RECEIVED');
-        $ac->valTotal = $this->getValueTotal();
         $ac->contractors = null;
+        $ac->dateConclusionContract = null;
+        $ac->nbSmeTender            = null;
+        $ac->nbSmeContractor        = null;
+        $ac->nbTendersReceived      = null;
+        $ac->valTotal               = null;
+
+        if (isset($data['AWARDED_CONTRACT'])) {
+            $ac->dateConclusionContract = $this->getDate($data['AWARDED_CONTRACT'],'DATE_CONCLUSION_CONTRACT');
+            $ac->nbSmeTender            = $this->getNumber($data['AWARDED_CONTRACT'],'NB_SME_TENDER');
+            $ac->nbSmeContractor        = isset($data['AWARDED_CONTRACT']['NB_SME_CONTRACTOR']);
+            $ac->nbTendersReceived      = $this->getNumber($data['AWARDED_CONTRACT'],'NB_TENDERS_RECEIVED');
+            $ac->valTotal               = $this->getValueTotal();
+        }
 
         if ($this->hasAnyContractor('AWARD')) {
             $ac->contractors = [];
