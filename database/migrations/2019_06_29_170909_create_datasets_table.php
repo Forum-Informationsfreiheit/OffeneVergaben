@@ -19,6 +19,7 @@ class CreateDatasetsTable extends Migration
             $table->unsignedInteger('datasource_id');
             $table->foreign('datasource_id')->references('id')->on('datasources')->onDelete('cascade');
             $table->unsignedInteger('version');
+            $table->boolean('is_current_version')->default(0);
             $table->unsignedBigInteger('result_id')->nullable();
             $table->foreign('result_id')->references('id')->on('scraper_results')->onDelete('set null');
 

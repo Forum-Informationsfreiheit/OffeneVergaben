@@ -13,7 +13,11 @@ class Datasource extends Model
         return $this->belongsTo('App\Origin');
     }
 
+    public function datasets() {
+        return $this->hasMany('App\Dataset');
+    }
+
     public function dataset() {
-        return $this->hasOne('App\Dataset');
+        return $this->hasOne('App\Dataset')->where('is_current_version',1);
     }
 }

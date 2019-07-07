@@ -373,12 +373,20 @@ class Process implements ShouldQueue
             $query = DB::table('datasets')
                 ->where('datasource_id',$id);
 
-            $version = $query->max('version');
+            $maxVersion = $query->max('version');
 
             // set the maximum version as the current version
             $datasource = Datasource::find($id);
-            $datasource->version = $version;
+            $datasource->version = $maxVersion;
             $datasource->save();
+
+            // also store the info on the datasets itself, which one the current one is
+            // (for laravel convenience purposes)
+            $datasets = Dataset::where('datasource_id',$id)->get();
+            foreach($datasets as $dataset) {
+                $dataset->is_current_version = $dataset->version == $maxVersion;
+                $dataset->save();
+            }
         }
     }
 

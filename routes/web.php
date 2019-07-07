@@ -15,26 +15,36 @@ Route::get('/', function () {
     return view('welcome');
 });
 
-Route::get('/test_timestamp', function () {
-    $testDate = "2019-04-01T07:17:33.997";
+Route::get('/origins','EarlyBirdController@origins');
+Route::get('/datasets','EarlyBirdController@datasets');
+Route::get('/datasets/{id}','EarlyBirdController@dataset');
 
-    $original = \Carbon\Carbon::createFromTimeString($testDate);
+// TEST routes, NOT in production env available
+Route::group(['prefix' => 'test'], function () {
+    if (App::environment('production')) {
+        return;
+    }
 
-    dump($original);
+    Route::get('/timestamp', function () {
+        $testDate = "2019-04-01T07:17:33.997";
 
-    $updated = $original->addHour();
+        $original = \Carbon\Carbon::createFromTimeString($testDate);
 
-    dd($updated);
-});
+        dump($original);
 
-Route::get('/test_version', function() {
-    $res = \Illuminate\Support\Facades\DB::table('scraper_results')->where('guid','123')->max('version');
+        $updated = $original->addHour();
 
-    dd($res);
-});
+        dd($updated);
+    });
 
-Route::get('/test_xml', function() {
-    $xmlString = '<kdq xmlns="http://www.brz.gv.at/eproc/kdq/20180626">
+    Route::get('/version', function() {
+        $res = \Illuminate\Support\Facades\DB::table('scraper_results')->where('guid','123')->max('version');
+
+        dd($res);
+    });
+
+    Route::get('/xml', function() {
+        $xmlString = '<kdq xmlns="http://www.brz.gv.at/eproc/kdq/20180626">
 <header>
 <publisher>BMBWF</publisher>
 <contact-person>Vergabeadministration</contact-person>
@@ -47,96 +57,98 @@ https://extapp.noc-science.at/apex/shibb/api/vergabe/1
 </item>
 </kdq>';
 
-    $xml = simplexml_load_string($xmlString);
+        $xml = simplexml_load_string($xmlString);
 
-    // use json encode to transform to json
-    $json = json_encode($xml);
+        // use json encode to transform to json
+        $json = json_encode($xml);
 
-    // use json decode to get an associative array
-    $array = json_decode($json,TRUE);
+        // use json decode to get an associative array
+        $array = json_decode($json,TRUE);
 
-    dump($array);
+        dump($array);
 
-    dump($array['item']);
+        dump($array['item']);
 
-    dd(count($array['item']));
-});
+        dd(count($array['item']));
+    });
 
-Route::get('/test_csv',function() {
-    $data = array ('aaa,bbb,ccc,dddd',
-        '123,456,789',
-        '"aaa","bbb"');
-    $fp = fopen(storage_path('data.csv'), 'w');
-    foreach($data as $line){
-        $val = explode(",",$line);
-        fputcsv($fp, $val);
-    }
-    fclose($fp);
-});
+    Route::get('/csv',function() {
+        $data = array ('aaa,bbb,ccc,dddd',
+            '123,456,789',
+            '"aaa","bbb"');
+        $fp = fopen(storage_path('data.csv'), 'w');
+        foreach($data as $line){
+            $val = explode(",",$line);
+            fputcsv($fp, $val);
+        }
+        fclose($fp);
+    });
 
-Route::get('/test_cpv',function() {
-    $cpv = \App\CPV::find("03115100");
+    Route::get('/cpv',function() {
+        $cpv = \App\CPV::find("03115100");
 
-    dd($cpv);
-});
-Route::get('/test_nuts',function() {
-    $nuts = \App\NUTS::find("AT111");
+        dd($cpv);
+    });
+    Route::get('/nuts',function() {
+        $nuts = \App\NUTS::find("AT111");
 
-    dd($nuts);
-});
-Route::get('/test_decimals',function() {
-    echo "String Input:".'<br>';
-    echo '100 --> '.convert_number_to_cents("100").'<br>';
-    echo '100,0 --> '.convert_number_to_cents("100,0").'<br>';
-    echo '100.0 --> '.convert_number_to_cents("100.0").'<br>';
-    echo '100,5 --> '.convert_number_to_cents("100,5").'<br>';
-    echo '100.5 --> '.convert_number_to_cents("100.5").'<br>';
-    echo '100,55 --> '.convert_number_to_cents("100,55").'<br>';
-    echo '100.55 --> '.convert_number_to_cents("100.55").'<br>';
-    echo '100,555 --> '.convert_number_to_cents("100,555").'<br>';
-    echo '100.555 --> '.convert_number_to_cents("100.555").'<br>';
+        dd($nuts);
+    });
+    Route::get('/decimals',function() {
+        echo "String Input:".'<br>';
+        echo '100 --> '.convert_number_to_cents("100").'<br>';
+        echo '100,0 --> '.convert_number_to_cents("100,0").'<br>';
+        echo '100.0 --> '.convert_number_to_cents("100.0").'<br>';
+        echo '100,5 --> '.convert_number_to_cents("100,5").'<br>';
+        echo '100.5 --> '.convert_number_to_cents("100.5").'<br>';
+        echo '100,55 --> '.convert_number_to_cents("100,55").'<br>';
+        echo '100.55 --> '.convert_number_to_cents("100.55").'<br>';
+        echo '100,555 --> '.convert_number_to_cents("100,555").'<br>';
+        echo '100.555 --> '.convert_number_to_cents("100.555").'<br>';
 
-    echo "Integer Input:".'<br>';
-    echo '100 --> '.convert_number_to_cents(100).'<br>';
-    echo '5000 --> '.convert_number_to_cents(5000).'<br>';
-    echo '90000 --> '.convert_number_to_cents(90000).'<br>';
+        echo "Integer Input:".'<br>';
+        echo '100 --> '.convert_number_to_cents(100).'<br>';
+        echo '5000 --> '.convert_number_to_cents(5000).'<br>';
+        echo '90000 --> '.convert_number_to_cents(90000).'<br>';
 
-    echo "Float Input:".'<br>';
-    echo '100.12 --> '.convert_number_to_cents(100.12).'<br>';
-    echo '100.123 --> '.convert_number_to_cents(100.123).'<br>';
-    echo '0.12345 --> '.convert_number_to_cents(0.12345).'<br>';
+        echo "Float Input:".'<br>';
+        echo '100.12 --> '.convert_number_to_cents(100.12).'<br>';
+        echo '100.123 --> '.convert_number_to_cents(100.123).'<br>';
+        echo '0.12345 --> '.convert_number_to_cents(0.12345).'<br>';
 
-});
-Route::get('/list_types',function() {
-    $types = [];
+    });
+    Route::get('/types',function() {
+        $types = [];
 
-    $datasources = \App\Datasource::all();
+        $datasources = \App\Datasource::all();
 
-    foreach($datasources as $datasource) {
+        foreach($datasources as $datasource) {
 
-        // quick and dirty get xml for datasource and parse it, so we can read the type
-        $result = \Illuminate\Support\Facades\DB::table('scraper_results')
-            ->where('parent_reference_id',$datasource->origin->reference_id)
-            ->where('reference_id',$datasource->reference_id)
-            ->where('version',$datasource->version_scraped)
-            ->first();
+            // quick and dirty get xml for datasource and parse it, so we can read the type
+            $result = \Illuminate\Support\Facades\DB::table('scraper_results')
+                ->where('parent_reference_id',$datasource->origin->reference_id)
+                ->where('reference_id',$datasource->reference_id)
+                ->where('version',$datasource->version_scraped)
+                ->first();
 
-        // xml to array
-        $xml = simplexml_load_string($result->content);
-        $type = $xml->getName(); // e.g. "KD_8_1_Z2"
+            // xml to array
+            $xml = simplexml_load_string($result->content);
+            $type = $xml->getName(); // e.g. "KD_8_1_Z2"
 
-        if (!isset($types[$type])) {
-            $types[$type] = [ 'name' => $type, 'count' => 1 ];
-        } else {
-            $types[$type]['count']++;
+            if (!isset($types[$type])) {
+                $types[$type] = [ 'name' => $type, 'count' => 1 ];
+            } else {
+                $types[$type]['count']++;
+            }
+
         }
 
-    }
+        dd($types);
+    });
+    Route::get('/types',function() {
+        $types = \App\DatasetType::find("KD_7_2_Z2");
 
-    dd($types);
+        dd($types);
+    });
 });
-Route::get('/test_types',function() {
-    $types = \App\DatasetType::find("KD_7_2_Z2");
 
-    dd($types);
-});
