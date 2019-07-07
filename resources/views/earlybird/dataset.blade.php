@@ -21,7 +21,7 @@
                                 @else
                                 <ul>
                                     @foreach($value as $v)
-                                        <li>{{ $v }}</li>
+                                        <li>{!! $v !!}</li>
                                     @endforeach
                                 </ul>
                             @endif

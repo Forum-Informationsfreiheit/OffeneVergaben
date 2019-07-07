@@ -59,3 +59,17 @@ if (! function_exists('convert_number_to_cents')) {
         return intval($arr[0].$arr[1][0].$arr[1][1]);
     }
 }
+
+if (! function_exists('ui_shorten')) {
+    function ui_shorten($text, $length = 50) {
+        if (!$text) {
+            return $text;
+        }
+
+        if (strlen($text) > $length) {
+            return substr($text,0,$length) . '...';
+        } else {
+            return $text;
+        }
+    }
+}

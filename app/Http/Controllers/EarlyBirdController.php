@@ -15,14 +15,29 @@ class EarlyBirdController extends Controller
         return view('earlybird.origins',compact('origins'));
     }
 
-    public function datasets() {
-        $datasets = Dataset::current()->orderBy('val_total','desc')->get();
+    public function datasets(Request $request) {
 
-        //dd(count($sources));
+        $order = $request->has('orderBy') ? $request->input('orderBy') : 'offerors.name';
+        $direction = $request->has('desc') ? 'desc' : 'asc';
 
-        //dd($sources[0]->dataset);
+        $query = Dataset::select([
+            'datasets.*',
+            'offerors.name as offeror_name',
+            'offerors.national_id as offeror_national_id',
+        ])->join('offerors', 'datasets.id', '=', 'offerors.dataset_id');
+        $query->where('offerors.is_extra',0);
+        $query->orderBy($order,$direction);
 
-        return view('earlybird.datasets',compact('datasets'));
+        $showAll = $request->has('showAll');
+        if ($showAll) {
+            $datasets = $query->get();
+        } else {
+            $datasets = $query->paginate(200);
+        }
+
+        $paramsString = "orderBy=$order" . ($direction == "desc" ? "&desc=1" : "");
+
+        return view('earlybird.datasets',compact('datasets','showAll','paramsString'));
     }
 
     public function dataset($id, Request $request) {

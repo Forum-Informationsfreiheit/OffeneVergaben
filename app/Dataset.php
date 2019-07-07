@@ -32,6 +32,10 @@ class Dataset extends Model
         return $this->belongsTo('App\DatasetType','type_code');
     }
 
+    public function offeror() {
+        return $this->hasOne('App\Offeror')->where('is_extra',0);
+    }
+
     public function offerors() {
         return $this->hasMany('App\Offeror');
     }
