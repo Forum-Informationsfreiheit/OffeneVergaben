@@ -57,7 +57,7 @@ class DataSourcePreProcessor
         }
 
         if ($this->hasProcedure()) {
-            $this->processProcedures();
+            $this->processProcedure();
         }
 
         if ($this->hasAwardContract()) {
@@ -182,7 +182,7 @@ class DataSourcePreProcessor
         $this->data->objectContract = $oc;
     }
 
-    protected function processProcedures() {
+    protected function processProcedure() {
         $data = $this->getProcedure();
 
         $p = new \stdClass();
@@ -204,6 +204,7 @@ class DataSourcePreProcessor
         if (isset($data['DPS'])) { $ps[] = 'DPS'; }
 
         $p->procedures = count($ps) > 0 ? $ps : null;
+        $p->isFramework = isset($data['FRAMEWORK']);
 
         $this->data->procedures = $p;
     }

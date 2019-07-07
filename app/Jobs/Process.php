@@ -201,6 +201,7 @@ class Process implements ShouldQueue
             $dataset->date_end = $data->objectContract->dateEnd;
             $dataset->duration = $data->objectContract->duration;
             $dataset->datetime_receipt_tenders = $data->procedures ? $data->procedures->dateTimeReceiptTenders : null;
+            $dataset->is_framework = $data->procedures ? $data->procedures->isFramework : null;
             $dataset->is_lot = $data->objectContract->lot ? 1 : ($data->objectContract->noLot ? 0 : null);
 
             // ADDITIONAL CORE DATA

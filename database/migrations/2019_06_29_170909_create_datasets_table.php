@@ -45,6 +45,8 @@ class CreateDatasetsTable extends Migration
 
             $table->boolean('is_lot')->nullable();
 
+            $table->boolean('is_framework')->nullable();
+
             // award contract
             $table->date('date_conclusion_contract')->nullable();
             $table->unsignedInteger('nb_tenders_received')->nullable();
