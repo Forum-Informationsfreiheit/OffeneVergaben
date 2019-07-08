@@ -90,6 +90,46 @@ class Dataset extends Model
         return count($others) ? $others : null;
     }
 
+    public function getTitleFormattedAttribute() {
+        if (!$this->title) {
+            return $this->title;
+        }
+
+        return nl_to_br($this->title);
+    }
+
+    public function getDescriptionFormattedAttribute() {
+        if (!$this->description) {
+            return $this->description;
+        }
+
+        return nl_to_br($this->description);
+    }
+
+    public function getInfoModificationsFormattedAttribute() {
+        if (!$this->info_modifications) {
+            return $this->info_modifications;
+        }
+
+        return nl_to_br($this->info_modifications);
+    }
+
+    public function getJustificationFormattedAttribute() {
+        if (!$this->justification) {
+            return $this->justification;
+        }
+
+        return nl_to_br($this->justification);
+    }
+
+    public function getProcedureDescriptionFormattedAttribute() {
+        if (!$this->procedure_description) {
+            return $this->procedure_description;
+        }
+
+        return nl_to_br($this->procedure_description);
+    }
+
     protected function formatMoney($value) {
         return number_format($value / 100,2,',','.');
     }

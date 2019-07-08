@@ -9,6 +9,7 @@
             <li><a href="{{ url('/datasets?orderBy=offeror_name'.($showAll?"&showAll":"")) }}">Anbieter Name</a>&nbsp;<a href="{{ url('/datasets?orderBy=offeror_name&desc=1'.($showAll?"&showAll":"")) }}">absteigend</a></li>
             <li><a href="{{ url('/datasets?orderBy=offeror_national_id'.($showAll?"&showAll":"")) }}">Anbieter Stammzahl</a>&nbsp;<a href="{{ url('/datasets?orderBy=offeror_national_id&desc=1'.($showAll?"&showAll":"")) }}">absteigend</a></li>
             <li><a href="{{ url('/datasets?orderBy=val_total').($showAll?"&showAll":"") }}">Wert</a>&nbsp;<a href="{{ url('/datasets?orderBy=val_total&desc=1'.($showAll?"&showAll":"")) }}">absteigend</a></li>
+            <li><a href="{{ url('/datasets?orderBy=id').($showAll?"&showAll":"") }}">ID</a>&nbsp;<a href="{{ url('/datasets?orderBy=id&desc=1'.($showAll?"&showAll":"")) }}">absteigend</a></li>
         </ul>
     </div>
 

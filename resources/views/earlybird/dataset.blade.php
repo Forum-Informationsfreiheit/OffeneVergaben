@@ -23,7 +23,7 @@
                     }
                 </style>
                 <tr>
-                    <td>Andere Versionen</td>
+                    <td>Andere Versionen*</td>
                     <td class="other-versions-container">
                         <ul class="other-versions">
                             @foreach($dataset->otherVersions as $other)
@@ -58,7 +58,12 @@
             @endforeach
         </table>
         <div style="margin-top: 20px;">
-            <a href="" id="xmlToggle">XML anzeigen</a>
+            @if($showAll)
+                <a href="{{ url()->current() }}">Weniger Felder anzeigen</a>
+                @else
+                <a href="{{ url()->current().'?showAll' }}">Alle Felder anzeigen</a>
+            @endif
+            <br><a href="" id="xmlToggle">XML anzeigen</a>
             <div id="xmlOutput" style="display: none">
                 <?php dump($dataset->xml); ?>
             </div>

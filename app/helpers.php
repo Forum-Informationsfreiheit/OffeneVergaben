@@ -73,3 +73,13 @@ if (! function_exists('ui_shorten')) {
         }
     }
 }
+
+if (! function_exists('nl_to_br')) {
+    function nl_to_br($text) {
+        if (!$text) {
+            return $text;
+        }
+
+        return preg_replace("/(\r\n|\n|\r)/", "<br />", $text);
+    }
+}
