@@ -62,7 +62,7 @@ class EarlyBirdController extends Controller
             'Contractors' => $dataset->contractors->map(function($o) { return $o->toHtmlString(); })->toArray(),
             'Procedures' => $dataset->procedures->map(function($p) { return $p->name; })->toArray(),
             'URL document' => $dataset->url_document,
-            'URL is restricted' => $dataset->url_is_restricted,
+            'URL is restricted' => $this->formatBoolean($dataset->url_is_restricted),
             'URL participation' => $dataset->url_participation,
             'URL revocation' => $dataset->url_revocation,
             'URL revocation statement.' => $dataset->url_revocation_statement,
