@@ -19,7 +19,7 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Monolog\Logger;
 
-class Process implements ShouldQueue
+class Process
 {
     use Dispatchable;
 
@@ -30,6 +30,8 @@ class Process implements ShouldQueue
     protected $recordIds;
 
     protected $touchedDatasources = [];
+
+    protected $log;
 
     /**
      *
@@ -42,6 +44,8 @@ class Process implements ShouldQueue
         $this->preProcessor = new DataSourcePreProcessor();
 
         $this->recordIds = $this->getRecordIds();
+
+        $this->log = Log::channel('processor_daily');
     }
 
     /**
@@ -51,15 +55,17 @@ class Process implements ShouldQueue
      */
     public function handle()
     {
-        dump(count($this->recordIds)." to be processed...");
+        dump(             'Process ' . count($this->recordIds)." datasources");
+        $this->log->debug('Process ' . count($this->recordIds)." datasources");
 
         // Use "block sized" processing to prevent any kind of memory issues
-        $blockSize = 200;
+        $blockSize = 100;
         $index = 0;
         $records = $this->getRecords(0, $blockSize);
 
         while(count($records) > 0) {
-            dump("processing blocked records, index:$index, records:".(count($records)));
+            dump(             "Process block info: index:".($index+1).", length:".(count($records)));
+            $this->log->debug("Process block info: index:".($index+1).", length:".(count($records)));
 
             foreach($records as $record) {
                 // preprocess source xml
@@ -78,96 +84,25 @@ class Process implements ShouldQueue
 
         // finally do some housekeeping
         // update the datasource table with info of the last processed version
-        dump("Finalizing...");
-        $this->updateDatasources();
+        dump(             "Finalizing process job...");
+        $this->log->debug("Finalizing process job...");
+
+        $this->updateVersionInfo();
     }
 
+    /**
+     * MAIN processing logic.
+     *
+     * @param $record
+     * @param $data
+     */
     protected function process($record,$data) {
 
         // fetch datasource for record
         $source = Datasource::where('origin_id',$record->origin_id)
             ->where('reference_id',$record->reference_id)->first();
 
-        // Validate foreign key values before attempting to write
-        $validationError = false;
-
-        $checkCPVCode  = $data->objectContract->cpv  ? CPV::find($data->objectContract->cpv) : true;
-        $checkNUTSCode = $data->objectContract->nuts ? NUTS::find($data->objectContract->nuts) : true;
-
-        if (!$checkCPVCode) {
-            dump('Failed validation for datasource (id:'.$source->id.') to db.');
-            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
-            dump('Unknown CPV #'.$data->objectContract->cpv.'#');
-            $validationError = true;
-        }
-
-        if (!$checkNUTSCode) {
-            dump('Failed validation for datasource (id:'.$source->id.') to db.');
-            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
-            dump('Unknown NUTS #'.$data->objectContract->nuts.'#');
-            $validationError = true;
-        }
-
-        if ($data->contractingBody->urlDocumentIsRestricted && $data->contractingBody->urlDocumentIsFull) {
-            dump('Failed validation for datasource (id:'.$source->id.') to db.');
-            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
-            dump('Both Document Flags (RESTRICTED&FULL) set instead of one or none');
-            $validationError = true;
-        }
-
-        if ($data->objectContract->lot && $data->objectContract->noLot) {
-            dump('Failed validation for datasource (id:'.$source->id.') to db.');
-            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
-            dump('Both LOT Flags (LOT_DIVISION&NO_LOT_DIVISION) set instead of one or none');
-            $validationError = true;
-        }
-
-        if ($data->additionalCoreData && $data->additionalCoreData->belowThreshold
-                && $data->additionalCoreData->aboveThreshold) {
-            dump('Failed validation for datasource (id:'.$source->id.') to db.');
-            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
-            dump('Both THRESHOLD Flags (ABOVE&BELOW) set instead of one or none');
-            $validationError = true;
-        }
-
-        if ($data->objectContract->additionalCpvs) {
-            $uniqueAdditionalCpvs = array_unique($data->objectContract->additionalCpvs);
-            $checkAddCpvs = CPV::whereIn('code',$data->objectContract->additionalCpvs)->get()->pluck('code')->all();
-
-            // Check if we could find all referenced in db, otherwise error
-            if (count($uniqueAdditionalCpvs) != count($checkAddCpvs)) {
-                dump('Failed validation for datasource (id:'.$source->id.') to db.');
-                dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
-                dump('At least one unknown additional cpv code.',$data->objectContract->additionalCpvs);
-                $validationError = true;
-            }
-        }
-
-        if ($data->additionalCoreData && $data->additionalCoreData->nbSmeContractor
-                && $data->awardContract && $data->awardContract->nbSmeContractor) {
-            dump('Failed validation for datasource (id:'.$source->id.') to db.');
-            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
-            dump('Both NB_SME_CONTRACTOR attributes are set (additional core data & award contract)!!');
-            $validationError = true;
-        }
-
-        if ($data->modificationsContract && $data->modificationsContract->cpv && $data->objectContract->cpv
-                && $data->modificationsContract->cpv != $data->objectContract->cpv) {
-            dump('Failed validation for datasource (id:'.$source->id.') to db.');
-            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
-            dump('Differing CPV Codes in OBJECT_CONTRACT and MODIFICATIONS_CONTRACT !!');
-            $validationError = true;
-        }
-
-        if ($data->modificationsContract && $data->modificationsContract->additionalNeed
-            && $data->modificationsContract->unforeseenCircumstance) {
-            dump('Failed validation for datasource (id:'.$source->id.') to db.');
-            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
-            dump('Both INFO_MODIFICATIONS text fields are set (additional_need & unforeseen_circumstance) !!');
-            $validationError = true;
-        }
-
-        if ($validationError) {
+        if (!$this->validateDatasource($data, $source, $record)) {
             return;
         }
 
@@ -349,11 +284,10 @@ class Process implements ShouldQueue
             }
 
         } catch(\Exception $ex) {
-            Log::error($ex->getCode() . ' ' . $ex->getMessage());
-            Log::error($ex->getTraceAsString());
+            $this->log->error('Unable to write dataset for datasource:'.$source->id.' to database.');
+            $this->log->error($ex->getCode() . ' ' . $ex->getMessage(),['trace' => $ex->getTraceAsString(),'data' => $data]);
 
-            dump('Unable to write dataset for datasource (id:'.$source->id.') to db.');
-            dump('reference_id:'.$source->reference_id . ' ORIGIN reference_id:'.$source->origin->reference_id);
+            dump('Unable to write dataset for datasource:'.$source->id.' to database.');
             dump($data);
 
             DB::rollBack();
@@ -361,9 +295,81 @@ class Process implements ShouldQueue
     }
 
     /**
+     * @param $data
+     * @param $source
+     */
+    protected function validateDatasource($data, $source, $record) {
+
+        // Validate foreign key values before attempting to write
+        $validationError = false;
+
+        $checkCPVCode  = $data->objectContract->cpv  ? CPV::find($data->objectContract->cpv) : true;
+        $checkNUTSCode = $data->objectContract->nuts ? NUTS::find($data->objectContract->nuts) : true;
+
+        if (!$checkCPVCode) {
+            $this->dumpAndLogValidationError($source, $record, 'Unknown CPV #'.$data->objectContract->cpv.'#');
+            $validationError = true;
+        }
+
+        if (!$checkNUTSCode) {
+            $this->dumpAndLogValidationError($source, $record, 'Unknown NUTS #'.$data->objectContract->nuts.'#');
+            $validationError = true;
+        }
+
+        if ($data->contractingBody->urlDocumentIsRestricted && $data->contractingBody->urlDocumentIsFull) {
+            $this->dumpAndLogValidationError($source, $record, 'Both Document Flags (RESTRICTED&FULL) set instead of one or none');
+            $validationError = true;
+        }
+
+        if ($data->objectContract->lot && $data->objectContract->noLot) {
+            $this->dumpAndLogValidationError($source, $record, 'Both LOT Flags (LOT_DIVISION&NO_LOT_DIVISION) set instead of one or none');
+            $validationError = true;
+        }
+
+        if ($data->additionalCoreData && $data->additionalCoreData->belowThreshold
+            && $data->additionalCoreData->aboveThreshold) {
+            $this->dumpAndLogValidationError($source, $record, 'Both THRESHOLD Flags (ABOVE&BELOW) set instead of one or none');
+            $validationError = true;
+        }
+
+        if ($data->objectContract->additionalCpvs) {
+            $uniqueAdditionalCpvs = array_unique($data->objectContract->additionalCpvs);
+            $checkAddCpvs = CPV::whereIn('code',$data->objectContract->additionalCpvs)->get()->pluck('code')->all();
+
+            // Check if we could find all referenced in db, otherwise error
+            if (count($uniqueAdditionalCpvs) != count($checkAddCpvs)) {
+                $this->dumpAndLogValidationError($source, $record, 'At least one unknown additional cpv code.',$data->objectContract->additionalCpvs);
+                $validationError = true;
+            }
+        }
+
+        if ($data->additionalCoreData && $data->additionalCoreData->nbSmeContractor
+            && $data->awardContract && $data->awardContract->nbSmeContractor) {
+            $this->dumpAndLogValidationError($source, $record, 'Both NB_SME_CONTRACTOR attributes are set (additional core data & award contract)!!');
+            $validationError = true;
+        }
+
+        if ($data->modificationsContract && $data->modificationsContract->cpv && $data->objectContract->cpv
+            && $data->modificationsContract->cpv != $data->objectContract->cpv) {
+            $this->dumpAndLogValidationError($source, $record, 'Differing CPV Codes in OBJECT_CONTRACT and MODIFICATIONS_CONTRACT !!');
+            $validationError = true;
+        }
+
+        if ($data->modificationsContract && $data->modificationsContract->additionalNeed
+            && $data->modificationsContract->unforeseenCircumstance) {
+            $this->dumpAndLogValidationError($source, $record, 'Both INFO_MODIFICATIONS text fields are set (additional_need & unforeseen_circumstance) !!');
+            $validationError = true;
+        }
+
+        if ($validationError) {
+            return;
+        }
+    }
+
+    /**
      * Set the highest processed version on the datasource objects
      */
-    protected function updateDatasources() {
+    protected function updateVersionInfo() {
 
         $ids = array_keys($this->touchedDatasources);
 
@@ -415,6 +421,11 @@ class Process implements ShouldQueue
         return [];
     }
 
+    /**
+     * @param null $offset
+     * @param null $limit
+     * @return \Illuminate\Support\Collection
+     */
     public function getRecords($offset = null, $limit = null) {
 
         $ids = array_slice($this->recordIds,$offset,$limit);
@@ -436,5 +447,17 @@ class Process implements ShouldQueue
         $result = $query->get();
 
         return $result;
+    }
+
+    /**
+     * @param $source
+     * @param $message
+     * @param string $logLevel (info,warning,error etc.), @see Monolog documentation
+     */
+    protected function dumpAndLogValidationError($source, $record, $message, $logLevel = 'warning') {
+        dump('Failed validation for datasource o'.$source->origin->id.':'.$source->id.':v'.$record->version);
+        dump('   '.$message);
+
+        $this->log->{$logLevel}('Failed validation for datasource o'.$source->origin->id.':'.$source->id.':v'.$record->version,['message' => $message]);
     }
 }

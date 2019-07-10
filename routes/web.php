@@ -150,5 +150,15 @@ https://extapp.noc-science.at/apex/shibb/api/vergabe/1
 
         dd($types);
     });
+
+    Route::get('/timediff',function() {
+        $now = \Carbon\Carbon::now();
+
+        usleep(1223456);
+
+        $later = \Carbon\Carbon::now();
+
+        dd(gmdate('H:i:s', $now->diffInSeconds($later)));
+    });
 });
 

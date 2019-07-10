@@ -11,6 +11,7 @@ use Illuminate\Queue\SerializesModels;
 use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\Log;
 
 class Scrape
 {
@@ -19,6 +20,8 @@ class Scrape
     protected $scraper;
 
     protected $timestamp;
+
+    protected $log;
 
     /**
      * @param Scraper $scraper
@@ -30,6 +33,8 @@ class Scrape
 
         // use same timestamp for all requests
         $this->timestamp = Carbon::now();
+
+        $this->log = Log::channel('scraper_daily');
     }
 
     /**
@@ -47,16 +52,20 @@ class Scrape
         }
     }
 
+    /**
+     * @param $origin
+     */
     protected function handleOrigin($origin) {
 
-        // step 1: scrape origin
-        dump('Checking origin: ' . $origin->name . ' (' . $origin->id . ')');
+        // Scrape origin
+        dump(             'Checking origin ' . $origin->id . ':' . $origin->name);
+        $this->log->debug('Checking origin ' . $origin->id . ':' . $origin->name);
+
         $datasources = $this->scraper->scrapeOrigin($origin->url);
 
         if ($datasources == null) {
-            // many possible errors here
-            // most likely scraper could not reach the endpoint
-            // todo error handling ???
+            dump(               'Unable to get any datasource information from origin '.$origin->id.':'.$origin->url);
+            $this->log->warning('Unable to get any datasource information from origin '.$origin->id.':'.$origin->url,['origin' => $origin]);
 
             return;
         }
@@ -65,29 +74,29 @@ class Scrape
         $origin->last_scraped_at = $this->timestamp;
         $origin->save();
 
-        // check for new / updated datasources, and return list of datasources
-        // that need to be processed further
+        // check for new/updated datasources, and return list of datasources for further processing
         $scrapeDetails = $this->manageDatasources($origin, $datasources);
+        $count = count($scrapeDetails);
 
-        dump(count($scrapeDetails) . ' datasources need to be updated. ');
+        if (!$count) {
+            // nothing to do? return...
+            return;
+        }
 
-        $idx = 0;
+        dump(             'Scrape ' . $count . ' datasources from origin '.$origin->id);
+        $this->log->debug('Scrape ' . $count . ' datasources from origin '.$origin->id);
 
         // step 2: scrape details
+        $idx = 0;
         foreach($scrapeDetails as $datasource) {
             $idx++;
-            dump('('.$origin->id.') Scraping datasource: '.$datasource->reference_id);
+
+            dump(             '   Scraping datasource: '.$origin->id.':'.$datasource->reference_id);
+            $this->log->debug('   Scraping datasource: '.$origin->id.':'.$datasource->reference_id);
 
             $version = $this->scraper->scrapeDatasource($origin->reference_id, $datasource->reference_id, $datasource->url);
 
             $this->manageUpdateDatasource($datasource, $version);
-
-            // TODO this is just temporary
-            /*
-            if ($idx >= 2) {
-                break;
-            }
-            */
         }
     }
 
@@ -120,6 +129,11 @@ class Scrape
         return $scrapeDetails;
     }
 
+    /**
+     * @param $origin
+     * @param $datasource
+     * @return Datasource
+     */
     protected function manageNewDatasource($origin, $datasource) {
 
         $obj = new Datasource();
@@ -131,9 +145,6 @@ class Scrape
         // init version value with 0
         $obj->version = 0;
         $obj->version_scraped = 0;
-
-        // temp deleteme todo
-        $obj->last_scraped_at = Carbon::now()->subWeek()->subWeek();
 
         $obj->save();
 

@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class Scrape extends Command
 {
@@ -37,12 +39,15 @@ class Scrape extends Command
      */
     public function handle()
     {
+        $start = Carbon::now();
         $this->info('Starting Scrape Job');
+        Log::channel('scraper_daily')->info('Starting Scrape Job');
 
         $job = app()->make('App\Jobs\Scrape');
-
         dispatch($job);
+        $runtime = $start->diffInSeconds(Carbon::now());
 
-        $this->info('Finished Scrape Job');
+        $this->info('Finished Scrape Job in '.$runtime.' seconds');
+        Log::channel('scraper_daily')->info('Finished Scrape Job in '.$runtime.' seconds');
     }
 }

@@ -2,7 +2,9 @@
 
 namespace App\Console\Commands;
 
+use Carbon\Carbon;
 use Illuminate\Console\Command;
+use Illuminate\Support\Facades\Log;
 
 class Process extends Command
 {
@@ -37,12 +39,15 @@ class Process extends Command
      */
     public function handle()
     {
+        $start = Carbon::now();
         $this->info('Starting Process Job');
+        Log::channel('processor_daily')->info('Starting Process Job');
 
         $job = app()->make('App\Jobs\Process');
-
         dispatch($job);
+        $runtime = $start->diffInSeconds(Carbon::now());
 
-        $this->info('Finished Process Job');
+        $this->info('Finished Process Job in '.$runtime.' seconds');
+        Log::channel('processor_daily')->info('Finished Process Job in '.$runtime.' seconds');
     }
 }

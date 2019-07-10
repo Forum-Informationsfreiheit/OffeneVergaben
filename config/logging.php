@@ -48,9 +48,23 @@ return [
 
         'daily' => [
             'driver' => 'daily',
-            'path' => storage_path('logs/laravel.log'),
+            'path' => storage_path('logs/app.log'),
             'level' => 'debug',
             'days' => 14,
+        ],
+
+        'scraper_daily' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/scraper.log'),
+            'level' => 'debug',
+            'days' => 30,
+        ],
+
+        'processor_daily' => [
+            'driver' => 'daily',
+            'path' => storage_path('logs/processor.log'),
+            'level' => 'debug',
+            'days' => 30,
         ],
 
         'slack' => [
