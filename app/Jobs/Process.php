@@ -361,9 +361,7 @@ class Process
             $validationError = true;
         }
 
-        if ($validationError) {
-            return;
-        }
+        return $validationError ? false : true;
     }
 
     /**
