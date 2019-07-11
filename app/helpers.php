@@ -61,7 +61,7 @@ if (! function_exists('convert_number_to_cents')) {
 }
 
 if (! function_exists('ui_shorten')) {
-    function ui_shorten($text, $length = 50) {
+    function ui_shorten($text, $length = 45) {
         if (!$text) {
             return $text;
         }

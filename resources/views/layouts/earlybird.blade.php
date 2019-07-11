@@ -12,6 +12,26 @@
         table td, table th { text-align: left; }
         table td { border-top: 1px solid #ddd; padding: 3px 5px; vertical-align: top; }
         ul { list-style: normal; margin: 0; padding: 0 0 0 18px; }
+        .pagination-wrapper {
+            margin-top: 50px;
+            margin-bottom: 50px;
+        }
+        .pagination-wrapper:after {
+            display: block;
+            content: '';
+            clear: left;
+        }
+        ul.pagination {
+            list-style: none;
+        }
+        ul.pagination li {
+            float: left;
+            padding-right: 5px;
+        }
+        .show-all-link {
+            display: inline-block;
+            margin-left: 20px;
+        }
     </style>
     @yield('styles:head')
     @yield('scripts:head')

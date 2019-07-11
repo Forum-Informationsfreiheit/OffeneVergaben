@@ -15,4 +15,8 @@ class CPV extends Model
     public function toString() {
         return $this->code . ' ' . $this->name;
     }
+
+    public function datasets() {
+        return $this->belongsToMany('App\Dataset','cpv_dataset','cpv_code','dataset_id');
+    }
 }

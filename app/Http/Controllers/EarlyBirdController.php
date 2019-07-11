@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\CPV;
 use App\Dataset;
 use App\Datasource;
 use App\Origin;
@@ -19,13 +20,27 @@ class EarlyBirdController extends Controller
 
         $order = $request->has('orderBy') ? $request->input('orderBy') : 'offerors.name';
         $direction = $request->has('desc') ? 'desc' : 'asc';
+        $cpvFilter = $request->has('cpvFilter') ? $request->input('cpvFilter') : null;
+        $cpv = null;
 
         $query = Dataset::select([
             'datasets.*',
             'offerors.name as offeror_name',
             'offerors.national_id as offeror_national_id',
-        ])->join('offerors', 'datasets.id', '=', 'offerors.dataset_id');
+            'res.created_at as scraped_at'
+        ]);
+        $query->join('offerors', 'datasets.id', '=', 'offerors.dataset_id');
         $query->where('offerors.is_extra',0);
+        $query->join('scraper_results as res','datasets.result_id','=','res.id');
+
+        if ($cpvFilter) {
+            // quick check cpv
+            $cpv = CPV::findOrFail($cpvFilter);
+
+            $query->join('cpv_dataset as cd','datasets.id','=','cd.dataset_id');
+            $query->where('cd.cpv_code','=',$cpvFilter);
+        }
+
         $query->orderBy($order,$direction);
 
         $showAll = $request->has('showAll');
@@ -37,7 +52,7 @@ class EarlyBirdController extends Controller
 
         $paramsString = "orderBy=$order" . ($direction == "desc" ? "&desc=1" : "");
 
-        return view('earlybird.datasets',compact('datasets','showAll','paramsString'));
+        return view('earlybird.datasets',compact('datasets','showAll','paramsString','cpv','cpvFilter'));
     }
 
     public function dataset($id, Request $request) {
@@ -48,6 +63,15 @@ class EarlyBirdController extends Controller
         $fields = $this->getDatasetFieldDump($dataset);
 
         return view('earlybird.dataset',compact('dataset','fields','showAll'));
+    }
+
+    public function cpvs(Request $request) {
+        $order = $request->has('orderBy') ? $request->input('orderBy') : 'code';
+        $direction = $request->has('desc') ? 'desc' : 'asc';
+
+        $cpvs = CPV::withCount('datasets')->orderBy($order,$direction)->paginate(1000);
+
+        return view('earlybird.cpvs',compact('cpvs'));
     }
 
     protected function getDatasetFieldDump($dataset) {
