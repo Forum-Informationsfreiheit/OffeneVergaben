@@ -17,7 +17,8 @@ class Offeror extends Model
             $this->domain,
             $this->phone,
             $this->email,
-            $this->contact
+            $this->contact,
+            $this->reference_number
         ];
 
         return implode(' | ',array_filter($values));
@@ -30,7 +31,8 @@ class Offeror extends Model
             $this->domain,
             $this->phone,
             $this->email,
-            $this->contact
+            $this->contact,
+            $this->reference_number
         ];
 
         return implode('<br>',array_filter($values));
