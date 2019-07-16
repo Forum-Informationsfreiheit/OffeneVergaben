@@ -35,6 +35,7 @@ class DataSourcePreProcessor
 
     public function preProcess($xmlString) {
         $this->xmlString = $xmlString;
+
         $this->simpleXmlParsedData = simplexml_load_string($xmlString);
         $this->simpleXmlArrayData = $this->xmlToArray($this->simpleXmlParsedData);
 

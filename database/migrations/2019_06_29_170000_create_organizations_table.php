@@ -18,6 +18,7 @@ class CreateOrganizationsTable extends Migration
 
             $table->string('national_id')->length(50);
             $table->string('type_code')->nullable();
+            $table->string('name',500)->nullable();
 
             $table->timestamps();
         });
