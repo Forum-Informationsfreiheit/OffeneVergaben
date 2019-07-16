@@ -74,7 +74,7 @@ class Process
                     $this->preProcessor->preProcess($record->content);
                 } catch(\Exception $ex) {
                     $this->log->error('Unable to preprocess record:'.$record->id. ' - skipping record.');
-                    $this->log->error($ex->getCode() . ' ' . $ex->getMessage(),['trace' => $ex->getTraceAsString(),'recordId' => $record->id, 'recordParentRef' => $record->parent_reference_number, 'recordRef' => $record->reference_number]);
+                    $this->log->error($ex->getCode() . ' ' . $ex->getMessage(),['trace' => $ex->getTraceAsString(),'recordId' => $record->id, 'recordParentRef' => $record->parent_reference_id, 'recordRef' => $record->reference_id]);
 
                     dump('Unable to preprocess record:'.$record->id.' - skipping record.');
                     dump($record);
