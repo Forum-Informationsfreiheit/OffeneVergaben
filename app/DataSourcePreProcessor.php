@@ -9,6 +9,7 @@ namespace App;
 
 
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 
 class DataSourcePreProcessor
 {
@@ -22,8 +23,11 @@ class DataSourcePreProcessor
     protected $simpleXmlArrayData;
     protected $simpleXmlParsedData;
     protected $data;
+    protected $log;
 
-    public function __construct() { }
+    public function __construct() {
+        $this->log = Log::channel('processor_daily');
+    }
 
     public function getData() {
         return $this->data;
@@ -36,7 +40,13 @@ class DataSourcePreProcessor
     public function preProcess($xmlString) {
         $this->xmlString = $xmlString;
 
-        $this->simpleXmlParsedData = simplexml_load_string($xmlString);
+        $this->simpleXmlParsedData = $this->simpleXmlLoadString($xmlString);
+
+        if (!$this->simpleXmlParsedData) {
+            // return early if we encountered an error on xml load
+            return;
+        }
+
         $this->simpleXmlArrayData = $this->xmlToArray($this->simpleXmlParsedData);
 
         $this->data = new \stdClass();
@@ -359,6 +369,19 @@ class DataSourcePreProcessor
         }
 
         $this->data->additionalCoreData = $acd;
+    }
+
+    protected function simpleXmlLoadString($xmlString) {
+        try {
+            $simpleXml = simplexml_load_string($xmlString);
+
+            return $simpleXml;
+        } catch(\Exception $ex) {
+            $this->log->error('Unable to preprocess data. Simple XML simple_xml_string failed.',['code' => $ex->getCode(), 'message' => $ex->getMessage()]);
+            dump('Unable to preprocess data. Simple XML simple_xml_string failed.',['code' => $ex->getCode(), 'message' => $ex->getMessage()]);
+        }
+
+        return null;
     }
 
     protected function xmlToArray($parsedXml) {

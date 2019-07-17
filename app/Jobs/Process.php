@@ -63,29 +63,26 @@ class Process
         $index = 0;
         $records = $this->getRecords(0, $blockSize);
 
+        $processedCount = 0;
+
         while(count($records) > 0) {
             dump(             "Process block info: index:".($index+1).", length:".(count($records)));
             $this->log->debug("Process block info: index:".($index+1).", length:".(count($records)));
 
             foreach($records as $record) {
+                $success = false;
+
                 // preprocess source xml
-
-                try {
-                    $this->preProcessor->preProcess($record->content);
-                } catch(\Exception $ex) {
-                    $this->log->error('Unable to preprocess record:'.$record->id. ' - skipping record.');
-                    $this->log->error($ex->getCode() . ' ' . $ex->getMessage(),['trace' => $ex->getTraceAsString(),'recordId' => $record->id, 'recordParentRef' => $record->parent_reference_id, 'recordRef' => $record->reference_id]);
-
-                    dump('Unable to preprocess record:'.$record->id.' - skipping record.');
-                    dump($record);
-
-                    continue;
-                }
+                $this->preProcessor->preProcess($record->content);
 
                 // actually do some processing
                 $data = $this->preProcessor->getData();
 
-                $this->process($record,$data);
+                if ($data) {
+                    $success = $this->process($record,$data);
+                }
+
+                $processedCount += $success ? 1 : 0;
             }
 
             // prepare for next iteration
@@ -93,12 +90,17 @@ class Process
             $records = $this->getRecords($index, $blockSize);
         }
 
+        dump(             "Processed $processedCount records.");
+        $this->log->debug("Processed $processedCount records.");
+
         // finally do some housekeeping
         // update the datasource table with info of the last processed version
-        dump(             "Finalizing process job...");
-        $this->log->debug("Finalizing process job...");
+        if ($processedCount > 0) {
+            dump(             "Finalizing process job...");
+            $this->log->debug("Finalizing process job...");
 
-        $this->updateVersionInfo();
+            $this->updateVersionInfo();
+        }
     }
 
     /**
@@ -106,6 +108,8 @@ class Process
      *
      * @param $record
      * @param $data
+     *
+     * @return boolean
      */
     protected function process($record,$data) {
 
@@ -114,7 +118,7 @@ class Process
             ->where('reference_id',$record->reference_id)->first();
 
         if (!$this->validateDatasource($data, $source, $record)) {
-            return;
+            return false;
         }
 
         // write dataset
@@ -306,6 +310,8 @@ class Process
                 $this->touchedDatasources[$source->id] = 1;
             }
 
+            return true;
+
         } catch(\Exception $ex) {
             $this->log->error('Unable to write dataset for datasource:'.$source->id.' to database.');
             $this->log->error($ex->getCode() . ' ' . $ex->getMessage(),['trace' => $ex->getTraceAsString(),'data' => $data]);
@@ -315,6 +321,8 @@ class Process
 
             DB::rollBack();
         }
+
+        return false;
     }
 
     /**
