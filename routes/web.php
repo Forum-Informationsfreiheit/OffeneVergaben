@@ -20,6 +20,8 @@ Route::get('/datasets','EarlyBirdController@datasets');
 Route::get('/datasets/{id}','EarlyBirdController@dataset');
 Route::get('/cpvs','EarlyBirdController@cpvs');
 Route::get('/cpvs/{id}','EarlyBirdController@cpv');
+Route::get('/organizations/','EarlyBirdController@orgs');
+Route::get('/organizations/{id}','EarlyBirdController@org');
 
 // TEST routes, NOT in production env available
 Route::group(['prefix' => 'test'], function () {

@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\CPV;
 use App\Dataset;
 use App\Datasource;
+use App\Organization;
 use App\Origin;
 use Illuminate\Http\Request;
 
@@ -72,6 +73,15 @@ class EarlyBirdController extends Controller
         $cpvs = CPV::withCount('datasets')->orderBy($order,$direction)->paginate(1000);
 
         return view('earlybird.cpvs',compact('cpvs'));
+    }
+
+    public function orgs(Request $request) {
+        $order = $request->has('orderBy') ? $request->input('orderBy') : 'name';
+        $direction = $request->has('desc') ? 'desc' : 'asc';
+
+        $organizations = Organization::orderBy($order,$direction)->paginate(200);
+
+        return view('earlybird.organizations',compact('organizations'));
     }
 
     protected function getDatasetFieldDump($dataset) {

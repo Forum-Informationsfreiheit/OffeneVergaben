@@ -16,9 +16,12 @@ class CreateOrganizationsTable extends Migration
         Schema::create('organizations', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->string('national_id')->length(50);
-            $table->string('type_code')->nullable();
-            $table->string('name',500)->nullable();
+            $table->string('name',500);
+            $table->string('fn',9)->nullable();
+            $table->string('gln',14)->nullable();
+            $table->string('gkz',5)->nullable();
+            $table->string('ukn',100)->nullable();
+            $table->boolean('is_identified')->default(0);
 
             $table->timestamps();
         });

@@ -7,8 +7,10 @@ use App\CPV;
 use App\Dataset;
 use App\Datasource;
 use App\DataSourcePreProcessor;
+use App\NationalIdParser;
 use App\NUTS;
 use App\Offeror;
+use App\Organization;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -80,6 +82,9 @@ class Process
 
                 if ($data) {
                     $success = $this->process($record,$data);
+                } else {
+                    dump('Failed preprocessing for record:'.$record->id);
+                    $this->log->error('Failed preprocessing for record:'.$record->id);
                 }
 
                 $processedCount += $success ? 1 : 0;
@@ -243,13 +248,8 @@ class Process
             // Handle organization
             // Try to match the record to an existing organization
             // or create a new one if there is no match
-            if (false) {        // TODO unfinished
-                $organization = $this->matchOfferorWithOrganization($offeror);
-                if (!$organization) {
-                    $organization = $this->createOrganizationFromOfferor($offeror);
-                }
-                $offeror->organization_id = $organization->id;
-            }
+            $organization = $this->matchOrCreateOrganization($offeror->national_id, $offeror->name);
+            $offeror->organization_id = $organization->id;
 
             $offeror->save();
 
@@ -267,6 +267,10 @@ class Process
                     $offeror->contact = $additional->contact;
                     $offeror->domain = $additional->domain;
                     $offeror->reference_number = $additional->refNumber;
+
+                    $organization = $this->matchOrCreateOrganization($offeror->national_id, $offeror->name);
+                    $offeror->organization_id = $organization->id;
+
                     $offeror->save();
                 }
             }
@@ -279,6 +283,10 @@ class Process
                     $contractor->dataset_id = $dataset->id;
                     $contractor->national_id = $ac->nationalId;
                     $contractor->name = $ac->officialName;
+
+                    $organization = $this->matchOrCreateOrganization($contractor->national_id, $contractor->name);
+                    $contractor->organization_id = $organization->id;
+
                     $contractor->save();
                 }
             }
@@ -289,6 +297,10 @@ class Process
                     $contractor->dataset_id = $dataset->id;
                     $contractor->national_id = $mc->nationalId;
                     $contractor->name = $mc->officialName;
+
+                    $organization = $this->matchOrCreateOrganization($contractor->national_id, $contractor->name);
+                    $contractor->organization_id = $organization->id;
+
                     $contractor->save();
                 }
             }
@@ -299,6 +311,10 @@ class Process
                     $contractor->dataset_id = $dataset->id;
                     $contractor->national_id = $w->nationalId;
                     $contractor->name = $w->officialName;
+
+                    $organization = $this->matchOrCreateOrganization($contractor->national_id, $contractor->name);
+                    $contractor->organization_id = $organization->id;
+
                     $contractor->save();
                 }
             }
@@ -450,71 +466,76 @@ class Process
         return [];
     }
 
-    protected function matchOfferorWithOrganization(Offeror $offeror) {
-        if (!$offeror) {
-            return null;
+    /**
+     * @param $id
+     * @param $name
+     *
+     * @return null|\App\Organization
+     */
+    protected function matchOrCreateOrganization($id, $name) {
+        $parser = null;
+        if ($id !== null) {
+            $parser = new NationalIdParser($id);
+            $parser->parse();
         }
 
-        $valid = true;
-        $blacklist = [
-            'unbekannt',
-            'na',
-            'va',
-        ];
+        // nice?
+        if ($parser && $parser->isValid() && !$parser->isUnknown()) {
+            $formatted = $parser->getFormattedId();
+            $type = strtolower($parser->getType());     // transform to lower case so it can be used in where clause
 
-        // step 0: prepare the number
-        $nationalId = $offeror->national_id;
-        $nationalId = str_replace(' ','',$nationalId); // kill whitespace
-        $nationalId = str_replace(['.',',','-','/'],'',$nationalId);  // remove special chars
-        $nationalId = strtolower($nationalId);
+            $existing = Organization::where($type,$formatted)->first();
 
-        // Step 1: very basic validation
-        //         string-length: shorter than 4? characters cant be valid
-        if (strlen($nationalId) <= 4) {
-            $valid = false;
-        }
-        if (in_array($nationalId,$blacklist)) {
-            $valid = false;
+            if ($existing) {
+                return $existing;
+            } else {
+                // new up!
+                return Organization::createFromType($formatted,$type,$name);
+            }
         }
 
-        if (!$valid) {
-            return null;
+        // not so nice
+        if ($parser && $parser->isValid() && $parser->isUnknown()) {
+            $existing = Organization::where('ukn',$id)->first();
+
+            if ($existing) {
+                return $existing;
+            } else {
+                // new up!
+                return Organization::createFromUnknownType($id, $name);
+            }
         }
 
-        $type = null;
-        // Step 2: check the type FN? GLN? GKZ? something else?
-        // FN  starts with: FN or number
-        //     prefix:      (FN) optional
-        //     length:      7, e.g. 123456Z (can be shorter, like 5+Z need to fill up with 0 on the left side)
-        //     ends with:   a character (one of ... 10?15 not every one!) check: A, B, D, F, G, H, I, K, M, P, S, T, V, W, X, Y, Z
-        //     check:       http://www.pruefziffernberechnung.de/F/Firmenbuchnummer.shtml
-        //     note:        es muss auch white space entfernt werden da manche die fn so schreiben "FN 12345z"
-        if (false) {
-            $type = 'FN';
+        // opposite of nice
+        $existing = Organization::where('name',$name)->get();  // lucky match?
+        if ($existing->count() === 1) {
+            $existing = $existing->first();
+        } else if ($existing->count() > 1) {
+            // yikes, multiple organizations with the same name in db
+            // try to find the super generic version
+            $existing = Organization::where('name',$name)
+                ->whereNull('fn')
+                ->whereNull('gln')
+                ->whereNull('gkz')
+                ->whereNull('ukn')
+                ->where('is_identified',0)
+                ->get();
+
+            if ($existing->count() === 1) {
+                $existing = $existing->first();
+            } else {
+                $existing = null;
+            }
+        } else {
+            $existing = null;
         }
 
-        // GLN starts with: 9
-        //     length:      14
-        //     ends with:   number
-        //     note:        sollte straight forward sein
-        if (false) {
-            $type = 'GLN';
+        if ($existing) {
+            return $existing;
+        } else {
+            // new organization!
+            return Organization::createGeneric($name);
         }
-
-        // GKZ starts with: number
-        //     length       5
-        //     ends with    number
-        //     note:        man könnte zur validierung eine lookup table erstellen ~2.500 results
-        //                  (die muss aber wieder aktuell gehalten werden)
-        if (false) {
-            $type = 'GKZ';
-        }
-
-        // Step 3: Check database for matching number and type
-        $sql = "SELECT * FROM orgainzations WHERE nationalId=$nationalId and type=$type";
-        $organization = null; // $sql->execute();
-
-        return $organization ? $organization : null;
     }
 
     /**
