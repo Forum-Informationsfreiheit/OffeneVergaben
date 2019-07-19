@@ -22,6 +22,9 @@ class EarlyBirdController extends Controller
         $order = $request->has('orderBy') ? $request->input('orderBy') : 'offerors.name';
         $direction = $request->has('desc') ? 'desc' : 'asc';
         $cpvFilter = $request->has('cpvFilter') ? $request->input('cpvFilter') : null;
+        $offerorFilter = $request->has('offerorFilter') ? $request->input('offerorFilter') : null;
+        $contractorFilter = $request->has('contractorFilter') ? $request->input('contractorFilter') : null;
+
         $cpv = null;
 
         $query = Dataset::select([
@@ -31,7 +34,7 @@ class EarlyBirdController extends Controller
             'res.created_at as scraped_at'
         ]);
         $query->join('offerors', 'datasets.id', '=', 'offerors.dataset_id');
-        $query->where('offerors.is_extra',0);
+        //$query->where('offerors.is_extra',0);
         $query->join('scraper_results as res','datasets.result_id','=','res.id');
 
         if ($cpvFilter) {
@@ -40,6 +43,21 @@ class EarlyBirdController extends Controller
 
             $query->join('cpv_dataset as cd','datasets.id','=','cd.dataset_id');
             $query->where('cd.cpv_code','=',$cpvFilter);
+        }
+
+        if ($offerorFilter) {
+            // quick check org
+            $org = Organization::findOrFail($offerorFilter);
+
+            $query->where('offerors.organization_id',$org->id);
+        }
+
+        if ($contractorFilter) {
+            // quick check org
+            $org = Organization::findOrFail($contractorFilter);
+
+            $query->join('contractors','datasets.id','=','contractors.dataset_id');
+            $query->where('contractors.organization_id',$org->id);
         }
 
         $query->orderBy($order,$direction);
@@ -79,7 +97,22 @@ class EarlyBirdController extends Controller
         $order = $request->has('orderBy') ? $request->input('orderBy') : 'name';
         $direction = $request->has('desc') ? 'desc' : 'asc';
 
-        $organizations = Organization::orderBy($order,$direction)->paginate(200);
+        $onlyOfferors = $request->has('filterBy') && $request->input('filterBy') == 'offerors' ? true : false;
+        $onlyContractors = $request->has('filterBy') && $request->input('filterBy') == 'contractors' ? true : false;
+
+        $query = Organization::with('offerors')
+            ->with('contractors');
+
+        if($onlyOfferors) {
+            $query->has('offerors');
+        }
+        if($onlyContractors) {
+            $query->has('contractors');
+        }
+
+        $query->orderBy($order,$direction);
+
+        $organizations = $query->paginate(200);
 
         return view('earlybird.organizations',compact('organizations'));
     }

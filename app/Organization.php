@@ -10,6 +10,14 @@ class Organization extends Model
         'is_identified' => 'boolean',
     ];
 
+    public function offerors() {
+        return $this->hasMany('App\Offeror');
+    }
+
+    public function contractors() {
+        return $this->hasMany('App\Contractor');
+    }
+
     /**
      * @param $id string
      * @param $type string

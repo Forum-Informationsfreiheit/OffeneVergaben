@@ -6,7 +6,7 @@
     <div class="sort" style="margin-bottom: 20px;">
         <strong>Sortieren nach</strong>
         <ul style="list-style: none; margin: 0; padding: 0">
-            <li><a href="{{ url('/datasets?orderBy=offeror_name'.($showAll?"&showAll":"").($cpvFilter?"&cpvFilter=$cpvFilter":"")) }}">Anbieter Name</a>&nbsp;<a href="{{ url('/datasets?orderBy=offeror_name&desc=1'.($showAll?"&showAll":"").($cpvFilter?"&cpvFilter=$cpvFilter":"")) }}">absteigend</a></li>
+            <li><a href="{{ url('/datasets?orderBy=offeror_name'.($showAll?"&showAll":"").($cpvFilter?"&cpvFilter=$cpvFilter":"").($cpvFilter?"&cpvFilter=$cpvFilter":"")) }}">Anbieter Name</a>&nbsp;<a href="{{ url('/datasets?orderBy=offeror_name&desc=1'.($showAll?"&showAll":"").($cpvFilter?"&cpvFilter=$cpvFilter":"")) }}">absteigend</a></li>
             <li><a href="{{ url('/datasets?orderBy=offeror_national_id'.($showAll?"&showAll":"").($cpvFilter?"&cpvFilter=$cpvFilter":"")) }}">Anbieter Stammzahl</a>&nbsp;<a href="{{ url('/datasets?orderBy=offeror_national_id&desc=1'.($showAll?"&showAll":"").($cpvFilter?"&cpvFilter=$cpvFilter":"")) }}">absteigend</a></li>
             <li><a href="{{ url('/datasets?orderBy=val_total').($showAll?"&showAll":"").($cpvFilter?"&cpvFilter=$cpvFilter":"") }}">Wert</a>&nbsp;<a href="{{ url('/datasets?orderBy=val_total&desc=1'.($showAll?"&showAll":"").($cpvFilter?"&cpvFilter=$cpvFilter":"")) }}">absteigend</a></li>
             <li><a href="{{ url('/datasets?orderBy=id').($showAll?"&showAll":"").($cpvFilter?"&cpvFilter=$cpvFilter":"") }}">ID</a>&nbsp;<a href="{{ url('/datasets?orderBy=id&desc=1'.($showAll?"&showAll":"").($cpvFilter?"&cpvFilter=$cpvFilter":"")) }}">absteigend</a></li>
