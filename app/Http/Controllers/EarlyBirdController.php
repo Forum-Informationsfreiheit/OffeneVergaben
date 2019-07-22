@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Contractor;
 use App\CPV;
 use App\Dataset;
 use App\Datasource;
@@ -15,6 +16,48 @@ class EarlyBirdController extends Controller
         $origins = Origin::all();
 
         return view('earlybird.origins',compact('origins'));
+    }
+
+    public function bekanntgaben(Request $request) {
+        $offerorFilter = $request->has('offerorFilter') ? $request->input('offerorFilter') : null;
+        $contractorFilter = $request->has('contractorFilter') ? $request->input('contractorFilter') : null;
+
+        $query = Dataset::select([
+            'datasets.*',
+            'offerors.name as offeror_name',
+            'offerors.national_id as offeror_national_id',
+            'contractors.name as contractor_name',
+            'contractors.national_id as contractor_national_id',
+            'res.created_at as scraped_at'
+        ]);
+        $query->join('scraper_results as res','datasets.result_id','=','res.id');
+        $query->join('offerors', 'datasets.id', '=', 'offerors.dataset_id');
+        $query->join('organizations as oo','offerors.organization_id','=','oo.id');
+        $query->join('contractors', 'datasets.id', '=', 'contractors.dataset_id');
+        $query->join('organizations as co','contractors.organization_id','=','co.id');
+        $query->join('dataset_types','datasets.type_code','=','dataset_types.code');
+
+        $query->where('offerors.is_extra',0);
+        $query->where('dataset_types.end',1);
+
+        if ($offerorFilter) {
+            $offeror = Organization::findOrFail($offerorFilter);
+
+            $query->where('oo.id',$offeror->id);
+        }
+
+        if ($contractorFilter) {
+            $contractor = Organization::findOrFail($contractorFilter);
+
+            $query->where('co.id',$contractor->id);
+        }
+
+        $query->orderBy('id','desc');
+
+        $datasets = $query->paginate(200);
+
+        return view('earlybird.bekanntgaben',compact('datasets'));
+
     }
 
     public function datasets(Request $request) {

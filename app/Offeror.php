@@ -10,6 +10,10 @@ class Offeror extends Model
         'is_extra' => 'boolean',
     ];
 
+    public function organization() {
+        return $this->belongsTo('App\Organization');
+    }
+
     public function toString() {
         $values = [
             $this->national_id,

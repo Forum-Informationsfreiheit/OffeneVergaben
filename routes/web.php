@@ -18,6 +18,7 @@ Route::get('/', function () {
 Route::get('/origins','EarlyBirdController@origins');
 Route::get('/datasets','EarlyBirdController@datasets');
 Route::get('/datasets/{id}','EarlyBirdController@dataset');
+Route::get('/bekanntgaben','EarlyBirdController@bekanntgaben');
 Route::get('/cpvs','EarlyBirdController@cpvs');
 Route::get('/cpvs/{id}','EarlyBirdController@cpv');
 Route::get('/organizations/','EarlyBirdController@orgs');

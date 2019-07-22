@@ -6,9 +6,15 @@ use Illuminate\Database\Eloquent\Model;
 
 class Contractor extends Model
 {
+    /*
     protected $casts = [
         'is_extra' => 'boolean',
     ];
+    */
+
+    public function organization() {
+        return $this->belongsTo('App\Organization');
+    }
 
     public function toString() {
         $values = [

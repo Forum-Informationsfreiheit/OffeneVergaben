@@ -17,6 +17,7 @@ class CreateDatasetTypesTable extends Migration
             $table->string('code')->length(15)->primary();
             $table->string('name');
             $table->string('description');
+            $table->boolean('end')->default(0);
         });
     }
 

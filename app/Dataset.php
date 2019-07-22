@@ -43,6 +43,10 @@ class Dataset extends Model
         return $this->hasMany('App\Offeror');
     }
 
+    public function contractor() {
+        return $this->hasOne('App\Contractor');
+    }
+
     public function contractors() {
         return $this->hasMany('App\Contractor');
     }
@@ -54,7 +58,11 @@ class Dataset extends Model
     public function procedures() {
         return $this->belongsToMany('App\Procedure','dataset_procedure','dataset_id','procedure_code');
     }
+/*
+    public function getContractorAttribute() {
 
+    }
+*/
     public function getValTotalFormattedAttribute() {
         if (!$this->val_total) {
             return null;

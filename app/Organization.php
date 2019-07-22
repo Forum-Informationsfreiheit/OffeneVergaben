@@ -84,4 +84,30 @@ class Organization extends Model
 
         return $org;
     }
+
+    /**
+     *      1. GLN
+     *      2. FN
+     *      3. GKZ
+     *      4. Other
+     */
+    public function getNationalIdAttribute() {
+        if ($this->gln != null) {
+            return $this->gln;
+        }
+
+        if ($this->fn != null) {
+            return $this->fn;
+        }
+
+        if ($this->gkz != null) {
+            return $this->gkz;
+        }
+
+        if ($this->ukn != null) {
+            return $this->ukn;
+        }
+
+        return "?";
+    }
 }
