@@ -23,6 +23,7 @@
             <th>FN</th>
             <th>GLN</th>
             <th>GKZ</th>
+            <th>Andere</th>
             <th>Name</th>
         </tr>
         @foreach($organizations as $org)
@@ -40,6 +41,7 @@
                 <td>{{ $org->fn }}</td>
                 <td>{{ $org->gln }}</td>
                 <td>{{ $org->gkz }}</td>
+                <td>{{ $org->ukn }}</td>
                 <td>{{ $org->name }}</td>
             </tr>
         @endforeach
