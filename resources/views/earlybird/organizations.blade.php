@@ -8,6 +8,14 @@
             <li><a href="{{ url('/organizations?filterBy=contractors') }}">nur Auftragnehmer</a></li>
         </ul>
     </div>
+    <div class="search" style="margin-bottom: 20px;">
+        <label>
+            <form method="GET" action="{{ url('/organizations') }}">
+                {{ csrf_field() }}
+                <input type="text" name="search" style="width: 300px; padding: 5px;" value="{{ request()->has('search') ? request('search') : '' }}">&nbsp;Organisation suchen
+            </form>
+        </label>
+    </div>
     <table style="width: 80%">
         <tr>
             <th>Auftraggeber</th>
@@ -26,7 +34,7 @@
                 </td>
                 <td>
                     @if($org->contractors->count() > 0)
-                        <a href="{{ url('/datasets?contractorFilter='.$org->id) }}">{{ $org->contractors->count() }}</a>
+                        <a href="{{ url('/bekanntgaben?contractorFilter='.$org->id) }}">{{ $org->contractors->count() }}</a>
                     @endif
                 </td>
                 <td>{{ $org->fn }}</td>

@@ -143,9 +143,14 @@ class EarlyBirdController extends Controller
         $onlyOfferors = $request->has('filterBy') && $request->input('filterBy') == 'offerors' ? true : false;
         $onlyContractors = $request->has('filterBy') && $request->input('filterBy') == 'contractors' ? true : false;
 
+        $search = $request->has('search') ? $request->input('search') : null;
+
         $query = Organization::with('offerors')
             ->with('contractors');
 
+        if ($search) {
+            $query->where('name','like',"%$search%");
+        }
         if($onlyOfferors) {
             $query->has('offerors');
         }
