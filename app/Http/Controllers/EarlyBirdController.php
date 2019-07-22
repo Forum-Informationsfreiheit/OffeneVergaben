@@ -149,7 +149,13 @@ class EarlyBirdController extends Controller
             ->with('contractors');
 
         if ($search) {
-            $query->where('name','like',"%$search%");
+            $query->where(function($q) use($search) {
+                $q->where('name','like',"%$search%");
+                $q->orWhere('fn',$search);
+                $q->orWhere('gln',$search);
+                $q->orWhere('gkz',$search);
+                $q->orWhere('ukn',$search);
+            });
         }
         if($onlyOfferors) {
             $query->has('offerors');

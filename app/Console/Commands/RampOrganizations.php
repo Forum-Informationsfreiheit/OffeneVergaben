@@ -151,7 +151,7 @@ class RampOrganizations extends Command
                 $offeror->save();
             } else {
                 // new organization!
-                $org = Organization::createFromUnknownType($offeror->id, $offeror->name);
+                $org = Organization::createFromUnknownType($offeror->national_id, $offeror->name);
 
                 // and store the reference in the offeror record
                 $offeror->organization_id = $org->id;
