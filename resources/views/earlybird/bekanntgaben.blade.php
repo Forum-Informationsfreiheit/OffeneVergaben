@@ -34,6 +34,15 @@
         @endforeach
     </table>
     <div class="pagination-wrapper">
-        {{ $datasets->appends(request()->query())->links() }}
+        @if($showAll)
+            <span class="show-less-link">
+                <a href="{{ url('/bekanntgaben') }}">weniger Ergebnisse anzeigen</a>
+            </span>
+        @else
+            {{ $datasets->appends(request()->query())->links() }}
+            <span class="show-all-link">
+                <a href="{{ url('/bekanntgaben?showAll') }}">alle Ergebnisse anzeigen</a>
+            </span>
+        @endif
     </div>
 @stop

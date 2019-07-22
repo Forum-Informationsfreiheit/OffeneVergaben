@@ -54,9 +54,14 @@ class EarlyBirdController extends Controller
 
         $query->orderBy('id','desc');
 
-        $datasets = $query->paginate(200);
+        $showAll = $request->has('showAll');
+        if ($showAll) {
+            $datasets = $query->get();
+        } else {
+            $datasets = $query->paginate(200);
+        }
 
-        return view('earlybird.bekanntgaben',compact('datasets'));
+        return view('earlybird.bekanntgaben',compact('datasets','showAll'));
 
     }
 
@@ -166,7 +171,12 @@ class EarlyBirdController extends Controller
 
         $query->orderBy($order,$direction);
 
-        $organizations = $query->paginate(200);
+        $showAll = $request->has('showAll');
+        if ($showAll) {
+            $organizations = $query->get();
+        } else {
+            $organizations = $query->paginate(200);
+        }
 
         return view('earlybird.organizations',compact('organizations'));
     }
