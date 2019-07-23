@@ -10,8 +10,16 @@ class Offeror extends Model
         'is_extra' => 'boolean',
     ];
 
+    public function scopeOrganization($query, $id) {
+        return $query->where('organization_id',$id);
+    }
+
     public function organization() {
         return $this->belongsTo('App\Organization');
+    }
+
+    public function dataset() {
+        return $this->belongsTo('App\Dataset');
     }
 
     public function toString() {

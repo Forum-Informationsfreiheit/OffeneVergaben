@@ -99,7 +99,7 @@ class DataSourcePreProcessor
         $adr = isset($data['ADDRESS_CONTRACTING_BODY']) ? $data['ADDRESS_CONTRACTING_BODY'] : null;
 
         if ($adr) {
-            $cb->officialName = $this->getField($adr,'OFFICIALNAME');
+            $cb->officialName = $this->cleanText($this->getField($adr,'OFFICIALNAME'));
             $cb->nationalId   = $this->getField($adr,'NATIONALID');
             $cb->phone        = $this->getField($adr,'PHONE');
             $cb->email        = $this->getField($adr,'E_MAIL');
@@ -115,7 +115,7 @@ class DataSourcePreProcessor
                 foreach($additionals as $additional) {
                     $add = new \stdClass();
 
-                    $add->officialName = $this->getField($additional,'OFFICIALNAME');
+                    $add->officialName = $this->cleanText($this->getField($additional,'OFFICIALNAME'));
                     $add->nationalId   = $this->getField($additional,'NATIONALID');
                     $add->phone        = $this->getField($additional,'PHONE');
                     $add->email        = $this->getField($additional,'E_MAIL');
@@ -249,7 +249,7 @@ class DataSourcePreProcessor
             foreach($contractors as $contractor) {
                 $con = new \stdClass();
 
-                $con->officialName = $this->getField($contractor,'OFFICIALNAME');
+                $con->officialName = $this->cleanText($this->getField($contractor,'OFFICIALNAME'));
                 $con->nationalId   = $this->getField($contractor,'NATIONALID');
 
                 $ac->contractors[] = $con;
@@ -281,7 +281,7 @@ class DataSourcePreProcessor
             foreach($contractors as $contractor) {
                 $con = new \stdClass();
 
-                $con->officialName = $this->getField($contractor,'OFFICIALNAME');
+                $con->officialName = $this->cleanText($this->getField($contractor,'OFFICIALNAME'));
                 $con->nationalId   = $this->getField($contractor,'NATIONALID');
 
                 $mc->contractors[] = $con;
@@ -316,7 +316,7 @@ class DataSourcePreProcessor
             foreach($winners as $winner) {
                 $win = new \stdClass();
 
-                $win->officialName = $this->getField($winner,'OFFICIALNAME');
+                $win->officialName = $this->cleanText($this->getField($winner,'OFFICIALNAME'));
                 $win->nationalId   = $this->getField($winner,'NATIONALID');
 
                 $ap->winners[] = $win;
@@ -934,5 +934,13 @@ class DataSourcePreProcessor
     protected function validatesAsInt($number) {
         $number = filter_var($number, FILTER_VALIDATE_INT);
         return ($number !== FALSE);
+    }
+
+    protected function cleanText($text) {
+        if ($text) {
+            return strip_tags($text);
+        }
+
+        return $text;
     }
 }

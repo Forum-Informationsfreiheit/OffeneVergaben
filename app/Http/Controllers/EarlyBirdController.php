@@ -141,6 +141,12 @@ class EarlyBirdController extends Controller
         return view('earlybird.cpvs',compact('cpvs'));
     }
 
+    public function org($id, Request $request) {
+        $org = Organization::findOrFail($id);
+
+        return view('earlybird.organization',compact('org'));
+    }
+
     public function orgs(Request $request) {
         $order = $request->has('orderBy') ? $request->input('orderBy') : 'name';
         $direction = $request->has('desc') ? 'desc' : 'asc';
