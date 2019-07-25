@@ -11,7 +11,6 @@
     <div class="search" style="margin-bottom: 20px;">
         <label>
             <form method="GET" action="{{ url('/organizations') }}">
-                {{ csrf_field() }}
                 <input type="text" name="search" style="width: 300px; padding: 5px;" value="{{ request()->has('search') ? request('search') : '' }}">&nbsp;Organisation suchen
             </form>
         </label>

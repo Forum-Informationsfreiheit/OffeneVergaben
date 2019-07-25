@@ -32,11 +32,44 @@
             display: inline-block;
             margin-left: 20px;
         }
+        nav {
+            text-align: center;
+        }
+        nav ul {
+            display: inline-block;
+            list-style: none;
+        }
+        nav ul li {
+            float: left;
+            padding-right: 5px;
+        }
+        nav ul li:after {
+            display: inline-block;
+            content: '|';
+            margin-left: 2px;
+            margin-right: 2px;
+        }
+        nav ul li:last-of-type:after {
+            display: none;
+        }
+        nav ul:after {
+            content: '';
+            display: block;
+            clear: both;
+        }
     </style>
     @yield('styles:head')
     @yield('scripts:head')
 </head>
 <body class="@yield('body:class')">
+<nav>
+    <ul>
+        <li><a href="{{ url('/datasets') }}">Datasets</a></li>
+        <li><a href="{{ url('/bekanntgaben') }}">Bekanntgaben</a></li>
+        <li><a href="{{ url('/organizations') }}">Organisationen</a></li>
+        <li><a href="{{ url('/cpvs') }}">CPV Codes</a></li>
+    </ul>
+</nav>
     <h1>Offene Vergaben</h1>
 @yield('body')
 @yield('scripts:bottom')
