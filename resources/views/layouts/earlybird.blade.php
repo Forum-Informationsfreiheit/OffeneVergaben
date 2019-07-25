@@ -41,13 +41,12 @@
         }
         nav ul li {
             float: left;
-            padding-right: 5px;
         }
         nav ul li:after {
             display: inline-block;
             content: '|';
-            margin-left: 2px;
-            margin-right: 2px;
+            margin-left: 5px;
+            margin-right: 5px;
         }
         nav ul li:last-of-type:after {
             display: none;
