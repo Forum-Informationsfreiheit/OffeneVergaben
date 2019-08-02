@@ -26,6 +26,15 @@
         @endforeach
     </table>
     <div class="pagination-wrapper">
-        {{ $cpvs->appends(request()->query())->links() }}
+        @if($showAll)
+            <span class="show-less-link">
+                <a href="{{ url('/cpvs') }}">weniger Ergebnisse anzeigen</a>
+            </span>
+        @else
+            {{ $cpvs->appends(request()->query())->links() }}
+            <span class="show-all-link">
+                <a href="{{ url('/cpvs?showAll') }}">alle Ergebnisse anzeigen</a>
+            </span>
+        @endif
     </div>
 @stop

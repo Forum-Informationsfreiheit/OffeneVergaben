@@ -60,8 +60,9 @@ class EarlyBirdController extends Controller
         } else {
             $datasets = $query->paginate(200);
         }
+        $showMoreText = $request->has('showMoreText');
 
-        return view('earlybird.bekanntgaben',compact('datasets','showAll'));
+        return view('earlybird.bekanntgaben',compact('datasets','showAll','showMoreText'));
 
     }
 
@@ -133,12 +134,19 @@ class EarlyBirdController extends Controller
     }
 
     public function cpvs(Request $request) {
+        $showAll = $request->has('showAll');
         $order = $request->has('orderBy') ? $request->input('orderBy') : 'code';
         $direction = $request->has('desc') ? 'desc' : 'asc';
 
-        $cpvs = CPV::withCount('datasets')->orderBy($order,$direction)->paginate(1000);
+        $cpvs = CPV::withCount('datasets')->orderBy($order,$direction);
 
-        return view('earlybird.cpvs',compact('cpvs'));
+        if ($showAll) {
+            $cpvs = $cpvs->get();
+        } else {
+            $cpvs = $cpvs->paginate(1000);
+        }
+
+        return view('earlybird.cpvs',compact('cpvs','showAll'));
     }
 
     public function org($id, Request $request) {
