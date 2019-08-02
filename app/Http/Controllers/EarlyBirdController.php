@@ -184,7 +184,7 @@ class EarlyBirdController extends Controller
             $organizations = $query->paginate(200);
         }
 
-        return view('earlybird.organizations',compact('organizations'));
+        return view('earlybird.organizations',compact('organizations','showAll'));
     }
 
     protected function getDatasetFieldDump($dataset) {

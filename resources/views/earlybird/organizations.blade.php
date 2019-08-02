@@ -46,6 +46,15 @@
         @endforeach
     </table>
     <div class="pagination-wrapper">
-        {{ $organizations->appends(request()->query())->links() }}
+        @if($showAll)
+            <span class="show-less-link">
+                <a href="{{ url('/organizations') }}">weniger Ergebnisse anzeigen</a>
+            </span>
+        @else
+            {{ $organizations->appends(request()->query())->links() }}
+            <span class="show-all-link">
+                <a href="{{ url('/organizations?showAll') }}">alle Ergebnisse anzeigen</a>
+            </span>
+        @endif
     </div>
 @stop
