@@ -634,8 +634,16 @@ class DataSourcePreProcessor
         $date = null;
 
         try {
+            $value = $hayStack[$needle];
+
+            if (is_array($value)) {
+                $this->log->error('Expected String, but got array for date conversion!.',['getDateHayStack' => $hayStack, 'getDateNeedle' => $needle]);
+                return $date;
+            }
+
             $date = Carbon::parse($hayStack[$needle]);
-        } catch (\Exception $e) {
+        } catch (\Exception $ex) {
+            $this->log->error('Unable to parse date from provided value.',['code' => $ex->getCode(), 'message' => $ex->getMessage(),'getDateHayStack' => $hayStack, 'getDateNeedle' => $needle]);
             dump('Unable to parse date from provided value ',$hayStack[$needle]);
         }
 
