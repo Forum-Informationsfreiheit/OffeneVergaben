@@ -1,5 +1,53 @@
 <?php
 
+if (! function_exists('link_to_stylesheet')) {
+    /**
+     * Returns a url to a <filename>.css stylesheet. If versioned is true
+     * elixir will be queried for the correct version of the stylesheet.
+     *
+     * @param $name
+     * @param $versioned
+     * @return string
+     */
+    function link_to_stylesheet($name, $versioned = false) {
+        if (!$name) return '';
+
+        $path = "css/{$name}.css";
+
+        if (\Illuminate\Support\Facades\App::environment('production')) {
+            $path = "css/{$name}.min.css";
+        }
+
+        $url = $versioned ? url(mix($path)) : url($path);
+
+        return $url;
+    }
+}
+
+if (! function_exists('link_to_script')) {
+    /**
+     * Returns a url to a <filename>.js script. If versioned is true
+     * elixir will be queried for the correct version of the script.
+     *
+     * @param $name
+     * @param $versioned
+     * @return string
+     */
+    function link_to_script($name, $versioned = false) {
+        if (!$name) return '';
+
+        $path = "js/{$name}.js";
+
+        if (\Illuminate\Support\Facades\App::environment('production')) {
+            $path = "js/{$name}.min.js";
+        }
+
+        $url = $versioned ? url(mix($path)) : url($path);
+
+        return $url;
+    }
+}
+
 if (! function_exists('contains_decimal')) {
     function contains_decimal($value) {
         if ( strpos( $value, "." ) !== false ) {

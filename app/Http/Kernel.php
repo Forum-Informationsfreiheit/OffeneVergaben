@@ -31,10 +31,19 @@ class Kernel extends HttpKernel
             \App\Http\Middleware\EncryptCookies::class,
             \Illuminate\Cookie\Middleware\AddQueuedCookiesToResponse::class,
             \Illuminate\Session\Middleware\StartSession::class,
+            /*
+             * Use the AuthenticateSession middleware if you wish to terminate any session your account has
+             * on other devices which means you will be forcibly logged out of your account on any other device.
+             * @see https://kfirba.me/blog/the-undocumented-authenticatesession-middleware-decoded
+             */
             // \Illuminate\Session\Middleware\AuthenticateSession::class,
             \Illuminate\View\Middleware\ShareErrorsFromSession::class,
             \App\Http\Middleware\VerifyCsrfToken::class,
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+
+        'web_admin' => [
+            \App\Http\Middleware\AuthorizeWebAdminAreaAccess::class,
         ],
 
         'api' => [

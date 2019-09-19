@@ -1,0 +1,32 @@
+
+// Bootstrap/SB-Admin Override
+table.table-sm {
+  font-size: 0.85rem;
+
+  th {
+    border-top: none;
+  }
+}
+
+table tr td {
+  a.action-link {
+    padding-right: 0.56rem;
+    color: $gray-400;
+    &:hover {
+      text-decoration: none;
+      color: $blue;
+    }
+    &:active {
+      color: $blue;
+    }
+  }
+  a.action-link.delete {
+    color: $gray-400;
+    &:hover {
+      color: $red;
+    }
+    &:active {
+      color: $red;
+    }
+  }
+}

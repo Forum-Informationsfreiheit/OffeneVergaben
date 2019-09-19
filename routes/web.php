@@ -15,6 +15,8 @@ Route::get('/', function () {
     return view('welcome');
 });
 
+Auth::routes();
+
 Route::get('/origins','EarlyBirdController@origins');
 Route::get('/datasets','EarlyBirdController@datasets');
 Route::get('/datasets/{id}','EarlyBirdController@dataset');
