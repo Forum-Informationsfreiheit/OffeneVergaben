@@ -10641,6 +10641,24 @@ body .page-title {
   color: #e54f5c;
 }
 
+.topbar.navbar .navbar-nav a.nav-link {
+  padding: 0;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  color: #4f402e;
+  border-bottom: 1px solid #4291cc;
+  font-size: 1em;
+}
+
+.topbar.navbar .navbar-nav a.nav-link:hover {
+  color: #4291cc;
+}
+
+.topbar.navbar .navbar-nav a.nav-link.active {
+  color: #4291cc;
+  border-bottom: 1px solid transparent;
+}
+
 footer {
   font-size: 80%;
 }
@@ -10663,10 +10681,6 @@ footer img {
   height: 35px;
 }
 
-footer p {
-  margin-bottom: 0.33rem;
-}
-
 footer .footer-one {
   padding: 25px 0;
   background-color: #e3eff7;
@@ -10674,6 +10688,15 @@ footer .footer-one {
 
 footer .footer-one .logo {
   margin-bottom: 10px;
+}
+
+footer .footer-one p {
+  color: #4291cc;
+  margin-bottom: 0.33rem;
+}
+
+footer .footer-one p a {
+  text-decoration: underline;
 }
 
 footer .footer-one ul > li {
@@ -10688,6 +10711,10 @@ footer .footer-one ul > li:after {
 footer .footer-one ul > li:last-of-type:after {
   content: "";
   margin: 0;
+}
+
+footer .footer-one ul > li a {
+  text-decoration: underline;
 }
 
 footer .footer-one:after {
@@ -10709,6 +10736,93 @@ footer .footer-two:after {
   display: block;
   content: "";
   clear: left;
+}
+
+section h3 {
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #e54f5c;
+}
+
+section.lead {
+  padding: 80px 0;
+  background-color: #e3eff7;
+}
+
+section.lead p.lead {
+  font-size: 1.39rem;
+  color: #4291cc;
+}
+
+section.overview {
+  padding: 50px 0;
+  background-color: #4291cc;
+}
+
+section.overview .box {
+  background-color: #fff;
+  padding: 30px;
+  margin-bottom: 30px;
+}
+
+section.overview .box .box-fake-inner {
+  height: 250px;
+  color: #e0e0e0;
+  font-weight: bold;
+  font-size: 1.1em;
+  padding-top: 110px;
+  text-align: center;
+}
+
+section.features {
+  padding: 50px 0;
+}
+
+section.features h3 {
+  text-align: center;
+}
+
+section.features .feature-wrapper {
+  text-align: center;
+  padding: 50px 30px 0 30px;
+}
+
+section.features h4 {
+  font-size: 1em;
+  font-weight: bold;
+}
+
+section.features .icon-wrapper {
+  position: relative;
+  display: block;
+  text-align: center;
+  width: 50px;
+  height: 50px;
+  background-color: #4291cc;
+  border-radius: 25px;
+  margin-bottom: 0.5rem;
+}
+
+section.features .icon-wrapper svg {
+  position: absolute;
+  top: 0;
+  left: 0;
+  transform: scale(1.5);
+}
+
+section.features .icon-wrapper svg.filter {
+  top: 17px;
+  left: 17px;
+}
+
+section.features .icon-wrapper svg.notification {
+  top: 19px;
+  left: 17px;
+}
+
+section.features .icon-wrapper svg.export {
+  top: 15px;
+  left: 18px;
 }
 
 .navbar-laravel {

@@ -4,6 +4,31 @@ body {
   }
 }
 
+.topbar.navbar {
+
+  .navbar-nav {
+
+    a.nav-link {
+      padding: 0;
+      margin-left: 0.5rem;
+      margin-right: 0.5rem;
+
+      color: $black;
+      border-bottom: 1px solid $blue;
+      font-size: 1em;
+    }
+
+    a.nav-link:hover {
+      color: $blue;
+    }
+    a.nav-link.active {
+      color: $blue;
+      border-bottom: 1px solid transparent;
+    }
+  }
+
+}
+
 footer {
   font-size: $small-font-size;
 
@@ -24,16 +49,21 @@ footer {
     height: 35px;
   }
 
-  p {
-    margin-bottom: 0.33rem;
-  }
-
   .footer-one {
     padding: 25px 0;
     background-color: $lightblue;
 
     .logo {
       margin-bottom: 10px;
+    }
+
+    p {
+      color: $blue;
+      margin-bottom: 0.33rem;
+
+      a {
+        text-decoration: underline;
+      }
     }
 
     ul > li {
@@ -46,6 +76,10 @@ footer {
       &:last-of-type:after {
         content : '';
         margin: 0;
+      }
+
+      a {
+        text-decoration: underline;
       }
     }
 
@@ -70,4 +104,3 @@ footer {
     }
   }
 }
-
