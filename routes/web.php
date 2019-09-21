@@ -12,8 +12,22 @@
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('public.frontpage');
 });
+
+Route::get('/test', function () {
+    return view('public.test');
+});
+
+Route::get('/auftraggeber',function () {
+    return view('public.auftraggeber');
+})->name('public::auftraggeber');
+Route::get('/lieferanten',function () {
+    return view('public.lieferanten');
+})->name('public::lieferanten');
+Route::get('/aufträge',function () {
+    return view('public.auftraege');
+})->name('public::auftraege');
 
 Auth::routes();
 

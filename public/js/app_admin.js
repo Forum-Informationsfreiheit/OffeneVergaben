@@ -81,7 +81,7 @@
 /******/
 /******/
 /******/ 	// Load entry module and return exports
-/******/ 	return __webpack_require__(__webpack_require__.s = 0);
+/******/ 	return __webpack_require__(__webpack_require__.s = 1);
 /******/ })
 /************************************************************************/
 /******/ ({
@@ -36960,26 +36960,14 @@ if (token) {
 
 /***/ }),
 
-/***/ "./resources/sass/app_admin/app_admin.scss":
-/*!*************************************************!*\
-  !*** ./resources/sass/app_admin/app_admin.scss ***!
-  \*************************************************/
-/*! no static exports found */
-/***/ (function(module, exports) {
-
-// removed by extract-text-webpack-plugin
-
-/***/ }),
-
-/***/ 0:
-/*!***********************************************************************************!*\
-  !*** multi ./resources/js/app_admin.js ./resources/sass/app_admin/app_admin.scss ***!
-  \***********************************************************************************/
+/***/ 1:
+/*!*****************************************!*\
+  !*** multi ./resources/js/app_admin.js ***!
+  \*****************************************/
 /*! no static exports found */
 /***/ (function(module, exports, __webpack_require__) {
 
-__webpack_require__(/*! /Interactives/projects/fif/workspace/fif_offenevergaben/resources/js/app_admin.js */"./resources/js/app_admin.js");
-module.exports = __webpack_require__(/*! /Interactives/projects/fif/workspace/fif_offenevergaben/resources/sass/app_admin/app_admin.scss */"./resources/sass/app_admin/app_admin.scss");
+module.exports = __webpack_require__(/*! /Interactives/projects/fif/workspace/fif_offenevergaben/resources/js/app_admin.js */"./resources/js/app_admin.js");
 
 
 /***/ })
