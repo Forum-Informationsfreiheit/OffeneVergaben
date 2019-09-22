@@ -29,6 +29,10 @@ Route::get('/aufträge',function () {
     return view('public.auftraege');
 })->name('public::auftraege');
 
+Route::get('/testpage', function () {
+    return view('public.page');
+});
+
 Auth::routes();
 
 Route::get('/origins','EarlyBirdController@origins');

@@ -1,88 +1,87 @@
-section {
-  h3 {
-    font-size: 1.3rem;
-    font-weight: bold;
-    color: $red;
-  }
-}
-
-
-section.lead {
-  padding: 80px 0;
-  background-color: $lightblue;
-
-  p.lead {
-    font-size: 1.39rem;
-    color: $blue;
-  }
-}
-
-section.overview {
-  padding: 50px 0;
-  background-color: $blue;
-
-  .box {
-    background-color: #fff;
-    padding: 30px;
-    margin-bottom: 30px;
-
-    .box-fake-inner {
-      height: 250px;
-      color: #e0e0e0;
+body.frontpage {
+  section {
+    h3 {
+      font-size: 1.3rem;
       font-weight: bold;
-      font-size: 1.1em;
-      padding-top: 110px;
-      text-align:center;
+      color: $red;
     }
   }
-}
 
-section.features {
-  padding: 50px 0;
+  section.lead {
+    padding: 80px 0;
+    background-color: $lightblue;
 
-  h3 {
-    text-align: center;
+    p.lead {
+      font-size: 1.39rem;
+      color: $blue;
+    }
   }
 
-  .feature-wrapper {
-    text-align: center;
-    padding: 50px 30px 0 30px;
-  }
-
-  h4 {
-    font-size: 1em;
-    font-weight: bold;
-  }
-
-  .icon-wrapper {
-    position: relative;
-    display: block;
-    text-align: center;
-    width: 50px;
-    height: 50px;
+  section.overview {
+    padding: 50px 0;
     background-color: $blue;
-    border-radius: 25px;
-    margin-bottom: 0.5rem;
 
-    svg {
-      position: absolute;
-      top: 0;
-      left: 0;
-      transform: scale(1.5);
-    }
-    svg.filter {
-      top: 17px;
-      left: 17px;
-    }
-    svg.notification {
-      top: 19px;
-      left: 17px;
-    }
-    svg.export {
-      top: 15px;
-      left: 18px;
+    .box {
+      background-color: #fff;
+      padding: 30px;
+      margin-bottom: 30px;
+
+      .box-fake-inner {
+        height: 250px;
+        color: #e0e0e0;
+        font-weight: bold;
+        font-size: 1.1em;
+        padding-top: 110px;
+        text-align:center;
+      }
     }
   }
 
+  section.features {
+    padding: 50px 0;
 
+    h3 {
+      text-align: center;
+    }
+
+    .feature-wrapper {
+      text-align: center;
+      padding: 50px 30px 0 30px;
+    }
+
+    h4 {
+      font-size: 1em;
+      font-weight: bold;
+    }
+
+    .icon-wrapper {
+      position: relative;
+      display: block;
+      text-align: center;
+      width: 50px;
+      height: 50px;
+      background-color: $blue;
+      border-radius: 25px;
+      margin-bottom: 0.5rem;
+
+      svg {
+        position: absolute;
+        top: 0;
+        left: 0;
+        transform: scale(1.5);
+      }
+      svg.filter {
+        top: 17px;
+        left: 17px;
+      }
+      svg.notification {
+        top: 19px;
+        left: 17px;
+      }
+      svg.export {
+        top: 15px;
+        left: 18px;
+      }
+    }
+  }
 }

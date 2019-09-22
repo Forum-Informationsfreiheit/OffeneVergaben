@@ -24,15 +24,21 @@
 
     @include('public.partials.topbar')
 
-    <!-- Content Wrapper -->
+            <!-- Content Wrapper -->
     <div id="content-wrapper" class="d-flex flex-column">
 
         <!-- Main Content -->
         <div id="content">
 
+            @yield('page:header')
+
             <!-- Begin Page Content -->
-            <div class="container">
-                @yield('page:content')
+            <div class="container page-content">
+                <div class="row">
+                    <div class="offset-2 col-md-8">
+                        @yield('page:content')
+                    </div>
+                </div>
             </div>
 
         </div>

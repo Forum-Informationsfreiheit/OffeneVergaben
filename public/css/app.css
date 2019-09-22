@@ -10637,8 +10637,18 @@ a.text-dark:focus {
   }
 }
 
-body .page-title {
+body h1 {
   color: #e54f5c;
+  margin-bottom: 1rem;
+  font-weight: bold;
+}
+
+body p {
+  line-height: 2rem;
+}
+
+body ul > li {
+  line-height: 2rem;
 }
 
 .topbar.navbar .navbar-nav a.nav-link {
@@ -10738,34 +10748,34 @@ footer .footer-two:after {
   clear: left;
 }
 
-section h3 {
+body.frontpage section h3 {
   font-size: 1.3rem;
   font-weight: bold;
   color: #e54f5c;
 }
 
-section.lead {
+body.frontpage section.lead {
   padding: 80px 0;
   background-color: #e3eff7;
 }
 
-section.lead p.lead {
+body.frontpage section.lead p.lead {
   font-size: 1.39rem;
   color: #4291cc;
 }
 
-section.overview {
+body.frontpage section.overview {
   padding: 50px 0;
   background-color: #4291cc;
 }
 
-section.overview .box {
+body.frontpage section.overview .box {
   background-color: #fff;
   padding: 30px;
   margin-bottom: 30px;
 }
 
-section.overview .box .box-fake-inner {
+body.frontpage section.overview .box .box-fake-inner {
   height: 250px;
   color: #e0e0e0;
   font-weight: bold;
@@ -10774,25 +10784,25 @@ section.overview .box .box-fake-inner {
   text-align: center;
 }
 
-section.features {
+body.frontpage section.features {
   padding: 50px 0;
 }
 
-section.features h3 {
+body.frontpage section.features h3 {
   text-align: center;
 }
 
-section.features .feature-wrapper {
+body.frontpage section.features .feature-wrapper {
   text-align: center;
   padding: 50px 30px 0 30px;
 }
 
-section.features h4 {
+body.frontpage section.features h4 {
   font-size: 1em;
   font-weight: bold;
 }
 
-section.features .icon-wrapper {
+body.frontpage section.features .icon-wrapper {
   position: relative;
   display: block;
   text-align: center;
@@ -10803,26 +10813,40 @@ section.features .icon-wrapper {
   margin-bottom: 0.5rem;
 }
 
-section.features .icon-wrapper svg {
+body.frontpage section.features .icon-wrapper svg {
   position: absolute;
   top: 0;
   left: 0;
   transform: scale(1.5);
 }
 
-section.features .icon-wrapper svg.filter {
+body.frontpage section.features .icon-wrapper svg.filter {
   top: 17px;
   left: 17px;
 }
 
-section.features .icon-wrapper svg.notification {
+body.frontpage section.features .icon-wrapper svg.notification {
   top: 19px;
   left: 17px;
 }
 
-section.features .icon-wrapper svg.export {
+body.frontpage section.features .icon-wrapper svg.export {
   top: 15px;
   left: 18px;
+}
+
+body.page section.header {
+  height: 300px;
+  background-color: #e3eff7;
+  font-size: 4em;
+  text-align: center;
+  padding-top: 100px;
+  color: #fff;
+}
+
+body.page .page-content {
+  padding-top: 30px;
+  padding-bottom: 30px;
 }
 
 .navbar-laravel {

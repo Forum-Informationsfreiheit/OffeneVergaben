@@ -1,5 +1,7 @@
 @extends('public.layouts.frontpage')
 
+@section('body:class','frontpage')
+
 @section('lead')
     <div class="container">
         <p class="lead">

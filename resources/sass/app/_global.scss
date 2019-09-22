@@ -1,6 +1,17 @@
 body {
-  .page-title {
+
+  h1 {
     color: $red;
+    margin-bottom: 1rem;
+    font-weight: bold;
+  }
+
+  p {
+    line-height: 2rem;
+  }
+
+  ul > li {
+    line-height: 2rem;
   }
 }
 
