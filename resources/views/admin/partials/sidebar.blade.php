@@ -6,7 +6,7 @@
         <div class="sidebar-brand-icon rotate-n-15">
             <i class="fas fa-laugh-wink"></i>
         </div>
-        <div class="sidebar-brand-text mx-3">ives lara v5.8</div>
+        <div class="sidebar-brand-text mx-3">{{ env('APP_NAME','Administration') }}</div>
     </a>
 
     <!-- Divider -->
