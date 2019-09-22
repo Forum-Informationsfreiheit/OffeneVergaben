@@ -7,6 +7,10 @@
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
+    @if(!App::environment('production'))
+        <meta name="robots" content="noindex, nofollow" />
+    @endif
+
     <title>@yield('page:title')| {{ config('app.name', 'Laravel') }}</title>
 
     <!-- Fonts -->
