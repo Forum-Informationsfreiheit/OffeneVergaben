@@ -1,0 +1,50 @@
+body.datasets {
+
+  .filter-wrapper {
+    margin-bottom: 20px;
+
+    .filter-head {
+      padding: 8px;
+      background-color: #cbd5dd;
+
+      a,
+      a:hover
+      a:focus {
+        color: $black;
+        text-decoration: none;
+      }
+    }
+  }
+
+  .results-meta {
+    margin-bottom: 10px;
+  }
+
+  table {
+    thead {
+      th {
+        padding: 12px;
+        background-color: $blue;
+        color: #fff;
+      }
+    }
+
+    th,td {
+      font-size: 0.8rem;
+      padding: 12px;
+    }
+
+    td.name {
+      width: 25%;
+    }
+    td.nb {
+      width: 5%;
+    }
+    td.value {
+      text-align: right;
+    }
+    td.date {
+      width: 10%;
+    }
+  }
+}

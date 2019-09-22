@@ -10850,6 +10850,53 @@ body.page section.header {
   color: #fff;
 }
 
+body.datasets .filter-wrapper {
+  margin-bottom: 20px;
+}
+
+body.datasets .filter-wrapper .filter-head {
+  padding: 8px;
+  background-color: #cbd5dd;
+}
+
+body.datasets .filter-wrapper .filter-head a,
+body.datasets .filter-wrapper .filter-head a:hover a:focus {
+  color: #4f402e;
+  text-decoration: none;
+}
+
+body.datasets .results-meta {
+  margin-bottom: 10px;
+}
+
+body.datasets table thead th {
+  padding: 12px;
+  background-color: #4291cc;
+  color: #fff;
+}
+
+body.datasets table th,
+body.datasets table td {
+  font-size: 0.8rem;
+  padding: 12px;
+}
+
+body.datasets table td.name {
+  width: 25%;
+}
+
+body.datasets table td.nb {
+  width: 5%;
+}
+
+body.datasets table td.value {
+  text-align: right;
+}
+
+body.datasets table td.date {
+  width: 10%;
+}
+
 .navbar-laravel {
   background-color: #fff;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
