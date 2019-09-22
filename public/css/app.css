@@ -10651,6 +10651,12 @@ body ul > li {
   line-height: 2rem;
 }
 
+.container.page-content {
+  padding-top: 40px;
+  padding-bottom: 30px;
+  min-height: 200px;
+}
+
 .topbar.navbar .navbar-nav a.nav-link {
   padding: 0;
   margin-left: 0.5rem;
@@ -10842,11 +10848,6 @@ body.page section.header {
   text-align: center;
   padding-top: 100px;
   color: #fff;
-}
-
-body.page .page-content {
-  padding-top: 30px;
-  padding-bottom: 30px;
 }
 
 .navbar-laravel {

@@ -13,13 +13,13 @@
         <div class="d-flex">
             <ul class="mx-auto justify-content-center">
                 <li>
-                    <a href="{{ url('/') }}">Über uns</a>
+                    <a href="{{ url('/überuns') }}">Über uns</a>
                 </li>
                 <li>
-                    <a href="{{ url('/') }}">Kontakt & Impressum</a>
+                    <a href="{{ url('/impressum') }}">Kontakt & Impressum</a>
                 </li>
                 <li>
-                    <a href="{{ url('/') }}">Datenschutzerklärung</a>
+                    <a href="{{ url('/datenschutz') }}">Datenschutzerklärung</a>
                 </li>
             </ul>
         </div>

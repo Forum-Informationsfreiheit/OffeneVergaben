@@ -37,6 +37,22 @@ class AuthServiceProvider extends ServiceProvider
             }
         });
 
+        Gate::define('show-page',function($user, $page) {
+            if ($user->role_id >= Role::EDITOR) {
+                return true;
+            }
+
+            return false;
+        });
+
+        Gate::define('show-news',function($user, $post) {
+            if ($user->role_id >= Role::EDITOR) {
+                return true;
+            }
+
+            return false;
+        });
+
         Gate::define('create-user',function($user) {
             return $user->isAdmin();
         });

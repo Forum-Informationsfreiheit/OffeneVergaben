@@ -31,7 +31,7 @@
         <div id="content">
 
             <!-- Begin Page Content -->
-            <div class="container">
+            <div class="container page-content">
                 @yield('page:content')
             </div>
 

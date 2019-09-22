@@ -11,9 +11,7 @@
 |
 */
 
-Route::get('/', function () {
-    return view('public.frontpage');
-});
+Route::get('/', 'PageController@frontpage');
 
 Route::get('/test', function () {
     return view('public.test');
@@ -29,12 +27,14 @@ Route::get('/aufträge',function () {
     return view('public.auftraege');
 })->name('public::auftraege');
 
-Route::get('/testpage', function () {
-    return view('public.page');
-});
+// reserved routes for dynamic page content, directly under domain (no other url prefix)
+Route::get('/impressum',   'PageController@reserved');
+Route::get('/datenschutz', 'PageController@reserved');
+Route::get('/überuns',     'PageController@reserved');
 
 Auth::routes();
 
+// temporary Earlybird stuff, remove for production
 Route::get('/origins','EarlyBirdController@origins');
 Route::get('/datasets','EarlyBirdController@datasets');
 Route::get('/datasets/{id}','EarlyBirdController@dataset');
@@ -49,6 +49,10 @@ Route::group(['prefix' => 'test'], function () {
     if (App::environment('production')) {
         return;
     }
+
+    Route::get('/typo', function () {
+        return view('public.typography-testpage');
+    });
 
     Route::get('/timestamp', function () {
         $testDate = "2019-04-01T07:17:33.997";
