@@ -4,14 +4,42 @@ body.datasets {
     margin-bottom: 20px;
 
     .filter-head {
-      padding: 8px;
-      background-color: #cbd5dd;
+      padding: 15px;
+      background-color: #e4e2e0;
 
       a,
       a:hover
       a:focus {
         color: $black;
         text-decoration: none;
+      }
+    }
+
+    .filter-body {
+      display: block;
+      background-color: #f6f6f5;
+      padding: 20px;
+    }
+
+    &.collapsed {
+      .filter-body {
+        display: none;
+      }
+    }
+
+    .filter-group {
+      .filter-group-label {
+        display: block;
+        font-weight: bold;
+      }
+      .filter-group-inputs {
+
+      }
+
+      &.collapsed {
+        .filter-group-inputs {
+          display: none;
+        }
       }
     }
   }
@@ -21,6 +49,8 @@ body.datasets {
   }
 
   table {
+    /*
+    moved to global.scss
     thead {
       th {
         padding: 12px;
@@ -28,6 +58,7 @@ body.datasets {
         color: #fff;
       }
     }
+    */
 
     th,td {
       font-size: 0.8rem;

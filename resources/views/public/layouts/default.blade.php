@@ -46,5 +46,7 @@
     @include('public.partials.footer')
 
 </div>
+
+    @yield('body:append')
 </body>
 </html>

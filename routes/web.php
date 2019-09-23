@@ -17,13 +17,9 @@ Route::get('/test', function () {
     return view('public.test');
 });
 
-Route::get('/auftraggeber',function () {
-    return view('public.auftraggeber');
-})->name('public::auftraggeber');
-Route::get('/lieferanten',function () {
-    return view('public.lieferanten');
-})->name('public::lieferanten');
 Route::get('/aufträge','DatasetController@index')->name('public::auftraege');
+Route::get('/lieferanten','ContractorController@index')->name('public::lieferanten');
+Route::get('/auftraggeber','OfferorController@index')->name('public::auftraggeber');
 
 // reserved routes for dynamic page content, directly under domain (no other url prefix)
 Route::get('/impressum',   'PageController@reserved');
