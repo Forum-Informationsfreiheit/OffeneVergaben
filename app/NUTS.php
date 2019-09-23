@@ -11,4 +11,8 @@ class NUTS extends Model
     protected $primaryKey = 'code';
 
     protected $keyType = 'string';
+
+    public function toString() {
+        return $this->code . ' ' . $this->name;
+    }
 }

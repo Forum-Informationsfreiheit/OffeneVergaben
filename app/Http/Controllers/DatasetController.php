@@ -68,4 +68,10 @@ class DatasetController extends Controller
 
         return view('public.datasets.index',compact('items','totalItems','showAll','paramsString','cpv','cpvFilter'));
     }
+
+    public function show($id) {
+        $dataset = Dataset::findOrFail($id);
+
+        return view('public.datasets.show',compact('dataset'));
+    }
 }

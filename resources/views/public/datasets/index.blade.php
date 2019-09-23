@@ -64,7 +64,9 @@
                 <tbody>
                 @foreach($items as $item)
                     <tr>
-                        <td class="name">{{ $item->title }}</td>
+                        <td class="name">
+                            <a href="{{ route('public::auftrag',$item->id) }}">{{ $item->title }}</a>
+                        </td>
                         <td class="name">
                             <a href="{{ route('public::show-auftraggeber',$item->offeror->organization_id) }}">{{ $item->offeror->name }}</a>
                         </td>

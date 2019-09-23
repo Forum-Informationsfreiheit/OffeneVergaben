@@ -10784,6 +10784,19 @@ table.ov-table thead th {
   color: #fff;
 }
 
+table.ov-table th,
+table.ov-table td {
+  font-size: 0.8rem;
+}
+
+table.ov-table.ov-table-vertical th {
+  padding: 6px 12px;
+  background-color: #f6f6f5;
+  color: #4f402e;
+  width: 25%;
+  vertical-align: middle;
+}
+
 body.frontpage section h3 {
   font-size: 1.3rem;
   font-weight: bold;
@@ -10931,9 +10944,7 @@ body.datasets table {
   */
 }
 
-body.datasets table th,
 body.datasets table td {
-  font-size: 0.8rem;
   padding: 12px;
 }
 
@@ -10951,6 +10962,23 @@ body.datasets table td.value {
 
 body.datasets table td.date {
   width: 10%;
+}
+
+body.dataset table tr td {
+  vertical-align: middle;
+  padding-left: 12px;
+  padding-right: 12px;
+}
+
+body.dataset table tr td ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body.dataset table tr td li {
+  display: block;
+  line-height: inherit;
 }
 
 .navbar-laravel {

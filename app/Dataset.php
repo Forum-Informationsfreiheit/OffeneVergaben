@@ -11,6 +11,7 @@ class Dataset extends Model
 
     protected $casts = [
         'is_current_version' => 'boolean',
+        'threshold' => 'boolean',
     ];
 
     protected $dates = [
@@ -53,6 +54,10 @@ class Dataset extends Model
 
     public function cpv() {
         return $this->belongsTo('App\CPV','cpv_code');
+    }
+
+    public function nuts() {
+        return $this->belongsTo('App\NUTS','nuts_code');
     }
 
     public function cpvs() {

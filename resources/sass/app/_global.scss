@@ -138,4 +138,18 @@ table.ov-table {
       color: #fff;
     }
   }
+
+  th,td {
+    font-size: 0.8rem;
+  }
+
+  &.ov-table-vertical {
+    th {
+      padding: 6px 12px;
+      background-color: #f6f6f5;;
+      color: $black;
+      width: 25%;
+      vertical-align: middle;
+    }
+  }
 }

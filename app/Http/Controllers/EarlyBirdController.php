@@ -231,7 +231,7 @@ class EarlyBirdController extends Controller
             'Justification' => $dataset->justificationFormatted,
             'Date first publication' => $this->formatDate($dataset->date_first_publication),
             'DT last change' => $this->formatDateTime($dataset->datetime_last_change),
-            'Deadline standstill' => $this->formatDate($dataset->deadline_stanstill),
+            'Deadline standstill' => $this->formatDate($dataset->deadline_standstill),
             'RD notification' => $this->formatBoolean($dataset->rd_notification),
             'Obj. Mod. title' => $dataset->ocm_title,
             'Obj. Mod. contract type' => $dataset->ocm_contract_type,
