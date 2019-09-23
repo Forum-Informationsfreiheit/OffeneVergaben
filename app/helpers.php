@@ -143,8 +143,14 @@ if (!function_exists('procedure_label')) {
             if ($p[0] == 'PT_COMPETITIVE_DIALOG') {
                 return 'wettbewerblicher Dialog';
             }
+            if ($p[0] == 'PT_COMPETITIVE_NEGOTIATION') {
+                return 'Verhandlungsverfahren';
+            }
             if ($p[0] == 'PT_INNOVATION_PARTNERSHIP') {
                 return 'Innovationspartnerschaft';
+            }
+            if ($p[0] == 'PT_SPECIAL_SERVICE') {
+                return 'Besonderer Dienstleistungsauftrag';
             }
             if ($p[0] == 'DPS') {
                 return 'dynamisches Beschaffungssystem';
