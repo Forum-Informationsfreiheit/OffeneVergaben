@@ -18,13 +18,13 @@
             <!-- Right Side Of Navbar -->
             <ul class="navbar-nav ml-auto">
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->route() && request()->route()->getName() == 'public::auftraggeber' ? 'active' : '' }}" href="{{ route('public::auftraggeber') }}">{{ __('Auftraggeber') }}</a>
+                    <a class="nav-link {{ request()->route() && request()->segment(1) == 'auftraggeber' ? 'active' : '' }}" href="{{ route('public::auftraggeber') }}">{{ __('Auftraggeber') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->route() && request()->route()->getName() == 'public::lieferanten' ? 'active' : '' }}" href="{{ route('public::lieferanten') }}">{{ __('Lieferanten') }}</a>
+                    <a class="nav-link {{ request()->route() && request()->segment(1) == 'lieferanten' ? 'active' : '' }}" href="{{ route('public::lieferanten') }}">{{ __('Lieferanten') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->route() && request()->route()->getName() == 'public::auftraege' ? 'active' : '' }}" href="{{ route('public::auftraege') }}">{{ __('Aufträge') }}</a>
+                    <a class="nav-link {{ request()->route() && request()->segment(1) == 'aufträge' ? 'active' : '' }}" href="{{ route('public::auftraege') }}">{{ __('Aufträge') }}</a>
                 </li>
             </ul>
         </div>

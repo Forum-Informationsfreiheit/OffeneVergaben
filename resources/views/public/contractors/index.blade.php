@@ -42,7 +42,9 @@
                 <tbody>
                 @foreach($items as $item)
                     <tr>
-                        <td class="name">{{ $item->name }}</td>
+                        <td class="name">
+                            <a href="{{ route('public::lieferant',$item->id) }}">{{ $item->name }}</a>
+                        </td>
                     </tr>
                 @endforeach
                 </tbody>

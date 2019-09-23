@@ -51,6 +51,10 @@ class Dataset extends Model
         return $this->hasMany('App\Contractor');
     }
 
+    public function cpv() {
+        return $this->belongsTo('App\CPV','cpv_code');
+    }
+
     public function cpvs() {
         return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code');
     }

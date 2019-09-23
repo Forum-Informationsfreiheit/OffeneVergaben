@@ -18,8 +18,13 @@ Route::get('/test', function () {
 });
 
 Route::get('/aufträge','DatasetController@index')->name('public::auftraege');
+Route::get('/aufträge/{id}','DatasetController@show')->name('public::auftrag');
+
 Route::get('/lieferanten','ContractorController@index')->name('public::lieferanten');
+Route::get('/lieferanten/{id}','ContractorController@show')->name('public::lieferant');
+
 Route::get('/auftraggeber','OfferorController@index')->name('public::auftraggeber');
+Route::get('/auftraggeber/{id}','OfferorController@show')->name('public::show-auftraggeber');
 
 // reserved routes for dynamic page content, directly under domain (no other url prefix)
 Route::get('/impressum',   'PageController@reserved');

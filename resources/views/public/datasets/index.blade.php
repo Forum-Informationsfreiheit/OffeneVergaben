@@ -65,8 +65,16 @@
                 @foreach($items as $item)
                     <tr>
                         <td class="name">{{ $item->title }}</td>
-                        <td class="name">{{ $item->offeror->name }}</td>
-                        <td class="name">{{ $item->contractor ? $item->contractor->name : '' }}</td>
+                        <td class="name">
+                            <a href="{{ route('public::show-auftraggeber',$item->offeror->organization_id) }}">{{ $item->offeror->name }}</a>
+                        </td>
+                        <td class="name">
+                            @if($item->contractor)
+                                <a href="{{ route('public::lieferant',$item->contractor->organization_id) }}">{{ $item->contractor->name }}</a>
+                                @else
+                                &nbsp;
+                                @endif
+                        </td>
                         <td class="nb">{{ $item->nb_tenders_received }}</td>
                         <td class="value">{{ $item->valTotalFormatted }}</td>
                         <td class="date" title="{{ $item->datetime_last_change ? $item->datetime_last_change->format('d.m.Y h:i') : '' }}">{{ $item->datetime_last_change ? $item->datetime_last_change->format('d.m.Y') : '' }}</td>

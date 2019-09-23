@@ -10643,6 +10643,30 @@ body h1 {
   font-weight: bold;
 }
 
+body h1 {
+  font-size: 1.8rem;
+}
+
+body h2 {
+  font-size: 1.575rem;
+}
+
+body h3 {
+  font-size: 1.35rem;
+}
+
+body h4 {
+  font-size: 1.125rem;
+}
+
+body h5 {
+  font-size: 1rem;
+}
+
+body h6 {
+  font-size: 0.9rem;
+}
+
 body p {
   line-height: 2rem;
 }
