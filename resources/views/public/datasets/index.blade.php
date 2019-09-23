@@ -22,7 +22,7 @@
     <div class="row">
         <div class="col">
             <div class="results-meta">
-                <span class="count">ungefähr ? Ergebnisse</span>
+                <span class="count">ungefähr {{ $totalItems }} Ergebnisse</span>
             </div>
         </div>
     </div>

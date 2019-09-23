@@ -18,6 +18,10 @@ class DatasetController extends Controller
 
         $cpv = null;
 
+        // todo need to use same query for list data as for count value
+        // this includes filters !!!
+        $totalItems = Dataset::current()->count();
+
         $query = Dataset::select([
             'datasets.*',
             'offerors.name as offeror_name',
@@ -62,6 +66,6 @@ class DatasetController extends Controller
 
         $paramsString = "orderBy=$order" . ($direction == "desc" ? "&desc=1" : "");
 
-        return view('public.datasets.index',compact('items','showAll','paramsString','cpv','cpvFilter'));
+        return view('public.datasets.index',compact('items','totalItems','showAll','paramsString','cpv','cpvFilter'));
     }
 }
