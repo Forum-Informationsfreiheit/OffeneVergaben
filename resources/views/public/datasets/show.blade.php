@@ -45,11 +45,9 @@
                     @endif
                     @if($dataset->procedures)
                     <tr>
-                        <th>Verfahrensart(en)</th>
+                        <th>Verfahrensart</th>
                         <td>
-                            @foreach($dataset->procedures as $procedure)
-                                {{ $procedure->name . ($loop->last ? '' : ', ') }}
-                            @endforeach
+                            {{ procedure_label($dataset->procedures->pluck('code')->toArray()) }}
                         </td>
                     </tr>
                     @endif
@@ -74,19 +72,19 @@
                     @endif
                     @if($dataset->date_start)
                         <tr>
-                            <th>Date Start</th>
+                            <th>Angabe des geplanten Ausführungsbeginns</th>
                             <td>{{ $dataset->date_start->format('d.m.Y') }}</td>
                         </tr>
                     @endif
                     @if($dataset->date_end)
                         <tr>
-                            <th>Date End</th>
+                            <th>{{ $dataset->label('date_end') }}</th>
                             <td>{{ $dataset->date_end->format('d.m.Y') }}</td>
                         </tr>
                     @endif
                     @if($dataset->duration)
                         <tr>
-                            <th>Duration (Days)</th>
+                            <th>{{ $dataset->label('duration') }}</th>
                             <td>{{ $dataset->duration }}</td>
                         </tr>
                     @endif
@@ -134,19 +132,19 @@
                     @endif
                     @if($dataset->val_total)
                         <tr>
-                            <th>Val Total</th>
+                            <th>{{ $dataset->label('val_total') }}</th>
                             <td>{{ $dataset->valTotalFormatted }}</td>
                         </tr>
                     @endif
                     @if($dataset->val_total_before)
                         <tr>
-                            <th>Val Total</th>
+                            <th>{{ $dataset->label('val_total_before') }}</th>
                             <td>{{ $dataset->valTotalBeforeFormatted }}</td>
                         </tr>
                     @endif
                     @if($dataset->val_total_after)
                         <tr>
-                            <th>Val Total</th>
+                            <th>{{ $dataset->label('val_total_after') }}</th>
                             <td>{{ $dataset->valTotalAfterFormatted }}</td>
                         </tr>
                     @endif

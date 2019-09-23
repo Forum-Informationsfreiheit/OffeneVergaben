@@ -131,3 +131,72 @@ if (! function_exists('nl_to_br')) {
         return preg_replace("/(\r\n|\n|\r)/", "<br />", $text);
     }
 }
+
+if (!function_exists('procedure_label')) {
+    function procedure_label($procedures) {
+        $p = is_array($procedures) ? $procedures : [ $procedures ];
+        if (count($p) == 1) {
+            // 'singles'
+            if ($p[0] == 'PT_OPEN') {
+                return 'offenes Verfahren';
+            }
+            if ($p[0] == 'PT_COMPETITIVE_DIALOG') {
+                return 'wettbewerblicher Dialog';
+            }
+            if ($p[0] == 'PT_INNOVATION_PARTNERSHIP') {
+                return 'Innovationspartnerschaft';
+            }
+            if ($p[0] == 'DPS') {
+                return 'dynamisches Beschaffungssystem';
+            }
+            if ($p[0] == 'PT_DIRECT') {
+                return 'Direktvergabe';
+            }
+        }
+        if (count($p) == 2) {
+            // 'doubles'
+            if(in_array('PT_RESTRICTED',$p) && in_array('PT_WITH_PRIOR_NOTICE',$p)) {
+                return 'nicht offenes Verfahren mit vorheriger Bekanntmachung';
+            }
+            if(in_array('PT_RESTRICTED',$p) && in_array('PT_WITHOUT_PRIOR_NOTICE',$p)) {
+                return 'nicht offenes Verfahren ohne vorheriger Bekanntmachung';
+            }
+            if(in_array('PT_COMPETITIVE_NEGOTIATION',$p) && in_array('PT_WITH_PRIOR_NOTICE',$p)) {
+                return 'Verhandlungsverfahren mit vorheriger Bekanntmachung';
+            }
+            if(in_array('PT_COMPETITIVE_NEGOTIATION',$p) && in_array('PT_WITHOUT_PRIOR_NOTICE',$p)) {
+                return 'Verhandlungsverfahren ohne vorheriger Bekanntmachung';
+            }
+            if(in_array('PT_SPECIAL_SERVICE',$p) && in_array('PT_WITH_PRIOR_NOTICE',$p)) {
+                return 'besonderer Dienstleistungsauftrag mit vorheriger Bekanntmachung';
+            }
+            if(in_array('PT_SPECIAL_SERVICE',$p) && in_array('PT_WITHOUT_PRIOR_NOTICE',$p)) {
+                return 'besonderer Dienstleistungsauftrag ohne vorheriger Bekanntmachung';
+            }
+            if(in_array('PT_DIRECT',$p) && in_array('PT_WITH_PRIOR_NOTICE',$p)) {
+                return 'Direktvergabe mit vorheriger Bekanntmachung';
+            }
+            if(in_array('PT_OPEN',$p) && in_array('PT_IDEA',$p)) {
+                return 'offener Ideenwettbewerb';
+            }
+            if(in_array('PT_OPEN',$p) && in_array('PT_IMPLEMENTATION',$p)) {
+                return 'offener Realisierungswettbewerb';
+            }
+            if(in_array('PT_RESTRICTED',$p) && in_array('PT_IDEA',$p)) {
+                return 'nicht offener Ideenwettbewerb';
+            }
+            if(in_array('PT_RESTRICTED',$p) && in_array('PT_IMPLEMENTATION',$p)) {
+                return 'nicht offener Realisierungswettbewerb';
+            }
+            if(in_array('PT_INVITED',$p) && in_array('PT_IDEA',$p)) {
+                return 'geladener Ideenwettbewerb';
+            }
+            if(in_array('PT_INVITED',$p) && in_array('PT_IMPLEMENTATION',$p)) {
+                return 'geladener Realisierungswettbewerb';
+            }
+        }
+
+        // nothing ? should never happen
+        return join(', ',$p);
+    }
+}

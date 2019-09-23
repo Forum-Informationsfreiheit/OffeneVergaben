@@ -4,6 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Lang;
 
 class Dataset extends Model
 {
@@ -23,6 +24,36 @@ class Dataset extends Model
         'datetime_receipt_tenders',
         'datetime_last_change'
     ];
+
+    /**
+     * Some attributes of a dataset have different meaning/translations
+     * depending on type.
+     *
+     * @param $attribute
+     *
+     * @return string
+     */
+    public static function labelStatic($attribute,$type) {
+        $translationGeneralKey = 'dataset.'.$attribute;
+
+        if (Lang::has($translationGeneralKey.'.'.$type)) {
+            return Lang::get($translationGeneralKey.'.'.$type);
+        } else {
+            // this should always be defined, if not, someone was lazy
+            return $translationGeneralKey;
+        }
+    }
+
+    /**
+     * Shortcut for static version. Handy if you have a $dataset at hand.
+     *
+     * @param $attribute
+     *
+     * @return string
+     */
+    public function label($attribute) {
+        return self::labelStatic($attribute,$this->type_code);
+    }
 
     public function scopeCurrent($query) {
         return $query->where('is_current_version',1);
