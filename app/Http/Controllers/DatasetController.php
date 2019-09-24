@@ -4,12 +4,24 @@ namespace App\Http\Controllers;
 
 use App\CPV;
 use App\Dataset;
+use App\Http\Filters\DatasetFilter;
 use App\Organization;
 use Illuminate\Http\Request;
 
 class DatasetController extends Controller
 {
-    public function index(Request $request) {
+    public function index(DatasetFilter $filters) {
+        $query = Dataset::with('contractor')->filter($filters);
+
+        $totalItems   = $query->count();
+        $data         = $query->paginate(20);
+
+        $items = $data;
+
+        return view('public.datasets.index',compact('items','totalItems','filters'));
+    }
+
+    public function indexOld(Request $request) {
         $order = $request->has('orderBy') ? $request->input('orderBy') : 'offerors.name';
         $direction = $request->has('desc') ? 'desc' : 'asc';
         $cpvFilter = $request->has('cpvFilter') ? $request->input('cpvFilter') : null;

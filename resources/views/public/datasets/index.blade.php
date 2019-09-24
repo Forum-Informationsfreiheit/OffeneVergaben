@@ -6,7 +6,7 @@
     <h1 class="page-title">
         Aufträge
     </h1>
-    <div id="filterWrapper" class="filter-wrapper collapsed">
+    <div id="filterWrapper" class="filter-wrapper {{ $filters->hasAny() ? '' : 'collapsed' }}">
         <div class="filter-head">
             <a href="#" id="filterToggle" class="filter-toggle" data-status="hidden">
                 <span class="icon-wrapper filter">
@@ -16,29 +16,7 @@
             </a>
         </div>
         <div class="filter-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="filter-group">
-                        <span class="filter-group-label">
-                            Auftragsart
-                        </span>
-                        <div class="filter-group-inputs">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" name="ausschreibung" id="filterAusschreibung">
-                                <label class="form-check-label" for="filterAusschreibung">
-                                    Ausschreibung
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" name="auftrag" id="filterAuftrag">
-                                <label class="form-check-label" for="filterAuftrag">
-                                    Auftrag
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
+            @include('public.datasets.partials.filter')
         </div>
     </div>
     <div class="row">
