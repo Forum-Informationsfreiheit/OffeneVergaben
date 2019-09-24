@@ -10949,11 +10949,11 @@ body.datasets table td {
 }
 
 body.datasets table td.name {
-  width: 25%;
+  width: 23%;
 }
 
 body.datasets table td.nb {
-  width: 5%;
+  width: 8%;
 }
 
 body.datasets table td.value {

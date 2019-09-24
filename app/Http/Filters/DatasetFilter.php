@@ -3,11 +3,32 @@
 namespace App\Http\Filters;
 
 use App\DatasetType;
+use Illuminate\Database\Query\Builder;
 use Kblais\QueryFilter\QueryFilter;
 
 class DatasetFilter extends QueryFilter
 {
     protected $filters = [];
+
+    // only single attribute sort implemented atm
+    protected $sortedBy = null;
+    protected $sortDirection = null;
+
+    public function sort($field) {
+
+        $this->sortDirection = substr($field, 0, 1) == '-' ? 'desc' : 'asc';
+        $this->sortedBy = substr($field, 0, 1) == '-' ? substr($field,1) : $field;
+
+        if($this->sortedBy == 'offeror') {
+            return $this->builder->orderBy('offerors.name',$this->sortDirection);
+        }
+
+        if($this->sortedBy == 'contractor') {
+            return $this->builder->orderBy('contractors.name',$this->sortDirection);
+        }
+
+        return $this->builder->orderBy($this->sortedBy,$this->sortDirection);
+    }
 
     public function types($values) {
         $count = count($values);
@@ -94,5 +115,18 @@ class DatasetFilter extends QueryFilter
 
     public function hasAny() {
         return count($this->filters) > 0;
+    }
+
+    public function isSortedBy($field) {
+        return $this->sortedBy == $field ? $this->sortDirection : false;
+    }
+
+    public function makeSortUrl($field,$direction) {
+
+        $url = url()->current();
+        $params = $this->request->except('sort');
+        $params['sort'] = ($direction == 'desc' ? '-' : '') . $field;
+
+        return $url . '?' . http_build_query($params);
     }
 }

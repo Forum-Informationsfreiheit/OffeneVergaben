@@ -6,12 +6,87 @@ use App\CPV;
 use App\Dataset;
 use App\Http\Filters\DatasetFilter;
 use App\Organization;
+use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 
 class DatasetController extends Controller
 {
+    /**
+     * IMPORTANT because not self explanatory.
+     * Laravels Eloquent is a fine ORM but when we are dealing with more than one table
+     * and have to query multiple relationships Eloquent gets more in the way than it is helping.
+     *
+     * Therefor don't use Eloquent when building the base query for the index view !!!
+     *
+     * How it works:
+     * 1. Build the base query by using Laravel QueryBuilder (NOT Eloquent)
+     *    The base query joins two external tables: offerors and contractors
+     * 2. The DatasetFilter further operates on this query and applies
+     *    filter- and sort-logic.
+     * 3. Do the pagination
+     * 4. The result of this query are just the Dataset-IDs.
+     *    These are correctly filtered and ordered and
+     *    represent only one "page"
+     *    (one page is 20 items at the time of writing this).
+     * 5. With the correct ids at hand now we use eloquent to actually
+     *    load up full eloquent models for those 20 items we are going to display
+     *    (they are just very convenient to handle in views)
+     *    Note the code that says DB::raw("FIELD......") this is to preserve
+     *    the original sort order (see 4.)
+     *
+     *
+     * @param DatasetFilter $filters
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
     public function index(DatasetFilter $filters) {
-        $query = Dataset::with('contractor')->filter($filters);
+        $query = $this->buildIndexQuery()->filter($filters);
+
+        $totalItems = $query->count();
+        $data       = $query->paginate(20);
+
+        // debug: this is the original sort order of the ids
+        // dump($data->pluck('id')->toArray());
+
+        $orderedIds = $data->pluck('id')->toArray();
+        $orderedIdsStr = join(',',$orderedIds);
+
+        // now load the appropriate models for the view
+        $items = Dataset::whereIn('id',$orderedIds)
+            ->orderByRaw(DB::raw("FIELD(id, $orderedIdsStr)")) // https://stackoverflow.com/a/26704767/718980
+            ->get();
+
+        return view('public.datasets.index',compact('items','totalItems','filters','data'));
+    }
+
+    /**
+     * @return \Illuminate\Database\Query\Builder;
+     */
+    protected function buildIndexQuery() {
+        // build up the basic query here
+        // do the micro management for where clause and order clause later
+        $query = Dataset::select(['datasets.id']);
+        $query->join('offerors',function($join) {
+            $join->on('datasets.id', '=', 'offerors.dataset_id')
+                ->where('offerors.is_extra','=',0);
+        });
+        // this could lead to future problems
+        // data at hand says there is max. one contractor per dataset
+        // but this is not enforced by the application. the relationship is actualy 1:n
+        // so this join _could_ potentially load more than one contractor record
+        // per dataset
+        $query->leftJoin('contractors','datasets.id','=','contractors.dataset_id');
+
+        return $query;
+    }
+
+    public function indexWithEloquentQueryFilter(DatasetFilter $filters) {
+
+        // this looks super clean, but just fails to work
+        // with filterable & sortable columns from relationship tables
+        // so .... its here for future reference but will not be used
+
+        $query = Dataset::with('offeror')->with('contractor')->filter($filters);
 
         $totalItems   = $query->count();
         $data         = $query->paginate(20);

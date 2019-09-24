@@ -31,17 +31,35 @@
             <table class="table ov-table table-sm table-bordered table-striped">
                 <thead>
                 <tr>
-                    <th>Bezeichnung</th>
-                    <th>Auftraggeber</th>
-                    <th>Lieferant</th>
-                    <th>Bieter</th>
-                    <th>Summe</th>
-                    <th>Aktualisiert</th>
+                    <th>
+                        Bezeichnung
+                        @include('public.datasets.partials.sort',['field' => 'title'])
+                    </th>
+                    <th>
+                        Auftraggeber
+                        @include('public.datasets.partials.sort',['field' => 'offeror'])
+                    </th>
+                    <th>
+                        Lieferant
+                        @include('public.datasets.partials.sort',['field' => 'contractor'])
+                    </th>
+                    <th>
+                        Bieter
+                        @include('public.datasets.partials.sort',['field' => 'nb_tenders_received'])
+                    </th>
+                    <th>
+                        Summe
+                        @include('public.datasets.partials.sort',['field' => 'val_total'])
+                    </th>
+                    <th>
+                        Aktualisiert
+                        @include('public.datasets.partials.sort',['field' => 'datetime_last_change'])
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($items as $item)
-                    <tr>
+                    <tr data-id="{{ $item->id }}">
                         <td class="name">
                             <a href="{{ route('public::auftrag',$item->id) }}">{{ $item->title }}</a>
                         </td>
@@ -63,7 +81,7 @@
                 </tbody>
             </table>
             <div class="pagination-wrapper">
-                {{ $items->links() }}
+                {{ $data->appends(request()->query())->links() }}
             </div>
         </div>
     </div>
