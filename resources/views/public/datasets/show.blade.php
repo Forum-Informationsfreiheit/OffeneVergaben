@@ -12,6 +12,10 @@
             <table class="table ov-table ov-table-vertical table-sm table-bordered">
                 <tbody>
                     <tr>
+                        <th>Art</th>
+                        <td>{{ $dataset->type->toString() }}</td>
+                    </tr>
+                    <tr>
                         <th>Bezeichnung</th>
                         <td>{{ $dataset->title }}</td>
                     </tr>

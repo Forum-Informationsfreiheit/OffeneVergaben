@@ -22,7 +22,7 @@
                 <tbody>
                 @foreach($items as $item)
                     <tr>
-                        <td class="name">{{ $item->title }}</td>
+                        <td class="name"><a href="{{ route('public::auftrag',$item->id) }}">{{ $item->title }}</a></td>
                         <td class="name">
                             @if($item->contractor)
                                 <a href="{{ route('public::lieferant',$item->contractor->organization_id) }}">{{ $item->contractor->name }}</a>
