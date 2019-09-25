@@ -27,7 +27,7 @@ body.frontpage {
       margin-bottom: 30px;
 
       h3 {
-        margin-bottom: 0;
+        margin-bottom: 20px;
       }
 
       .box-fake-inner {
@@ -39,8 +39,29 @@ body.frontpage {
         text-align:center;
       }
 
+      ul.nav-tabs {
+        margin-bottom: 20px;
+
+        li.nav-item {
+          width: 50%;
+
+          a.nav-link {
+            font-size: 0.8rem;
+            padding: 0;
+            text-align: center;
+            font-weight: normal;
+            background-color: #f6f6f5;
+            border-radius: 0;
+            color: $black;
+          }
+          a.nav-link.active {
+            font-weight: bold;
+            background-color: #fff;
+          }
+        }
+      }
+
       ol.top-ten {
-        margin-top: 20px;
         list-style: none;
         counter-reset: item;
         padding-left: 3px;

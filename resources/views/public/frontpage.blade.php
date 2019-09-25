@@ -19,21 +19,81 @@
             <div class="col-md">
                 <div class="box">
                     <h3>Wer vergibt am meisten öffentliche Aufträge?</h3>
-                    <ol class="top-ten">
-                        @foreach($topOfferorsByCount as $topOfferorByCount)
-                            <li><a href="{{ route('public::show-auftraggeber',$topOfferorByCount->id) }}">{{ ui_shorten($topOfferorByCount->name,60) }}</a> ({{ $topOfferorByCount->datasets_count }})</li>
-                        @endforeach
-                    </ol>
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" id="offerors-sum-tab" data-toggle="tab" href="#offerorsSum" role="tab" aria-controls="home" aria-selected="true">
+                                @svg('/img/icons/auftragsvolumen.svg','sum')&nbsp;&nbsp;Nach Auftragsvolumen
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" id="offerors-count-tab" data-toggle="tab" href="#offerorsCount" role="tab" aria-controls="home" aria-selected="true">
+                                @svg('/img/icons/auftragsanzahl.svg','sum')&nbsp;&nbsp;Nach Anzahl Aufträgen
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="fifTabContentOfferors">
+                        <div class="tab-pane fade" id="offerorsSum" role="tabpanel" aria-labelledby="offerors-sum-tab">
+                            <ol class="top-ten">
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                            </ol>
+                        </div>
+                        <div class="tab-pane fade show active" id="offerorsCount" role="tabpanel" aria-labelledby="offerors-count-tab">
+                            <ol class="top-ten">
+                                @foreach($topOfferorsByCount as $topOfferorByCount)
+                                    <li><a href="{{ route('public::show-auftraggeber',$topOfferorByCount->id) }}">{{ ui_shorten($topOfferorByCount->name,60) }}</a> ({{ $topOfferorByCount->datasets_count }})</li>
+                                @endforeach
+                            </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
             <div class="col-md">
                 <div class="box">
                     <h3>Wer erhält am meisten öffentliche Aufträge?</h3>
-                    <ol class="top-ten">
-                        @foreach($topContractorsByCount as $topContractorByCount)
-                            <li><a href="{{ route('public::lieferant',$topContractorByCount->id) }}">{{ ui_shorten($topContractorByCount->name,60) }}</a> ({{ $topContractorByCount->datasets_count }})</li>
-                        @endforeach
-                    </ol>
+                    <ul class="nav nav-tabs">
+                        <li class="nav-item">
+                            <a class="nav-link" id="contractors-sum-tab" data-toggle="tab" href="#contractorsSum" role="tab" aria-controls="home" aria-selected="true">
+                                @svg('/img/icons/auftragsvolumen.svg','sum')&nbsp;&nbsp;Nach Auftragsvolumen
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link active" id="contractors-count-tab" data-toggle="tab" href="#contractorsCount" role="tab" aria-controls="home" aria-selected="true">
+                                @svg('/img/icons/auftragsanzahl.svg','sum')&nbsp;&nbsp;Nach Anzahl Aufträgen
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="tab-content" id="fifTabContentContractors">
+                        <div class="tab-pane fade" id="contractorsSum" role="tabpanel" aria-labelledby="contractors-sum-tab">
+                            <ol class="top-ten">
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                                <li></li>
+                            </ol>
+                        </div>
+                        <div class="tab-pane fade show active" id="contractorsCount" role="tabpanel" aria-labelledby="contractors-count-tab">
+                            <ol class="top-ten">
+                                @foreach($topContractorsByCount as $topContractorByCount)
+                                    <li><a href="{{ route('public::lieferant',$topContractorByCount->id) }}">{{ ui_shorten($topContractorByCount->name,60) }}</a> ({{ $topContractorByCount->datasets_count }})</li>
+                                @endforeach
+                            </ol>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
