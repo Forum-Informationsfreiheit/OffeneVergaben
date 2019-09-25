@@ -153,3 +153,45 @@ table.ov-table {
     }
   }
 }
+
+.pagination-wrapper {
+  ul.pagination {
+    li.page-item {
+      margin-left: 4px;
+      margin-right: 4px;
+
+      a.page-link, span.page-link {
+        background-color: $blue;
+        color: #fff;
+        border: 2px solid $blue;
+        border-radius: 4px;
+        padding: 0.4rem 0.6rem;
+        font-size: 0.8rem;
+        line-height: 1.1;
+      }
+
+      &:first-of-type {
+        margin-left: 0;
+      }
+      &:last-of-type {
+        margin-right: 0;
+      }
+    }
+    li.page-item.active .page-link {
+      background-color: #fff;
+      color: $blue;
+    }
+    li.page-item.disabled .page-link {
+      background-color: #e4e2e0;
+      color: #fff;
+      border-color: #e4e2e0;
+    }
+    li.page-item.disabled.three-dots .page-link {
+      background-color: transparent;
+      color: $black;
+      padding-left: 0;
+      padding-right: 0;
+      border-color: transparent;
+    }
+  }
+}

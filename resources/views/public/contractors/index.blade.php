@@ -50,7 +50,7 @@
                 </tbody>
             </table>
             <div class="pagination-wrapper">
-                {{ $items->links() }}
+                {{ $items->links('public.partials.pagination', [ 'ulClass' => [ "mx-auto", "justify-content-center" ] ]) }}
             </div>
         </div>
     </div>

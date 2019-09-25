@@ -81,7 +81,7 @@
                 </tbody>
             </table>
             <div class="pagination-wrapper">
-                {{ $data->appends(request()->query())->links() }}
+                {{ $data->appends(request()->query())->links('public.partials.pagination', [ 'ulClass' => [ "mx-auto", "justify-content-center" ] ]) }}
             </div>
         </div>
     </div>

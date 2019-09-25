@@ -10797,6 +10797,49 @@ table.ov-table.ov-table-vertical th {
   vertical-align: middle;
 }
 
+.pagination-wrapper ul.pagination li.page-item {
+  margin-left: 4px;
+  margin-right: 4px;
+}
+
+.pagination-wrapper ul.pagination li.page-item a.page-link,
+.pagination-wrapper ul.pagination li.page-item span.page-link {
+  background-color: #4291cc;
+  color: #fff;
+  border: 2px solid #4291cc;
+  border-radius: 4px;
+  padding: 0.4rem 0.6rem;
+  font-size: 0.8rem;
+  line-height: 1.1;
+}
+
+.pagination-wrapper ul.pagination li.page-item:first-of-type {
+  margin-left: 0;
+}
+
+.pagination-wrapper ul.pagination li.page-item:last-of-type {
+  margin-right: 0;
+}
+
+.pagination-wrapper ul.pagination li.page-item.active .page-link {
+  background-color: #fff;
+  color: #4291cc;
+}
+
+.pagination-wrapper ul.pagination li.page-item.disabled .page-link {
+  background-color: #e4e2e0;
+  color: #fff;
+  border-color: #e4e2e0;
+}
+
+.pagination-wrapper ul.pagination li.page-item.disabled.three-dots .page-link {
+  background-color: transparent;
+  color: #4f402e;
+  padding-left: 0;
+  padding-right: 0;
+  border-color: transparent;
+}
+
 body.frontpage section h3 {
   font-size: 1.3rem;
   font-weight: bold;
