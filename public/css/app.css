@@ -10840,6 +10840,44 @@ table.ov-table.ov-table-vertical th {
   border-color: transparent;
 }
 
+.results-meta {
+  margin-bottom: 10px;
+}
+
+.filter-wrapper {
+  margin-bottom: 20px;
+}
+
+.filter-wrapper .filter-head {
+  padding: 15px;
+  background-color: #e4e2e0;
+}
+
+.filter-wrapper .filter-head a,
+.filter-wrapper .filter-head a:hover a:focus {
+  color: #4f402e;
+  text-decoration: none;
+}
+
+.filter-wrapper .filter-body {
+  display: block;
+  background-color: #f6f6f5;
+  padding: 20px;
+}
+
+.filter-wrapper.collapsed .filter-body {
+  display: none;
+}
+
+.filter-wrapper .filter-group .filter-group-label {
+  display: block;
+  font-weight: bold;
+}
+
+.filter-wrapper .filter-group.collapsed .filter-group-inputs {
+  display: none;
+}
+
 body.frontpage section h3 {
   font-size: 1.3rem;
   font-weight: bold;
@@ -10968,57 +11006,6 @@ body.page section.header {
   color: #fff;
 }
 
-body.datasets .filter-wrapper {
-  margin-bottom: 20px;
-}
-
-body.datasets .filter-wrapper .filter-head {
-  padding: 15px;
-  background-color: #e4e2e0;
-}
-
-body.datasets .filter-wrapper .filter-head a,
-body.datasets .filter-wrapper .filter-head a:hover a:focus {
-  color: #4f402e;
-  text-decoration: none;
-}
-
-body.datasets .filter-wrapper .filter-body {
-  display: block;
-  background-color: #f6f6f5;
-  padding: 20px;
-}
-
-body.datasets .filter-wrapper.collapsed .filter-body {
-  display: none;
-}
-
-body.datasets .filter-wrapper .filter-group .filter-group-label {
-  display: block;
-  font-weight: bold;
-}
-
-body.datasets .filter-wrapper .filter-group.collapsed .filter-group-inputs {
-  display: none;
-}
-
-body.datasets .results-meta {
-  margin-bottom: 10px;
-}
-
-body.datasets table {
-  /*
-  moved to global.scss
-  thead {
-    th {
-      padding: 12px;
-      background-color: $blue;
-      color: #fff;
-    }
-  }
-  */
-}
-
 body.datasets table td {
   padding: 12px;
 }
@@ -11054,6 +11041,40 @@ body.dataset table tr td ul {
 body.dataset table tr td li {
   display: block;
   line-height: inherit;
+}
+
+body.contractors table td {
+  padding: 12px;
+}
+
+body.contractors table td.count {
+  width: 12%;
+}
+
+body.contractors table td.value {
+  width: 13%;
+  text-align: right;
+}
+
+body.contractors table td.national-id {
+  width: 12%;
+}
+
+body.offerors table td {
+  padding: 12px;
+}
+
+body.offerors table td.count {
+  width: 10%;
+}
+
+body.offerors table td.value {
+  width: 10%;
+  text-align: right;
+}
+
+body.offerors table td.date {
+  width: 10%;
 }
 
 .navbar-laravel {

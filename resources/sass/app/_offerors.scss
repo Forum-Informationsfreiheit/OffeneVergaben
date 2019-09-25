@@ -1,0 +1,21 @@
+body.offerors {
+  table {
+    td {
+      padding: 12px;
+    }
+
+    td.name {
+      //width: 40%;
+    }
+    td.count {
+      width: 10%;
+    }
+    td.value {
+      width: 10%;
+      text-align: right;
+    }
+    td.date {
+      width: 10%;
+    }
+  }
+}

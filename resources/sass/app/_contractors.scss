@@ -1,0 +1,21 @@
+body.contractors {
+  table {
+    td {
+      padding: 12px;
+    }
+
+    td.name {
+      //width: 40%;
+    }
+    td.count {
+      width: 12%;
+    }
+    td.value {
+      width: 13%;
+      text-align: right;
+    }
+    td.national-id {
+      width: 12%;
+    }
+  }
+}

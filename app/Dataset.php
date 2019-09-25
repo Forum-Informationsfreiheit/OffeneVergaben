@@ -205,6 +205,6 @@ class Dataset extends Model
     }
 
     protected function formatMoney($value) {
-        return number_format($value / 100,2,',','.');
+        return ui_format_money($value);
     }
 }

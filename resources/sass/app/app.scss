@@ -11,11 +11,14 @@
 // Global Layout
 @import 'global';
 
-@import 'frontpage';
+@import 'filters';
 
+@import 'frontpage';
 @import 'pages';
 
 @import 'datasets';
+@import 'contractors';
+@import 'offerors';
 
 .navbar-laravel {
   background-color: #fff;

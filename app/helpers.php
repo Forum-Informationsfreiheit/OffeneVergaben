@@ -122,6 +122,12 @@ if (! function_exists('ui_shorten')) {
     }
 }
 
+if (! function_exists('ui_format_money')) {
+    function ui_format_money($value) {
+        return number_format($value / 100,2,',','.');
+    }
+}
+
 if (! function_exists('nl_to_br')) {
     function nl_to_br($text) {
         if (!$text) {
