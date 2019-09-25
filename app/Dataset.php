@@ -48,6 +48,29 @@ class Dataset extends Model
     }
 
     /**
+     * Use query builder to build up the index query for /aufträge main table
+     *
+     * @return mixed
+     */
+    public static function indexQuery() {
+        // build up the basic query here
+        // do the micro management for where clause and order clause later
+        $query = self::select(['datasets.id']);
+        $query->join('offerors',function($join) {
+            $join->on('datasets.id', '=', 'offerors.dataset_id')
+                ->where('offerors.is_extra','=',0);
+        });
+        // this could lead to future problems
+        // data at hand says there is max. one contractor per dataset
+        // but this is not enforced by the application. the relationship is actualy 1:n
+        // so this join _could_ potentially load more than one contractor record
+        // per dataset, possible solution like is_extra on offerors
+        $query->leftJoin('contractors','datasets.id','=','contractors.dataset_id');
+
+        return $query;
+    }
+
+    /**
      * Shortcut for static version. Handy if you have a $dataset at hand.
      *
      * @param $attribute

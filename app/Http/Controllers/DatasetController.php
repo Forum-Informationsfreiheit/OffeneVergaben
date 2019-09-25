@@ -40,7 +40,7 @@ class DatasetController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index(DatasetFilter $filters) {
-        $query = $this->buildIndexQuery()->filter($filters);
+        $query = Dataset::indexQuery()->filter($filters);
 
         $totalItems = $query->count();
         $data       = $query->paginate(20);
@@ -57,27 +57,6 @@ class DatasetController extends Controller
             ->get();
 
         return view('public.datasets.index',compact('items','totalItems','filters','data'));
-    }
-
-    /**
-     * @return \Illuminate\Database\Query\Builder;
-     */
-    protected function buildIndexQuery() {
-        // build up the basic query here
-        // do the micro management for where clause and order clause later
-        $query = Dataset::select(['datasets.id']);
-        $query->join('offerors',function($join) {
-            $join->on('datasets.id', '=', 'offerors.dataset_id')
-                ->where('offerors.is_extra','=',0);
-        });
-        // this could lead to future problems
-        // data at hand says there is max. one contractor per dataset
-        // but this is not enforced by the application. the relationship is actualy 1:n
-        // so this join _could_ potentially load more than one contractor record
-        // per dataset
-        $query->leftJoin('contractors','datasets.id','=','contractors.dataset_id');
-
-        return $query;
     }
 
     public function indexWithEloquentQueryFilter(DatasetFilter $filters) {

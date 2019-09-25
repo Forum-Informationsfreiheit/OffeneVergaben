@@ -18,6 +18,29 @@
         <div class="row">
             <div class="col-md">
                 <div class="box">
+                    <h3>Wer vergibt am meisten öffentliche Aufträge?</h3>
+                    <ol class="top-ten">
+                        @foreach($topOfferorsByCount as $topOfferorByCount)
+                            <li><a href="{{ route('public::show-auftraggeber',$topOfferorByCount->id) }}">{{ ui_shorten($topOfferorByCount->name,60) }}</a> ({{ $topOfferorByCount->datasets_count }})</li>
+                        @endforeach
+                    </ol>
+                </div>
+            </div>
+            <div class="col-md">
+                <div class="box">
+                    <h3>Wer erhält am meisten öffentliche Aufträge?</h3>
+                    <ol class="top-ten">
+                        @foreach($topContractorsByCount as $topContractorByCount)
+                            <li><a href="{{ route('public::lieferant',$topContractorByCount->id) }}">{{ ui_shorten($topContractorByCount->name,60) }}</a> ({{ $topContractorByCount->datasets_count }})</li>
+                        @endforeach
+                    </ol>
+                </div>
+            </div>
+        </div>
+        <?php /*
+        <div class="row">
+            <div class="col-md">
+                <div class="box">
                     <h3>Wo werden am meisten Aufträge vergeben?</h3>
                     <div class="box-fake-inner">
                         <span>todo</span>
@@ -26,31 +49,14 @@
             </div>
             <div class="col-md">
                 <div class="box">
-                    <h3>Wer vergibt am meisten öffentliche Aufträge?</h3>
-                    <div class="box-fake-inner">
-                        <span>todo</span>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <div class="row">
-            <div class="col-md">
-                <div class="box">
                     <h3>Auftragsvergaben nach Branchen - wer führt?</h3>
                     <div class="box-fake-inner">
                         <span>todo</span>
                     </div>
                 </div>
             </div>
-            <div class="col-md">
-                <div class="box">
-                    <h3>Wer erhält am meisten öffentliche Aufträge?</h3>
-                    <div class="box-fake-inner">
-                        <span>todo</span>
-                    </div>
-                </div>
-            </div>
         </div>
+        */ ?>
     </div>
 @stop
 

@@ -34,6 +34,30 @@ body.frontpage {
         padding-top: 110px;
         text-align:center;
       }
+
+      ol.top-ten {
+        list-style: none;
+        counter-reset: item;
+        padding-left: 3px;
+
+        li {
+          counter-increment: item;
+
+          a {
+            color: $black;
+            text-decoration: underline;
+            text-decoration-color: $blue;
+          }
+          a:hover {
+            color: $blue;
+          }
+        }
+        li:before {
+          margin-right: 5px;
+          content: counter(item) ".";
+          color: $red;
+        }
+      }
     }
   }
 

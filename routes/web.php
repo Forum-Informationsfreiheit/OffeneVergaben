@@ -49,6 +49,22 @@ Route::group(['prefix' => 'test'], function () {
         return;
     }
 
+    Route::get('/bigfish',function() {
+        $query = \App\Offeror::bigFishQuery();
+        $query->limit(20);
+        $res = $query->get();
+
+        $ids = $res->pluck('organization_id')->toArray();      // has order
+        $idsStr = join(',',$ids);
+
+        // now load the appropriate models for the view
+        $items = \App\Organization::whereIn('id',$ids)
+            ->orderByRaw(\Illuminate\Support\Facades\DB::raw("FIELD(id, $idsStr)")) // https://stackoverflow.com/a/26704767/718980
+            ->get();
+
+        dd($items);
+    });
+
     Route::get('/typo', function () {
         return view('public.typography-testpage');
     });

@@ -10833,6 +10833,33 @@ body.frontpage section.overview .box .box-fake-inner {
   text-align: center;
 }
 
+body.frontpage section.overview .box ol.top-ten {
+  list-style: none;
+  counter-reset: item;
+  padding-left: 3px;
+}
+
+body.frontpage section.overview .box ol.top-ten li {
+  counter-increment: item;
+}
+
+body.frontpage section.overview .box ol.top-ten li a {
+  color: #4f402e;
+  text-decoration: underline;
+  -webkit-text-decoration-color: #4291cc;
+          text-decoration-color: #4291cc;
+}
+
+body.frontpage section.overview .box ol.top-ten li a:hover {
+  color: #4291cc;
+}
+
+body.frontpage section.overview .box ol.top-ten li:before {
+  margin-right: 5px;
+  content: counter(item) ".";
+  color: #e54f5c;
+}
+
 body.frontpage section.features {
   padding: 50px 0;
 }
