@@ -11065,16 +11065,16 @@ body.offerors table td {
 }
 
 body.offerors table td.count {
-  width: 10%;
+  width: 12%;
 }
 
 body.offerors table td.value {
-  width: 10%;
+  width: 13%;
   text-align: right;
 }
 
-body.offerors table td.date {
-  width: 10%;
+body.offerors table td.national-id {
+  width: 12%;
 }
 
 .navbar-laravel {

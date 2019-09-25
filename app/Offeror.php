@@ -26,6 +26,24 @@ class Offeror extends Model
         return $this->belongsTo('App\Dataset');
     }
 
+    public static function indexQuery() {
+        $query = self::select([
+            'offerors.organization_id',
+            DB::raw('count(*) as datasets_count'),
+            DB::raw('sum(val_total) as sum_val_total')
+        ]);
+        $query->join('datasets','offerors.dataset_id','=','datasets.id');
+        $query->join('organizations','offerors.organization_id','=','organizations.id');
+        $query->where('datasets.is_current_version',1);
+        // note actually there is no need to group on organization name
+        // but newer mysql version needs it to be there so we can select it, or order by it
+        $query->groupBy('offerors.organization_id','organizations.name');
+
+        //$query->orderBy('datasets_count','desc');
+
+        return $query;
+    }
+
     public static function bigFishQuery() {
         $query = self::select(['offerors.organization_id', DB::raw('count(*) as datasets_count')]);
         $query->join('datasets','offerors.dataset_id','=','datasets.id');

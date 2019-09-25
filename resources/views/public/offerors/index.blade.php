@@ -6,6 +6,7 @@
     <h1 class="page-title">
         Auftraggeber
     </h1>
+    <!--
     <div id="filterWrapper" class="filter-wrapper collapsed">
         <div class="filter-head">
             <a href="#" id="filterToggle" class="filter-toggle" data-status="hidden">
@@ -41,6 +42,7 @@
             </div>
         </div>
     </div>
+    -->
     <div class="row">
         <div class="col">
             <div class="results-meta">
@@ -53,19 +55,38 @@
             <table class="table ov-table table-sm table-bordered table-striped">
                 <thead>
                 <tr>
-                    <th>Name</th>
+                    <th>
+                        Name
+                        @include('public.datasets.partials.sort',['field' => 'name'])
+                    </th>
+                    <th>
+                        National Id
+                    </th>
+                    <th>
+                        Anzahl&nbsp;Aufträge
+                        @include('public.datasets.partials.sort',['field' => 'count'])
+                    </th>
+                    <th>
+                        Gesamtvolumen
+                        @include('public.datasets.partials.sort',['field' => 'sum'])
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
                 @foreach($items as $item)
-                    <tr>
-                        <td><a href="{{ route('public::show-auftraggeber',$item->id) }}">{{ $item->name }}</a></td>
+                    <tr data-id="{{ $item->id }}">
+                        <td class="name">
+                            <a href="{{ route('public::show-auftraggeber',$item->id) }}">{{ $item->name }}</a>
+                        </td>
+                        <td class="national-id">{{ $item->national_id === "?" ? "" : $item->national_id }}</td>
+                        <td class="count">{{ $item->datasets_count }}</td>
+                        <td class="value">{{ ui_format_money($item->sum_val_total) }}</td>
                     </tr>
                 @endforeach
                 </tbody>
             </table>
             <div class="pagination-wrapper">
-                {{ $items->links('public.partials.pagination', [ 'ulClass' => [ "mx-auto", "justify-content-center" ] ]) }}
+                {{ $data->appends(request()->query())->links('public.partials.pagination', [ 'ulClass' => [ "mx-auto", "justify-content-center" ] ]) }}
             </div>
         </div>
     </div>
