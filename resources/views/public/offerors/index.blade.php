@@ -1,6 +1,6 @@
 @extends('public.layouts.default')
 
-@section('body:class','datasets')
+@section('body:class','offerors')
 
 @section('page:content')
     <h1 class="page-title">
