@@ -10824,6 +10824,10 @@ body.frontpage section.overview .box {
   margin-bottom: 30px;
 }
 
+body.frontpage section.overview .box h3 {
+  margin-bottom: 0;
+}
+
 body.frontpage section.overview .box .box-fake-inner {
   height: 250px;
   color: #e0e0e0;
@@ -10834,6 +10838,7 @@ body.frontpage section.overview .box .box-fake-inner {
 }
 
 body.frontpage section.overview .box ol.top-ten {
+  margin-top: 20px;
   list-style: none;
   counter-reset: item;
   padding-left: 3px;

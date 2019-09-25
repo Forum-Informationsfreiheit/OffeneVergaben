@@ -26,6 +26,10 @@ body.frontpage {
       padding: 30px;
       margin-bottom: 30px;
 
+      h3 {
+        margin-bottom: 0;
+      }
+
       .box-fake-inner {
         height: 250px;
         color: #e0e0e0;
@@ -36,6 +40,7 @@ body.frontpage {
       }
 
       ol.top-ten {
+        margin-top: 20px;
         list-style: none;
         counter-reset: item;
         padding-left: 3px;
