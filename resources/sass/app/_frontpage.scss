@@ -28,6 +28,11 @@ body.frontpage {
 
       h3 {
         margin-bottom: 20px;
+
+        a {
+          color: $red;
+          text-decoration: none;
+        }
       }
 
       .box-fake-inner {

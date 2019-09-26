@@ -16,9 +16,9 @@
 @section('overview')
     <div class="container">
         <div class="row">
-            <div class="col-md">
+            <div class="col-lg">
                 <div class="box">
-                    <h3>Wer vergibt am meisten öffentliche Aufträge?</h3>
+                    <h3><a href="{{ route('public::auftraggeber') }}">Wer vergibt am meisten öffentliche Aufträge?</a></h3>
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
                             <a class="nav-link" id="offerors-sum-tab" data-toggle="tab" href="#offerorsSum" role="tab" aria-controls="home" aria-selected="true">
@@ -34,16 +34,9 @@
                     <div class="tab-content" id="fifTabContentOfferors">
                         <div class="tab-pane fade" id="offerorsSum" role="tabpanel" aria-labelledby="offerors-sum-tab">
                             <ol class="top-ten">
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
+                                @foreach($topOfferorsBySum as $topOfferorBySum)
+                                    <li><a href="{{ route('public::show-auftraggeber',$topOfferorBySum->id) }}" title="{{ $topOfferorBySum->name }}">{{ ui_shorten($topOfferorBySum->name,45) }}</a><span class="float-right">{{ ui_format_money($topOfferorBySum->sum_total_val) }}</span></li>
+                                @endforeach
                             </ol>
                         </div>
                         <div class="tab-pane fade show active" id="offerorsCount" role="tabpanel" aria-labelledby="offerors-count-tab">
@@ -56,9 +49,9 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md">
+            <div class="col-lg">
                 <div class="box">
-                    <h3>Wer erhält am meisten öffentliche Aufträge?</h3>
+                    <h3><a href="{{ route('public::lieferanten') }}">Wer erhält am meisten öffentliche Aufträge?</a></h3>
                     <ul class="nav nav-tabs">
                         <li class="nav-item">
                             <a class="nav-link" id="contractors-sum-tab" data-toggle="tab" href="#contractorsSum" role="tab" aria-controls="home" aria-selected="true">
@@ -74,16 +67,9 @@
                     <div class="tab-content" id="fifTabContentContractors">
                         <div class="tab-pane fade" id="contractorsSum" role="tabpanel" aria-labelledby="contractors-sum-tab">
                             <ol class="top-ten">
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
-                                <li></li>
+                                @foreach($topContractorsBySum as $topContractorBySum)
+                                    <li><a href="{{ route('public::lieferant',$topContractorBySum->id) }}" title="{{ $topContractorBySum->name }}">{{ ui_shorten($topContractorBySum->name,45) }}</a><span class="float-right">{{ ui_format_money($topContractorBySum->sum_total_val) }}</span></li>
+                                @endforeach
                             </ol>
                         </div>
                         <div class="tab-pane fade show active" id="contractorsCount" role="tabpanel" aria-labelledby="contractors-count-tab">

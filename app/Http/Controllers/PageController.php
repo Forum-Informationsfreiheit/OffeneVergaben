@@ -15,45 +15,63 @@ class PageController extends Controller
 {
     public function frontpage() {
 
-        $topOfferorsByCount = $this->fetchTopOfferorsByCountData();
-        $topContractorsByCount = $this->fetchTopContractorsByCountData();
+        $topOfferorsByCount = $this->fetchTopOfferors('count',10);
+        $topOfferorsBySum = $this->fetchTopOfferors('sum',10);
 
-        return view('public.frontpage',compact('topOfferorsByCount','topContractorsByCount'));
+        $topContractorsByCount = $this->fetchTopContractors('count',10);
+        $topContractorsBySum = $this->fetchTopContractors('sum',10);
+
+        return view('public.frontpage',compact('topOfferorsByCount','topOfferorsBySum','topContractorsByCount','topContractorsBySum'));
     }
 
-    protected function fetchTopOfferorsByCountData() {
-        $res = Offeror::bigFishQuery()->limit(10)->get();
+    protected function fetchTopOfferors($type, $limit) {
+        $res = Offeror::bigFishQuery($type)->limit($limit)->get();
         $ids = $res->pluck('organization_id')->toArray();      // has order
         $idsStr = join(',',$ids);
-        $values = $res->pluck('datasets_count','organization_id');  // key count value by org id
+        $values = $res->keyBy('organization_id');  // key count value by org id
 
         // now load the appropriate models for the view
         $orgs = Organization::whereIn('id',$ids)
             ->orderByRaw(DB::raw("FIELD(id, $idsStr)"))->get();
 
         foreach($orgs as &$org) {
-            // write the datasets count value into the orgs entities as a 'dynamic' attribute
-            $org->datasets_count = $values[$org->id];
+            if ($type == 'count') {
+                $org->datasets_count = $values[$org->id]->datasets_count;
+            }
+            if ($type == 'sum') {
+                $org->sum_total_val = $values[$org->id]->sum_total_val;
+            }
         }
 
         return $orgs;
     }
 
-    protected function fetchTopContractorsByCountData() {
-        $res = Contractor::bigFishQuery()->limit(10)->get();
+    /**
+     * @param $type String, "count" or "sum" (forwarded to bigFishQuery)
+     * @param int $limit
+     *
+     * @return mixed
+     */
+    protected function fetchTopContractors($type, $limit = 10) {
+
+        $res = Contractor::bigFishQuery($type)->limit($limit)->get();
         $ids = $res->pluck('organization_id')->toArray();      // has order
         $idsStr = join(',',$ids);
-        $values = $res->pluck('datasets_count','organization_id');  // key count value by org id
-
+        $values = $res->keyBy('organization_id');  // key count value by org id
         // now load the appropriate models for the view
         $orgs = Organization::whereIn('id',$ids)
             ->orderByRaw(DB::raw("FIELD(id, $idsStr)"))->get();
 
         foreach($orgs as &$org) {
             // write the datasets count value into the orgs entities as a 'dynamic' attribute
-            $org->datasets_count = $values[$org->id];
-        }
 
+            if ($type == 'count') {
+                $org->datasets_count = $values[$org->id]->datasets_count;
+            }
+            if ($type == 'sum') {
+                $org->sum_total_val = $values[$org->id]->sum_total_val;
+            }
+        }
         return $orgs;
     }
 

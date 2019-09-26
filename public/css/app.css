@@ -10909,6 +10909,11 @@ body.frontpage section.overview .box h3 {
   margin-bottom: 20px;
 }
 
+body.frontpage section.overview .box h3 a {
+  color: #e54f5c;
+  text-decoration: none;
+}
+
 body.frontpage section.overview .box .box-fake-inner {
   height: 250px;
   color: #e0e0e0;

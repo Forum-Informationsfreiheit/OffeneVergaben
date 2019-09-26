@@ -44,12 +44,31 @@ class Offeror extends Model
         return $query;
     }
 
-    public static function bigFishQuery() {
-        $query = self::select(['offerors.organization_id', DB::raw('count(*) as datasets_count')]);
-        $query->join('datasets','offerors.dataset_id','=','datasets.id');
-        $query->where('datasets.is_current_version',1);
-        $query->groupBy('offerors.organization_id');
-        $query->orderBy('datasets_count','desc');
+    /**
+     * Top ten listing either by count of contracts or total monetary volume of contracts.
+     *
+     * @param $type String, "count" or "sum"
+     *
+     * @return mixed
+     */
+    public static function bigFishQuery($type) {
+        $query = null;
+
+        if ($type == 'count') {
+            $query = self::select(['offerors.organization_id', DB::raw('count(*) as datasets_count')]);
+            $query->join('datasets','offerors.dataset_id','=','datasets.id');
+            $query->where('datasets.is_current_version',1);
+            $query->groupBy('offerors.organization_id');
+            $query->orderBy('datasets_count','desc');
+        }
+
+        if ($type == 'sum') {
+            $query = self::select(['offerors.organization_id', DB::raw('sum(val_total) as sum_total_val')]);
+            $query->join('datasets','offerors.dataset_id','=','datasets.id');
+            $query->where('datasets.is_current_version',1);
+            $query->groupBy('offerors.organization_id');
+            $query->orderBy('sum_total_val','desc');
+        }
 
         return $query;
     }
