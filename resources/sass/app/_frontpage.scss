@@ -15,12 +15,24 @@ body.frontpage {
       font-size: 1.39rem;
       color: $blue;
       margin-bottom: 2rem;
+
+      a.lead-link {
+        text-decoration: underline;
+        text-decoration-color: $black;
+        color: $blue;
+
+        &:hover {
+          text-decoration-color: $blue;
+          color: $blue;
+        }
+      }
     }
 
     form.search-form-lg {
 
       input {
         border: 2px solid #e4e2e0;
+        border-right: none;
       }
 
       button {

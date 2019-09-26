@@ -19,6 +19,7 @@
     @endif
     <div class="row">
         <div class="col">
+            @if(count($organizations))
             <ul class="results">
                 @foreach($organizations as $org)
                     <li class="result-item">
@@ -34,6 +35,9 @@
                     </li>
                 @endforeach
             </ul>
+            @else
+                <em>keine Ergebnisse gefunden</em>
+            @endif
         </div>
     </div>
     @if($totalItems > 100)

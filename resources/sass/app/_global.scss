@@ -31,6 +31,34 @@ body {
 
 .topbar.navbar {
 
+  form.search-form {
+
+    margin-left: 20px;
+
+    @include media-breakpoint-up(lg) { margin-left: 105px; }
+    @include media-breakpoint-up(xl) { margin-left: 200px; }
+
+    input {
+
+      @include media-breakpoint-up(md) { width: 170px; }
+      @include media-breakpoint-up(lg) { width: 250px; }
+
+      border: 2px solid #e4e2e0;
+      border-right: none;
+    }
+
+    button {
+      padding: 0 0.5rem;
+      background-color: $lightblue;
+      border: 2px solid $lightblue;
+
+      svg {
+        transform: scale(0.9);
+      }
+    }
+
+  }
+
   .navbar-nav {
 
     a.nav-link {

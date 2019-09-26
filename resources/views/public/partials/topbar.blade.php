@@ -1,8 +1,20 @@
-<nav class="topbar navbar navbar-expand-md bg-white shadow-sm">
+<nav class="topbar navbar navbar-expand-md bg-white navbar-light shadow-sm">
     <div class="container">
         <a class="navbar-brand" href="{{ url('/') }}">
             @svg('img/icons/logo_offenevergaben.svg','test')
         </a>
+
+        <form class="search-form float-left" action="{{ route('public::suchen') }}" method="GET">
+            <div class="input-group">
+                <input type="text" class="form-control" placeholder="Suche" aria-label="suchen" name="suche" value="{{ request()->route()->getName() == 'public::suchen' ? request()->input('suche') : '' }}">
+                <div class="input-group-append">
+                    <button class="btn btn-outline-secondary" type="submit" id="navbar-search-button">
+                        @svg('/img/icons/suche.svg','search')
+                    </button>
+                </div>
+            </div>
+        </form>
+
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="{{ __('Toggle navigation') }}">
             <span class="navbar-toggler-icon"></span>
         </button>

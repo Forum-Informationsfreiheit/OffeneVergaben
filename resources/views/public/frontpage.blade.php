@@ -5,7 +5,7 @@
 @section('lead')
     <div class="container">
         <p class="lead">
-            Das Forum Informationsfreiheit engagiert sich für mehr Transparenz in der Verwaltung.
+            Das <a class="lead-link" href="https://www.informationsfreiheit.at">Forum Informationsfreiheit</a> engagiert sich für mehr Transparenz in der Verwaltung.
             Auf offenevergaben.at machen wir Auftragsvergaben der öffentlichen Hand, die ab 2019
             als Open Data veröffentlicht werden, für Journalist*innen, Bürgerinitiativen, NGOs und
             interessierte Bürger*innen nachvollziehbar.
