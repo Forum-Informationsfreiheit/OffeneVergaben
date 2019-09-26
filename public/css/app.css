@@ -10892,6 +10892,21 @@ body.frontpage section.lead {
 body.frontpage section.lead p.lead {
   font-size: 1.39rem;
   color: #4291cc;
+  margin-bottom: 2rem;
+}
+
+body.frontpage section.lead form.search-form-lg input {
+  border: 2px solid #e4e2e0;
+}
+
+body.frontpage section.lead form.search-form-lg button {
+  padding: 0 0.5rem;
+  background-color: #4291cc;
+  border: 2px solid #4291cc;
+}
+
+body.frontpage section.lead form.search-form-lg button svg {
+  transform: scale(0.8);
 }
 
 body.frontpage section.overview {

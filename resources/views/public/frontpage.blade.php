@@ -10,6 +10,16 @@
             als Open Data veröffentlicht werden, für Journalist*innen, Bürgerinitiativen, NGOs und
             interessierte Bürger*innen nachvollziehbar.
         </p>
+        <form class="search-form-lg" action="{{ route('public::suchen') }}" method="GET">
+            <div class="input-group">
+                <input type="text" class="form-control form-control-lg" placeholder="Nach Lieferanten oder Auftraggebern suchen..." aria-label="Recipient's username" aria-describedby="button-addon2" name="suche">
+                <div class="input-group-append">
+                    <button class="btn btn-lg btn-outline-secondary" type="submit" id="button-addon2">
+                        @svg('/img/icons/suche_start.svg','search')
+                    </button>
+                </div>
+            </div>
+        </form>
     </div>
 @stop
 
