@@ -31,7 +31,10 @@
                     <a target="_blank" href="https://www.informationsfreiheit.at/"><img src="{{ url('/img/logo/foi_logo_w2.gif') }}"></a>
                 </li>
                 <li>
-                    <a target="_blank" href="https://www.netidee.at/"><img src="{{ url('/img/logo/netidee-logo-color.jpg') }}"></a>
+                    <a target="_blank" href="https://www.netidee.at/">
+                        <!-- <img src="{{ url('/img/logo/netidee-logo-color.jpg') }}"> -->
+                        @svg('/img/logo/netidee-logo-white.svg','netidee')
+                    </a>
                 </li>
             </ul>
         </div>

@@ -10764,6 +10764,11 @@ footer img {
   height: 35px;
 }
 
+footer svg.netidee {
+  height: 35px;
+  width: auto;
+}
+
 footer .footer-one {
   padding: 25px 0;
   background-color: #e3eff7;
