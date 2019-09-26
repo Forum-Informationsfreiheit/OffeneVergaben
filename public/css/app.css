@@ -11033,6 +11033,36 @@ body.page section.header {
   color: #fff;
 }
 
+body.searchresults ul.results {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+body.searchresults ul.results li.result-item {
+  padding: 6px 0;
+  border-bottom: 1px solid #4f402e;
+  line-height: 1.5rem;
+}
+
+body.searchresults ul.results li.result-item .result-text {
+  display: block;
+  margin-bottom: 2px;
+}
+
+body.searchresults ul.results li.result-item .badge {
+  font-size: 80%;
+}
+
+body.searchresults ul.results li.result-item:last-of-type {
+  border-bottom: none;
+}
+
+body.searchresults ul.results strong {
+  font-weight: bold;
+  text-decoration: underline;
+}
+
 body.datasets table td {
   padding: 12px;
 }

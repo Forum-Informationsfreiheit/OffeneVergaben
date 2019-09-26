@@ -128,6 +128,17 @@ if (! function_exists('ui_format_money')) {
     }
 }
 
+if (! function_exists('ui_highlight_tokens')) {
+    function ui_highlight_tokens($text, $tokens, $highlightTag = 'b') {
+
+        foreach($tokens as $token) {
+            $text = preg_replace('/(' . $token . ')/i', "<$highlightTag>$1</$highlightTag>", $text);
+        }
+
+        return $text;
+    }
+}
+
 if (! function_exists('nl_to_br')) {
     function nl_to_br($text) {
         if (!$text) {

@@ -26,6 +26,8 @@ Route::get('/lieferanten/{id}','ContractorController@show')->name('public::liefe
 Route::get('/auftraggeber','OfferorController@index')->name('public::auftraggeber');
 Route::get('/auftraggeber/{id}','OfferorController@show')->name('public::show-auftraggeber');
 
+Route::get('/suchen','PageController@searchResultsPage')->name('public::suche');
+
 // reserved routes for dynamic page content, directly under domain (no other url prefix)
 Route::get('/impressum',   'PageController@reserved');
 Route::get('/datenschutz', 'PageController@reserved');
@@ -48,6 +50,15 @@ Route::group(['prefix' => 'test'], function () {
     if (App::environment('production')) {
         return;
     }
+
+    Route::get('/search_name',function() {
+
+        $name = request('search');
+
+        $res = \App\Organization::searchNameQuery($name);
+
+        dd($res);
+    });
 
     Route::get('/bigfish',function() {
         $query = \App\Offeror::bigFishQuery();

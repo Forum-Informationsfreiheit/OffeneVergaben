@@ -3,6 +3,7 @@
 namespace App;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\DB;
 
 class Organization extends Model
 {
@@ -44,6 +45,33 @@ class Organization extends Model
         $org->save();
 
         return $org;
+    }
+
+    /**
+     * Very simple organization name search implementation.
+     * Adds information as is_offeror and is_contractor about the type of organization.
+     *
+     * @param $name
+     * @return mixed
+     */
+    public static function searchNameQuery($tokens) {
+
+        if (!$tokens) {
+            return null;
+        }
+
+        $query = self::select([
+            'organizations.id',
+            'organizations.name',
+            DB::raw('(SELECT 1 FROM offerors    o WHERE o.organization_id = organizations.id LIMIT 1) as "is_offeror"'),
+            DB::raw('(SELECT 1 FROM contractors c WHERE c.organization_id = organizations.id LIMIT 1) as "is_contractor"')
+        ]);
+
+        foreach($tokens as $token) {
+            $query->where('name','like','%'. $token .'%');
+        }
+
+        return $query;
     }
 
     /**

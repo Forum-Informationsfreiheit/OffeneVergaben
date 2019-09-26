@@ -1,0 +1,35 @@
+body.searchresults {
+
+  ul.results {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+
+    li.result-item {
+      padding: 6px 0;
+      border-bottom: 1px solid $black;
+      line-height: 1.5rem;
+
+      .result-text {
+        display: block;
+        margin-bottom: 2px;
+      }
+
+      .badge {
+        font-size: 80%;
+      }
+
+      &:last-of-type {
+        border-bottom: none;
+      }
+    }
+
+    strong {
+      font-weight: bold;
+      text-decoration: underline;
+    }
+
+
+  }
+
+}

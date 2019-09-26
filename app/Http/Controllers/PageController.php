@@ -24,6 +24,25 @@ class PageController extends Controller
         return view('public.frontpage',compact('topOfferorsByCount','topOfferorsBySum','topContractorsByCount','topContractorsBySum'));
     }
 
+    public function searchResultsPage(Request $request) {
+        $search = $request->input('suche');
+
+        $search = trim($search);
+        $tokens = explode(' ',$search);
+
+        $organizations = [];
+        $datasets = [];
+
+        if ($search) {
+            $organizations = Organization::searchNameQuery($tokens)->limit(101)->get();
+            // todo search datasets
+        }
+
+        $totalItems = count($organizations);
+
+        return view('public.searchresults',compact('organizations','datasets','totalItems','tokens'));
+    }
+
     protected function fetchTopOfferors($type, $limit) {
         $res = Offeror::bigFishQuery($type)->limit($limit)->get();
         $ids = $res->pluck('organization_id')->toArray();      // has order
