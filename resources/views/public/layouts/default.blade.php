@@ -46,7 +46,9 @@
     @include('public.partials.footer')
 
 </div>
-
+    @if(app()->environment('production') && env('GOOGLE_ANALYTICS_ID'))
+        @include('public.partials.google-analytics', ['gaId' => env('GOOGLE_ANALYTICS_ID')])
+    @endif
     @yield('body:append')
 </body>
 </html>

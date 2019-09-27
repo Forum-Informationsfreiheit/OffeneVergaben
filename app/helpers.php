@@ -14,9 +14,11 @@ if (! function_exists('link_to_stylesheet')) {
 
         $path = "css/{$name}.css";
 
+        /*
         if (\Illuminate\Support\Facades\App::environment('production')) {
             $path = "css/{$name}.min.css";
         }
+        */
 
         $url = $versioned ? url(mix($path)) : url($path);
 
@@ -38,9 +40,11 @@ if (! function_exists('link_to_script')) {
 
         $path = "js/{$name}.js";
 
+        /*
         if (\Illuminate\Support\Facades\App::environment('production')) {
             $path = "js/{$name}.min.js";
         }
+        */
 
         $url = $versioned ? url(mix($path)) : url($path);
 
