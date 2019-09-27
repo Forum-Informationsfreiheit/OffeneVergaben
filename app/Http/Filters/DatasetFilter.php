@@ -19,12 +19,16 @@ class DatasetFilter extends QueryFilter
         $this->sortDirection = substr($field, 0, 1) == '-' ? 'desc' : 'asc';
         $this->sortedBy = substr($field, 0, 1) == '-' ? substr($field,1) : $field;
 
-        if($this->sortedBy == 'offeror') {
+        if ($this->sortedBy == 'offeror') {
             return $this->builder->orderBy('offerors.name',$this->sortDirection);
         }
 
-        if($this->sortedBy == 'contractor') {
+        if ($this->sortedBy == 'contractor') {
             return $this->builder->orderBy('contractors.name',$this->sortDirection);
+        }
+
+        if ($this->sortedBy == 'cpv') {
+            return $this->builder->orderBy('datasets.cpv_code',$this->sortDirection);
         }
 
         return $this->builder->orderBy($this->sortedBy,$this->sortDirection);

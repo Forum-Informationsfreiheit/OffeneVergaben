@@ -11,12 +11,30 @@
             <table class="table ov-table table-sm table-bordered table-striped">
                 <thead>
                 <tr>
-                    <th>Bezeichnung</th>
-                    <th>Lieferant</th>
-                    <th>Kategorie (CPV Hauptteil)</th>
-                    <th>Bieter</th>
-                    <th>Summe</th>
-                    <th>Aktualisiert</th>
+                    <th>
+                        Bezeichnung
+                        @include('public.datasets.partials.sort',['field' => 'title'])
+                    </th>
+                    <th>
+                        Lieferant
+                        @include('public.datasets.partials.sort',['field' => 'contractor'])
+                    </th>
+                    <th>
+                        Kategorie (CPV Hauptteil)
+                        @include('public.datasets.partials.sort',['field' => 'cpv'])
+                    </th>
+                    <th>
+                        Bieter
+                        @include('public.datasets.partials.sort',['field' => 'nb_tenders_received'])
+                    </th>
+                    <th>
+                        Summe
+                        @include('public.datasets.partials.sort',['field' => 'val_total'])
+                    </th>
+                    <th>
+                        Aktualisiert
+                        @include('public.datasets.partials.sort',['field' => 'datetime_last_change'])
+                    </th>
                 </tr>
                 </thead>
                 <tbody>
@@ -39,7 +57,7 @@
                 </tbody>
             </table>
             <div class="pagination-wrapper">
-                {{ $items->links('public.partials.pagination', [ 'ulClass' => [ "mx-auto", "justify-content-center" ] ]) }}
+                {{ $data->appends(request()->query())->links('public.partials.pagination', [ 'ulClass' => [ "mx-auto", "justify-content-center" ] ]) }}
             </div>
         </div>
     </div>

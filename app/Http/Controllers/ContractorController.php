@@ -5,6 +5,7 @@ namespace App\Http\Controllers;
 use App\Contractor;
 use App\Dataset;
 use App\Http\Filters\ContractorFilter;
+use App\Http\Filters\DatasetFilter;
 use App\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -37,8 +38,9 @@ class ContractorController extends Controller
         return view('public.contractors.index',compact('items','totalItems','data','filters'));
     }
 
-    public function show($id) {
+    public function show(DatasetFilter $filters, $id) {
         $org = Organization::findOrFail($id);
+        /*
         $query = Dataset::select([
             'datasets.*',
             'res.created_at as scraped_at'
@@ -49,7 +51,26 @@ class ContractorController extends Controller
         $query->where('datasets.is_current_version',1);
 
         $items = $query->paginate(20);
+        */
 
-        return view('public.contractors.show',compact('items','totalItems','org'));
+        $query = Dataset::indexQuery()
+            ->filter($filters)
+            ->where('contractors.organization_id',$org->id);
+
+        $totalItems = $query->count();
+        $data       = $query->paginate(20);
+
+        // debug: this is the original sort order of the ids
+        // dump($data->pluck('id')->toArray());
+
+        $orderedIds = $data->pluck('id')->toArray();
+        $orderedIdsStr = join(',',$orderedIds);
+
+        // now load the appropriate models for the view
+        $items = Dataset::whereIn('id',$orderedIds)
+            ->orderByRaw(DB::raw("FIELD(id, $orderedIdsStr)")) // https://stackoverflow.com/a/26704767/718980
+            ->get();
+
+        return view('public.contractors.show',compact('items','totalItems','org','filters','data'));
     }
 }
