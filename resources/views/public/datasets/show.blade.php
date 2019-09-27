@@ -31,19 +31,19 @@
                     @endif
                     <tr>
                         <th>Auftraggeber</th>
-                        <td><a href="{{ route('public::show-auftraggeber',$dataset->offeror->organization_id) }}">{{ $dataset->offeror->name }}</a></td>
+                        <td>
+                            @foreach($dataset->offerors as $offeror)
+                                <a href="{{ route('public::show-auftraggeber',$offeror->organization_id) }}">{{ $offeror->organization->name }}</a>@if(!$loop->last), @endif
+                            @endforeach
+                        </td>
                     </tr>
                     @if($dataset->contractors)
                     <tr>
                         <th>Lieferant</th>
                         <td>
-                            <ul>
                             @foreach($dataset->contractors as $contractor)
-                                <li>
-                                    <a href="{{ route('public::lieferant',$contractor->organization_id) }}">{{ $contractor->name }}</a>
-                                </li>
+                                <a href="{{ route('public::lieferant',$contractor->organization_id) }}">{{ $contractor->organization->name }}</a>@if(!$loop->last), @endif
                             @endforeach
-                            </ul>
                         </td>
                     </tr>
                     @endif
