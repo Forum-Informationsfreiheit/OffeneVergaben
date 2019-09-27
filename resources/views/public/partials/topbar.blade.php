@@ -6,7 +6,7 @@
 
         <form class="search-form float-left" action="{{ route('public::suchen') }}" method="GET">
             <div class="input-group">
-                <input type="text" class="form-control" placeholder="Suche" aria-label="suchen" name="suche" value="{{ request()->route()->getName() == 'public::suchen' ? request()->input('suche') : '' }}">
+                <input type="text" class="form-control" placeholder="Suche" aria-label="suchen" name="suche" value="{{ request()->route() && request()->route()->getName() == 'public::suchen' ? request()->input('suche') : '' }}">
                 <div class="input-group-append">
                     <button class="btn btn-outline-secondary" type="submit" id="navbar-search-button">
                         @svg('/img/icons/suche.svg','search')

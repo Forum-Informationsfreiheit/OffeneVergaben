@@ -13,10 +13,6 @@
 
 Route::get('/', 'PageController@frontpage');
 
-Route::get('/test', function () {
-    return view('public.test');
-});
-
 Route::get('/aufträge','DatasetController@index')->name('public::auftraege');
 Route::get('/aufträge/{id}','DatasetController@show')->name('public::auftrag');
 
@@ -33,17 +29,24 @@ Route::get('/impressum',   'PageController@reserved');
 Route::get('/datenschutz', 'PageController@reserved');
 Route::get('/überuns',     'PageController@reserved');
 
-Auth::routes();
+// Auth routes, only /login is open, others (register,passwort reset and email verification are not)
+if (App::environment('production')) {
+    Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
+} else {
+    Auth::routes();
+}
 
-// temporary Earlybird stuff, remove for production
-Route::get('/origins','EarlyBirdController@origins');
-Route::get('/datasets','EarlyBirdController@datasets');
-Route::get('/datasets/{id}','EarlyBirdController@dataset');
-Route::get('/bekanntgaben','EarlyBirdController@bekanntgaben');
-Route::get('/cpvs','EarlyBirdController@cpvs');
-Route::get('/cpvs/{id}','EarlyBirdController@cpv');
-Route::get('/organizations/','EarlyBirdController@orgs');
-Route::get('/organizations/{id}','EarlyBirdController@org');
+// Temporary Earlybird routes still available in production but staff only please
+Route::group(['middleware' => 'web_admin'], function() {
+    Route::get('/origins','EarlyBirdController@origins');
+    Route::get('/datasets','EarlyBirdController@datasets');
+    Route::get('/datasets/{id}','EarlyBirdController@dataset');
+    Route::get('/bekanntgaben','EarlyBirdController@bekanntgaben');
+    Route::get('/cpvs','EarlyBirdController@cpvs');
+    Route::get('/cpvs/{id}','EarlyBirdController@cpv');
+    Route::get('/organizations/','EarlyBirdController@orgs');
+    Route::get('/organizations/{id}','EarlyBirdController@org');
+});
 
 // TEST routes, NOT in production env available
 Route::group(['prefix' => 'test'], function () {
