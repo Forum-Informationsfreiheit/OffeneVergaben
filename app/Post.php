@@ -96,4 +96,8 @@ class Post extends Model
 
         $this->attributes['published_at'] = $published_at;
     }
+
+    public function getIsPublicAttribute() {
+        return $this->published_at != null;
+    }
 }
