@@ -20,6 +20,21 @@ class Organization extends Model
     }
 
     /**
+     * Use this method if order is important when loading organizations by id
+     * Almost duplicate of Dataset::loadInOrder (refactor?)
+     *
+     * @param $orderedIds
+     * @return mixed
+     */
+    public static function loadInOrder($orderedIds) {
+        $str = join(',',$orderedIds);
+
+        return Organization::whereIn('id',$orderedIds)
+            ->orderByRaw(DB::raw("FIELD(id, $str)")) // https://stackoverflow.com/a/26704767/718980
+            ->get();
+    }
+
+    /**
      * @param $id string
      * @param $type string
      * @param $name string

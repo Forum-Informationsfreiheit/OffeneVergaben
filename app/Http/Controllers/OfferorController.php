@@ -13,21 +13,15 @@ use Illuminate\Support\Facades\DB;
 class OfferorController extends Controller
 {
     public function index(OfferorFilter $filters) {
-        $query = Offeror::indexQuery()->filter($filters);
-        //$query = Contractor::indexQuery();
-
         $totalItems = Organization::whereHas('offerors')->count();
-        $data       = $query->paginate(20);
 
-        $orderedIds = $data->pluck('organization_id')->toArray();
-        $orderedIdsStr = join(',',$orderedIds);
+        $query = Offeror::indexQuery()->filter($filters);
+        $data  = $query->paginate(20);
 
         $values = $data->keyBy('organization_id');
 
         // now load the appropriate models for the view
-        $items = Organization::whereIn('id',$orderedIds)
-            ->orderByRaw(DB::raw("FIELD(id, $orderedIdsStr)")) // https://stackoverflow.com/a/26704767/718980
-            ->get();
+        $items = Organization::loadInOrder($data->pluck('organization_id')->toArray());
 
         foreach($items as &$item) {
             $item->datasets_count = $values[$item->id]->datasets_count;
@@ -37,30 +31,7 @@ class OfferorController extends Controller
         return view('public.offerors.index',compact('items','totalItems','data','filters'));
     }
 
-    public function indexOld() {
-        $totalItems = Organization::with('offerors')->has('offerors')->count();
-
-        $query = Organization::with('offerors')->has('offerors');
-
-        $items = $query->paginate(20);
-
-        return view('public.offerors.index',compact('items','totalItems'));
-    }
-
     public function show(DatasetFilter $filters, $id) {
-        /*
-        $org = Organization::findOrFail($id);
-        $query = Dataset::select([
-            'datasets.*',
-            'res.created_at as scraped_at'
-        ]);
-        $query->join('scraper_results as res','datasets.result_id','=','res.id');
-        $query->join('offerors','datasets.id','=','offerors.dataset_id');
-        $query->where('offerors.organization_id',$org->id);
-        $query->where('datasets.is_current_version',1);
-
-                $items = $query->paginate(20);
-        */
         $org = Organization::findOrFail($id);
 
         $query = Dataset::indexQuery()
@@ -70,16 +41,8 @@ class OfferorController extends Controller
         $totalItems = $query->count();
         $data       = $query->paginate(20);
 
-        // debug: this is the original sort order of the ids
-        // dump($data->pluck('id')->toArray());
-
-        $orderedIds = $data->pluck('id')->toArray();
-        $orderedIdsStr = join(',',$orderedIds);
-
         // now load the appropriate models for the view
-        $items = Dataset::whereIn('id',$orderedIds)
-            ->orderByRaw(DB::raw("FIELD(id, $orderedIdsStr)")) // https://stackoverflow.com/a/26704767/718980
-            ->get();
+        $items = Dataset::loadInOrder($data->pluck('id')->toArray());
 
         return view('public.offerors.show',compact('items','totalItems','org','filters','data'));
     }

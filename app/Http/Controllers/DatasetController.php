@@ -45,16 +45,8 @@ class DatasetController extends Controller
         $totalItems = $query->count();
         $data       = $query->paginate(20);
 
-        // debug: this is the original sort order of the ids
-        // dump($data->pluck('id')->toArray());
-
-        $orderedIds = $data->pluck('id')->toArray();
-        $orderedIdsStr = join(',',$orderedIds);
-
         // now load the appropriate models for the view
-        $items = Dataset::whereIn('id',$orderedIds)
-            ->orderByRaw(DB::raw("FIELD(id, $orderedIdsStr)")) // https://stackoverflow.com/a/26704767/718980
-            ->get();
+        $items = Dataset::loadInOrder($data->pluck('id')->toArray());
 
         return view('public.datasets.index',compact('items','totalItems','filters','data'));
     }

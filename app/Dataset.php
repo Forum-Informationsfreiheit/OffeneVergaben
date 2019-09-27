@@ -71,6 +71,20 @@ class Dataset extends Model
     }
 
     /**
+     * Use this method if order is important when loading datasets by id
+     *
+     * @param $orderedIds
+     * @return mixed
+     */
+    public static function loadInOrder($orderedIds) {
+        $str = join(',',$orderedIds);
+
+        return Dataset::whereIn('id',$orderedIds)
+            ->orderByRaw(DB::raw("FIELD(id, $str)")) // https://stackoverflow.com/a/26704767/718980
+            ->get();
+    }
+
+    /**
      * Shortcut for static version. Handy if you have a $dataset at hand.
      *
      * @param $attribute
