@@ -9,3 +9,26 @@ body.page {
   }
 }
 
+body.cpvs {
+
+  .treemap-wrapper {
+    margin-bottom: 20px;
+  }
+
+  table {
+    td {
+      padding: 12px;
+    }
+
+    td.code {
+      width: 6%;
+    }
+    td.name {
+
+    }
+    td.value {
+      width: 13%;
+      text-align: right;
+    }
+  }
+}

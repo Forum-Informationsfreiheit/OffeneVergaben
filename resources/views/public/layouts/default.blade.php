@@ -6,6 +6,7 @@
 
     <!-- CSRF Token -->
     <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="test" content="hello">
 
     @if(!App::environment('production'))
         <meta name="robots" content="noindex, nofollow" />

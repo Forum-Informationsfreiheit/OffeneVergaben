@@ -22,6 +22,8 @@ Route::get('/lieferanten/{id}','ContractorController@show')->name('public::liefe
 Route::get('/auftraggeber','OfferorController@index')->name('public::auftraggeber');
 Route::get('/auftraggeber/{id}','OfferorController@show')->name('public::show-auftraggeber');
 
+Route::get('/branchen','CpvController@index')->name('public::branchen');
+
 Route::get('/suchen','PageController@searchResultsPage')->name('public::suchen');
 
 // reserved routes for dynamic page content, directly under domain (no other url prefix)

@@ -29,6 +29,11 @@
 
             <!-- Right Side Of Navbar -->
             <ul class="navbar-nav ml-auto">
+                @if(!app()->environment('production'))
+                    <li class="nav-item">
+                        <a class="nav-link {{ request()->route() && request()->segment(1) == 'branchen' ? 'active' : '' }}" href="{{ route('public::branchen') }}">{{ __('Branchen') }}</a>
+                    </li>
+                @endif
                 <li class="nav-item">
                     <a class="nav-link {{ request()->route() && request()->segment(1) == 'auftraggeber' ? 'active' : '' }}" href="{{ route('public::auftraggeber') }}">{{ __('Auftraggeber') }}</a>
                 </li>
