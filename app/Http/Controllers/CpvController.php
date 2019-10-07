@@ -10,33 +10,49 @@ use Laracasts\Utilities\JavaScript\JavaScriptFacade;
 
 class CpvController extends Controller
 {
-    public function index(Request $request) {
+    public static function buildViewUrl($defaultParams, $changedParams) {
+        $tempParams = new \stdClass();
 
-        $totalItems = 0;
-
-        //$items = CPV::paginate(100);
-
-        $root = null;
-        if ($request->has('node')) {
-            $root = CPV::findOrFail($request->input('node'));
+        foreach($defaultParams as $key => $value) {
+            $tempParams->{$key} = isset($changedParams[$key]) ? $changedParams[$key] : $value;
         }
 
-        //$code = "33000000";
-        //$root = CPV::where('code',$code)->first();
+        $routeParams = [];
 
-        //dump($root->toArray());
+        if ($tempParams->root) {
+            $routeParams['node'] = $tempParams->root->code;
+        }
+        if ($tempParams->type == 'anzahl') {
+            $routeParams[] = 'anzahl';
+        }
 
-        // query sum(...)
-        $result = $this->sumQuery($root)->map(function($i) use($root) {
+        $url = route('public::branchen',$routeParams);
+
+        return $url;
+    }
+
+    public function index() {
+
+        $params = $this->buildViewParams();
+
+        $result = $this->query($params);
+
+        // Iterate over result and add treestructure data is-root, is-leaf flags
+        $result = $result->map(function($i) use($params) {
             // put in more info about each node, which helps later with the treemap processing
             $i->isRoot = 0;
-            $i->sum = (int) $i->sum;
+
+            if ($params->type == 'volume') {
+                $i->sum = (int) $i->sum;
+            } else {
+                $i->count = (int) $i->count;
+            }
 
             // if there is a root node the result includes the "leveled"(?)
             // root node (with 1 extra 0 at the end)
             // but with that extra 0 it won't be accessible in the cpvMap
             // therefore cut it.
-            if ($root) {
+            if ($params->root) {
                 $trimmedCpv = rtrim($i->cpv,'0');
 
                 if ($i->cpv != $trimmedCpv) {
@@ -50,6 +66,21 @@ class CpvController extends Controller
             return $i;
         });
 
+        // add key value dictionary for cpv lookup by trimmed_code (for usage in javascript)
+        $cpvMap = $this->cpvMap($result);
+
+        $items = $result;
+
+        JavaScriptFacade::put([
+            'parameters' => $params,
+            'cpvMap' => $cpvMap,
+            'cpvRecords' => $result,
+        ]);
+
+        return view('public.cpvs.index',compact('params','items','cpvMap'));
+    }
+
+    protected function cpvMap($result) {
         $cpvMap = CPV::whereIn('trimmed_code',
             $result->pluck('cpv')->map(function($i) {
 
@@ -60,26 +91,40 @@ class CpvController extends Controller
             } ))
             ->get()->keyBy('trimmed_code');
 
-        $items = $result;
-
-        // query count(...)
-        //$result2 = $this->countQuery($root);
-        //dump($result2);
-
-
-
-        //$data = $items;
-
-        JavaScriptFacade::put([
-            'rootNode' => $root,
-            'cpvMap' => $cpvMap,
-            'cpvRecords' => $result,
-        ]);
-
-        return view('public.cpvs.index',compact('totalItems','items','cpvMap'));
+        return $cpvMap;
     }
 
-    protected function sumQuery($root) {
+    protected function buildViewParams() {
+        $params = new \stdClass();
+
+        $params->type = 'volume';
+        $params->year = null; // not yet needed / implemented
+        $params->root = null;
+        $params->baseUrl = route('public::branchen');
+
+        if (request()->has('anzahl')) {
+            $params->type = 'anzahl';
+        }
+
+        if (request()->has('node')) {
+            $params->root = CPV::findOrFail(request()->input('node'));
+        }
+
+        return $params;
+    }
+
+    protected function query($params) {
+        if ($params->type == 'volume') {
+            return $this->volumeQuery($params->root);
+        }
+        if ($params->type == 'anzahl') {
+            return $this->countQuery($params->root);
+        }
+
+        return null;
+    }
+
+    protected function volumeQuery($root) {
         $query = DB::table('datasets')
             ->select(DB::raw('sum(val_total) as sum'))
             ->where('datasets.is_current_version',1)

@@ -57,6 +57,31 @@
             url += (tempParams.valueType == "prokopf") ? "&prokopf" : "";
 
             return url;
+        },
+
+        buildViewUrl: function(view, defaultParams, changedParams) {
+            var tempParams = {};
+            var url = "";
+
+            for (var key in defaultParams) {
+                var value = defaultParams[key];
+
+                tempParams[key] = typeof changedParams[key] !== 'undefined' ? changedParams[key] : value;
+            }
+
+            if (view == 'cpv') {
+                url = tempParams.baseUrl;
+
+                var paramsArray = [];
+                if (tempParams.root != null) {
+                    paramsArray.push("node=" + tempParams.root.code);
+                }
+                if (tempParams.type == 'anzahl') {
+                    paramsArray.push("anzahl");
+                }
+
+                return url + (paramsArray.length > 0 ? '?' + paramsArray.join('&') : '');
+            }
         }
     }
 

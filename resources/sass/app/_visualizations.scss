@@ -11,7 +11,7 @@
     .node-title {
       display: block;
       font-size: 0.9rem;
-      font-weight: bold;
+      font-weight: normal;
       line-height: 1.15rem;
       margin-bottom: 4px;
       word-break: break-all;
@@ -52,6 +52,13 @@
       .node-value:before {
         color: rgba(255,255,255,0.5);
       }
+    }
+
+    &:hover {
+      background-color: darken($treemapBlue,5);
+    }
+    &.is-root:hover {
+      background-color: $gray-500;
     }
   }
 
