@@ -55,6 +55,10 @@ class CpvController extends Controller
             if ($params->root) {
                 $trimmedCpv = rtrim($i->cpv,'0');
 
+                // but don't trim too far there is no cpv code that has a trimmed code of only one char
+                // so a trimmed code of '6' is actually '60' in the database
+                $trimmedCpv = strlen($trimmedCpv) == 1 ? $trimmedCpv . '0' : $trimmedCpv;
+
                 if ($i->cpv != $trimmedCpv) {
                     $i->cpv = $trimmedCpv;
                     $i->isRoot = 1;
