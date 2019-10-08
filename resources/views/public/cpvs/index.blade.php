@@ -10,8 +10,22 @@
         <div class="col">
             <div class="treemap-top-controls">
                 <ul class="float-left">
-                    <li>@svg('/img/icons/auftragsvolumen.svg','sum')&nbsp;&nbsp;<a href="{{ \App\Http\Controllers\CpvController::buildViewUrl($params, [ 'type' => 'volume' ]) }}">nach Auftragsvolumen</a></li>
-                    <li>@svg('/img/icons/auftragsanzahl.svg','sum')&nbsp;&nbsp;<a href="{{ \App\Http\Controllers\CpvController::buildViewUrl($params, [ 'type' => 'anzahl' ]) }}">nach Anzahl Aufträgen</a></li>
+                    <li>
+                        @svg('/img/icons/auftragsvolumen.svg','sum')&nbsp;&nbsp;
+                        @if($params->type === 'volume')
+                            nach Auftragsvolumen
+                            @else
+                            <a href="{{ \App\Http\Controllers\CpvController::buildViewUrl($params, [ 'type' => 'volume' ]) }}">nach Auftragsvolumen</a>
+                        @endif
+                    </li>
+                    <li>
+                        @svg('/img/icons/auftragsanzahl.svg','sum')&nbsp;&nbsp;
+                        @if($params->type === 'anzahl')
+                            nach Anzahl Aufträgen
+                            @else
+                            <a href="{{ \App\Http\Controllers\CpvController::buildViewUrl($params, [ 'type' => 'anzahl' ]) }}">nach Anzahl Aufträgen</a>
+                        @endif
+                    </li>
                 </ul>
             </div>
             <div class="treemap-wrapper" id="treemap">
@@ -204,11 +218,12 @@
                 var node = d3.select(this);
 
                 if (!d) {
+                    d3.selectAll('.treemap .node').classed('highlight',false);
                     $tooltip.hide();
                     return;
                 }
 
-                // no actual highlighting via javascript, use simple :hover css pseudo class instead
+                node.classed('highlight',true);
 
                 showTooltip(d);
                 moveTooltip(d);

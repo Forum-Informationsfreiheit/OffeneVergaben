@@ -22,6 +22,18 @@ body.cpvs {
         float: left;
         font-size: 0.9rem;
         margin-right: 2rem;
+        color: $blue;
+
+        // these styles are used in other views / for other control links as well,
+        // so find a new place for this code?!
+        a {
+          color: $black;
+          text-decoration: underline;
+          text-decoration-color: $blue;
+        }
+        a:hover {
+          color: $blue;
+        }
       }
 
       &:after {

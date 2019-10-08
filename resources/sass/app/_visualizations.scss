@@ -36,12 +36,6 @@
       cursor: pointer;
     }
 
-    &.highlight {
-      .node-title {
-        text-decoration: underline;
-      }
-    }
-
     &.with-label {
       padding: 10px;
     }
@@ -54,11 +48,19 @@
       }
     }
 
-    &:hover {
-      background-color: darken($treemapBlue,5);
+    &.highlight {
+      background-color: $red;
+
+      .node-title {
+        text-decoration: underline;
+      }
     }
-    &.is-root:hover {
+    &.highlight.is-root {
       background-color: $gray-500;
+
+      .node-title {
+        text-decoration: none;
+      }
     }
   }
 
