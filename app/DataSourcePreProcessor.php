@@ -25,8 +25,8 @@ class DataSourcePreProcessor
     protected $data;
     protected $log;
 
-    public function __construct() {
-        $this->log = Log::channel('processor_daily');
+    public function __construct($logChannel = 'processor_daily') {
+        $this->log = Log::channel($logChannel);
     }
 
     public function getData() {
@@ -242,18 +242,29 @@ class DataSourcePreProcessor
         if ($this->hasAnyContractor('AWARD')) {
             $ac->contractors = [];
 
-            $contractors = $this->hasMultipleContractors('AWARD') ?
-                $data['AWARDED_CONTRACT']['CONTRACTOR']['ADDRESS_CONTRACTOR'] :
-                [ $data['AWARDED_CONTRACT']['CONTRACTOR']['ADDRESS_CONTRACTOR'] ];
+            if ($this->hasMultipleContractors('AWARD')) {
+                $contractors = $data['AWARDED_CONTRACT']['CONTRACTOR'];
+            } else {
+                $contractors = [ $data['AWARDED_CONTRACT']['CONTRACTOR'] ];
+            }
 
             foreach($contractors as $contractor) {
-                $con = new \stdClass();
+                if (!isset($contractor['ADDRESS_CONTRACTOR'])) {
+                    dump('Contractor has no ADDRESS_CONTRACTOR. Cant process contractor without. skipping.');
+                    continue;
+                }
 
-                $con->officialName = $this->cleanText($this->getField($contractor,'OFFICIALNAME'));
-                $con->nationalId   = $this->getField($contractor,'NATIONALID');
+                $addressCon = $contractor['ADDRESS_CONTRACTOR'];
 
-                $ac->contractors[] = $con;
+                $conObj = new \stdClass();
+
+                $conObj->officialName = $this->cleanText($this->getField($addressCon,'OFFICIALNAME'));
+                $conObj->nationalId   = $this->getField($addressCon,'NATIONALID');
+
+                $ac->contractors[] = $conObj;
             }
+        } else {
+            // nothing ...
         }
 
         $this->data->awardContract = $ac;
@@ -274,17 +285,26 @@ class DataSourcePreProcessor
         if ($this->hasAnyContractor('MODIFICATIONS')) {
             $mc->contractors = [];
 
-            $contractors = $this->hasMultipleContractors('MODIFICATIONS') ?
-                $data['DESCRIPTION_PROCUREMENT']['CONTRACTOR']['ADDRESS_CONTRACTOR'] :
-                [ $data['DESCRIPTION_PROCUREMENT']['CONTRACTOR']['ADDRESS_CONTRACTOR'] ];
+            if ($this->hasMultipleContractors('MODIFICATIONS')) {
+                $contractors = $data['DESCRIPTION_PROCUREMENT']['CONTRACTOR'];
+            } else {
+                $contractors = [ $data['DESCRIPTION_PROCUREMENT']['CONTRACTOR'] ];
+            }
 
             foreach($contractors as $contractor) {
-                $con = new \stdClass();
+                if (!isset($contractor['ADDRESS_CONTRACTOR'])) {
+                    dump('Contractor has no ADDRESS_CONTRACTOR. Cant process contractor without. skipping.');
+                    continue;
+                }
 
-                $con->officialName = $this->cleanText($this->getField($contractor,'OFFICIALNAME'));
-                $con->nationalId   = $this->getField($contractor,'NATIONALID');
+                $addressCon = $contractor['ADDRESS_CONTRACTOR'];
 
-                $mc->contractors[] = $con;
+                $conObj = new \stdClass();
+
+                $conObj->officialName = $this->cleanText($this->getField($addressCon,'OFFICIALNAME'));
+                $conObj->nationalId   = $this->getField($addressCon,'NATIONALID');
+
+                $mc->contractors[] = $conObj;
             }
         }
 
@@ -310,14 +330,24 @@ class DataSourcePreProcessor
         if ($this->hasAnyWinner()) {
             $ap->winners = [];
 
-            $winners = $this->hasMultipleWinners() ? $data['WINNER']['ADDRESS_WINNER'] :
-                [ $data['WINNER']['ADDRESS_WINNER'] ];
+            if ($this->hasMultipleWinners()) {
+                $winners = $data['WINNER'];
+            } else {
+                $winners = [ $data['WINNER'] ];
+            }
 
             foreach($winners as $winner) {
+                if (!isset($winner['ADDRESS_WINNER'])) {
+                    dump('Winner(contractor) has no ADDRESS_WINNER. Cant process without. skipping.');
+                    continue;
+                }
+
+                $addressWin = $winner['ADDRESS_WINNER'];
+
                 $win = new \stdClass();
 
-                $win->officialName = $this->cleanText($this->getField($winner,'OFFICIALNAME'));
-                $win->nationalId   = $this->getField($winner,'NATIONALID');
+                $win->officialName = $this->cleanText($this->getField($addressWin,'OFFICIALNAME'));
+                $win->nationalId   = $this->getField($addressWin,'NATIONALID');
 
                 $ap->winners[] = $win;
             }
@@ -732,14 +762,12 @@ class DataSourcePreProcessor
         if ($contract == 'AWARD') {
             return $this->hasAwardContract()
             && isset($this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT'])
-            && isset($this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT']['CONTRACTOR'])
-            && isset($this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT']['CONTRACTOR']['ADDRESS_CONTRACTOR']);
+            && isset($this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT']['CONTRACTOR']);
         }
         if ($contract == 'MODIFICATIONS') {
             return $this->hasModificationsContract()
             && isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT'])
-            && isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT']['CONTRACTOR'])
-            && isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT']['CONTRACTOR']['ADDRESS_CONTRACTOR']);
+            && isset($this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT']['CONTRACTOR']);
         }
 
         return false;
@@ -748,8 +776,7 @@ class DataSourcePreProcessor
     public function hasAnyWinner() {
         return $this->hasResults()
             && isset($this->simpleXmlArrayData['RESULTS']['AWARDED_PRIZE'])
-            && isset($this->simpleXmlArrayData['RESULTS']['AWARDED_PRIZE']['WINNER'])
-            && isset($this->simpleXmlArrayData['RESULTS']['AWARDED_PRIZE']['WINNER']['ADDRESS_WINNER']);
+            && isset($this->simpleXmlArrayData['RESULTS']['AWARDED_PRIZE']['WINNER']);
     }
 
     protected function hasMultipleAdditionalContractingBodies() {
@@ -779,7 +806,7 @@ class DataSourcePreProcessor
             return false;
         }
 
-        $array = $this->simpleXmlArrayData['RESULTS']['AWARDED_PRIZE']['WINNER']['ADDRESS_WINNER'];
+        $array = $this->simpleXmlArrayData['RESULTS']['AWARDED_PRIZE']['WINNER'];
 
         return count(array_filter(array_keys($array), 'is_string')) === 0;
     }
@@ -790,9 +817,9 @@ class DataSourcePreProcessor
         }
 
         if ($contract == 'AWARD') {
-            $array = $this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT']['CONTRACTOR']['ADDRESS_CONTRACTOR'];
+            $array = $this->simpleXmlArrayData['AWARD_CONTRACT']['AWARDED_CONTRACT']['CONTRACTOR'];
         } else if ($contract == 'MODIFICATIONS') {
-            $array = $this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT']['CONTRACTOR']['ADDRESS_CONTRACTOR'];
+            $array = $this->simpleXmlArrayData['MODIFICATIONS_CONTRACT']['DESCRIPTION_PROCUREMENT']['CONTRACTOR'];
         } else {
             return false;
         }

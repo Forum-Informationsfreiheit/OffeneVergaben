@@ -46,6 +46,13 @@ return [
             'level' => 'debug',
         ],
 
+        'dev' => [
+            'driver' => 'single',
+            'path' => storage_path('logs/dev.log'),
+            'level' => 'debug',
+            'days' => 14,
+        ],
+
         'daily' => [
             'driver' => 'daily',
             'path' => storage_path('logs/app.log'),
