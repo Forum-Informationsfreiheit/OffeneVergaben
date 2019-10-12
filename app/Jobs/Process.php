@@ -285,7 +285,7 @@ class Process
                     $contractor->name = $ac->officialName;
 
                     $organization = $this->matchOrCreateOrganization($contractor->national_id, $contractor->name);
-                    $contractor->organization_id = $organization->id;
+                    $contractor->organization_id = $organization ? $organization->id : null;
 
                     $contractor->save();
                 }
@@ -299,7 +299,7 @@ class Process
                     $contractor->name = $mc->officialName;
 
                     $organization = $this->matchOrCreateOrganization($contractor->national_id, $contractor->name);
-                    $contractor->organization_id = $organization->id;
+                    $contractor->organization_id = $organization ? $organization->id : null;
 
                     $contractor->save();
                 }
@@ -313,7 +313,7 @@ class Process
                     $contractor->name = $w->officialName;
 
                     $organization = $this->matchOrCreateOrganization($contractor->national_id, $contractor->name);
-                    $contractor->organization_id = $organization->id;
+                    $contractor->organization_id = $organization ? $organization->id : null;
 
                     $contractor->save();
                 }
