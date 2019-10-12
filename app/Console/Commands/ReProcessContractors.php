@@ -49,8 +49,6 @@ class ReProcessContractors extends Command
         $this->info('Starting Re-Process-Contractors Job');
         Log::channel('processor_daily')->info('Starting Re-Process-Contractors Job');
 
-        $runtime = $start->diffInSeconds(Carbon::now());
-
         // reset contractors table
         $this->resetContractors();
 
@@ -76,6 +74,8 @@ class ReProcessContractors extends Command
             }
         }
 
+
+        $runtime = $start->diffInSeconds(Carbon::now());
         $this->info('Finished Re-Process-Contractors Job in '.$runtime.' seconds');
         Log::channel('processor_daily')->info('Finished Re-Process-Contractors Job in '.$runtime.' seconds');
     }
