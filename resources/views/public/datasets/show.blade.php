@@ -17,7 +17,7 @@
                     </tr>
                     <tr>
                         <th>Bezeichnung</th>
-                        <td>{{ $dataset->title }}</td>
+                        <td>{{ $dataset->titleFormatted }}</td>
                     </tr>
                     <tr>
                         <th>Kategorie (CPV Hauptteil)</th>
@@ -29,12 +29,31 @@
                         <td>{{ $dataset->nuts->toString() }}</td>
                     </tr>
                     @endif
-                    <tr>
+                    <tr class="auftraggeber">
                         <th>Auftraggeber</th>
                         <td>
-                            @foreach($dataset->offerors as $offeror)
-                                <a href="{{ route('public::show-auftraggeber',$offeror->organization_id) }}">{{ $offeror->organization->name }}</a>@if(!$loop->last), @endif
-                            @endforeach
+                            <ul>
+                                @foreach($dataset->offerors as $offeror)
+                                    <li>
+                                        <a href="{{ route('public::show-auftraggeber',$offeror->organization_id) }}">{{ $offeror->organization->name }}</a>&nbsp;<small>{{ $offeror->organization->nationalId }}</small>
+                                        @if($offeror->phone)
+                                            <br>{{ $offeror->phone }}
+                                        @endif
+                                        @if($offeror->email)
+                                            <br>{{ $offeror->email }}
+                                        @endif
+                                        @if($offeror->contact)
+                                            <br>{{ $offeror->contact }}
+                                        @endif
+                                        @if($offeror->domain)
+                                            <br>Vollziehungsbereich:&nbsp;{{ \Illuminate\Support\Facades\Lang::has('dataset.domain.'.strtolower($offeror->domain)) ? __('dataset.domain.'.strtolower($offeror->domain)) : $offeror->domain }}
+                                        @endif
+                                        @if($offeror->reference_number)
+                                        <br>Geschäftszahl:&nbsp;{{ $offeror->reference_number }}
+                                        @endif
+                                    </li>
+                                @endforeach
+                            </ul>
                         </td>
                     </tr>
                     @if($dataset->contractors)
@@ -71,7 +90,7 @@
                     @if($dataset->description)
                         <tr>
                             <th>Beschreibung</th>
-                            <td>{{ $dataset->description }}</td>
+                            <td>{!! $dataset->descriptionFormatted !!}</td>
                         </tr>
                     @endif
                     @if($dataset->date_start)
@@ -226,6 +245,9 @@
                     @endif
                 </tbody>
             </table>
+            <div class="meta">
+                Version {{ $dataset->version }}@if(count($dataset->otherVersions))&nbsp;(<span class="version-links-inline">{!! $dataset->versionLinks !!}</span>)@endif, zuletzt aktualisiert: {{ $dataset->updated_at->format('d.m.Y') }}
+            </div>
         </div>
     </div>
 @stop

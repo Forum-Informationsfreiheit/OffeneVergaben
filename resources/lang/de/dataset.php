@@ -9,6 +9,10 @@ return [
     | Everything Dataset
     */
 
+    'domain' => [
+        'federal' => 'Bundesebene',
+    ],
+
     'contract_types' => [
         'SERVICES' => 'Dienstleistungsauftrag',
         'WORKS' => 'Bauauftrag',

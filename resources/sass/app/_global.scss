@@ -232,3 +232,28 @@ table.ov-table {
 .results-meta {
   margin-bottom: 10px;
 }
+
+.version-links-inline {
+
+  ul {
+    display: inline;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+
+    li {
+      display: inline;
+
+      &:after {
+        content: ',';
+        padding-right: 2px;
+      }
+    }
+    li:last-of-type {
+      &:after {
+        content: '';
+        padding-right: 0;
+      }
+    }
+  }
+}

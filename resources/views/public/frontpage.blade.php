@@ -58,7 +58,7 @@
                         <div class="tab-pane fade show active" id="offerorsCount" role="tabpanel" aria-labelledby="offerors-count-tab">
                             <ol class="top-ten">
                                 @foreach($topOfferorsByCount as $topOfferorByCount)
-                                    <li><a href="{{ route('public::show-auftraggeber',$topOfferorByCount->id) }}">{{ ui_shorten($topOfferorByCount->name,60) }}</a> ({{ $topOfferorByCount->datasets_count }})</li>
+                                    <li><a href="{{ route('public::show-auftraggeber',$topOfferorByCount->id) }}">{{ ui_shorten($topOfferorByCount->name,58) }}</a> ({{ $topOfferorByCount->datasets_count }})</li>
                                 @endforeach
                             </ol>
                         </div>
@@ -91,7 +91,7 @@
                         <div class="tab-pane fade show active" id="contractorsCount" role="tabpanel" aria-labelledby="contractors-count-tab">
                             <ol class="top-ten">
                                 @foreach($topContractorsByCount as $topContractorByCount)
-                                    <li><a href="{{ route('public::lieferant',$topContractorByCount->id) }}">{{ ui_shorten($topContractorByCount->name,60) }}</a> ({{ $topContractorByCount->datasets_count }})</li>
+                                    <li><a href="{{ route('public::lieferant',$topContractorByCount->id) }}">{{ ui_shorten($topContractorByCount->name,58) }}</a> ({{ $topContractorByCount->datasets_count }})</li>
                                 @endforeach
                             </ol>
                         </div>

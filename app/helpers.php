@@ -149,7 +149,9 @@ if (! function_exists('nl_to_br')) {
             return $text;
         }
 
-        return preg_replace("/(\r\n|\n|\r)/", "<br />", $text);
+        $t = preg_replace("/(\r\n|\n|\r)/", "<br />", $text);
+
+        return str_replace(['\rn','\n','\r'],'<br />',$t);      // why is this necessary ??
     }
 }
 

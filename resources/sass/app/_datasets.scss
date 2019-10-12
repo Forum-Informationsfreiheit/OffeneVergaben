@@ -21,6 +21,13 @@ body.datasets {
 }
 
 body.dataset {
+
+  .meta {
+    padding-right: 10px;
+    text-align: right;
+    font-size: 0.8rem;
+  }
+
   table {
     tr {
       td {
@@ -38,6 +45,23 @@ body.dataset {
           line-height: inherit;
         }
       }
+    }
+
+    tr.auftraggeber {
+
+      ul {
+        li {
+          border-bottom: 1px solid #eee;
+          margin-bottom: 4px;
+          padding-bottom: 4px;
+        }
+        li:last-of-type {
+          border-bottom: none;
+          margin-bottom: 0;
+          padding-bottom: 0;
+        }
+      }
+
     }
   }
 }

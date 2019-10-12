@@ -178,6 +178,27 @@ class Dataset extends Model
         return count($others) ? $others : null;
     }
 
+    public function getVersionLinksAttribute() {
+
+        $otherVersions = $this->otherVersions;
+
+        if (count($otherVersions) === 0) {
+            return '';
+        }
+
+        $html = '<ul>';
+
+        foreach($this->otherVersions as $other) {
+            $html .= '<li>';
+            $html .= '<a href="'.route('public::auftrag',$other->id).'">'.$other->version.'</a>';
+            $html .= '</li>';
+        }
+
+        $html .= '</ul>';
+
+        return $html;
+    }
+
     public function getTitleFormattedAttribute() {
         if (!$this->title) {
             return $this->title;
