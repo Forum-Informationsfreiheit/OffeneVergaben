@@ -16,10 +16,10 @@ body.frontpage {
       color: $blue;
       margin-bottom: 2rem;
 
-      a.lead-link {
-        text-decoration: underline;
-        text-decoration-color: $black;
+      a {
         color: $blue;
+        text-decoration:underline;
+        text-decoration-color: $black;
 
         &:hover {
           text-decoration-color: $blue;

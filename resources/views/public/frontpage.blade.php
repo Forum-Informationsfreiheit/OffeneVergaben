@@ -4,11 +4,17 @@
 
 @section('lead')
     <div class="container">
+        @if(false)
+            <!-- old text -->
         <p class="lead">
             Das <a class="lead-link" href="https://www.informationsfreiheit.at">Forum Informationsfreiheit</a> engagiert sich für mehr Transparenz in der Verwaltung.
             Auf offenevergaben.at machen wir Auftragsvergaben der öffentlichen Hand, die ab 2019
             als Open Data veröffentlicht werden, für Journalist*innen, Bürgerinitiativen, NGOs und
             interessierte Bürger*innen nachvollziehbar.
+        </p>
+        @endif
+        <p class="lead">
+            OffeneVergaben.at ist ein zivilgesellschaftliches Projekt des <a class="lead-link" href="https://www.informationsfreiheit.at">Forum Informationsfreiheit</a> und derzeit noch in einer Test-Phase. Wir machen Auftragsvergaben der öffentlichen Hand über 50.000 Euro nachvollziehbar. Dafür verwenden wir seit März 2019 verfügbare <a href="https://www.data.gv.at/suche/?searchterm=&tagFilter_sub%5B%5D=Ausschreibung">offene Daten</a> der Auftraggeber. Über Feedback an <a href="mailto:info@offenevergaben.at">info@offenevergaben.at</a> freuen wir uns.
         </p>
         <form class="search-form-lg" action="{{ route('public::suchen') }}" method="GET">
             <div class="input-group">
@@ -120,7 +126,12 @@
     <div class="container">
         <div class="row">
             <div class="col">
+                @if(false)
                 <h3>Was bietet offenevergaben.at?</h3>
+                @endif
+                <h3>
+                    Diese Features wird OffeneVergaben.at im Endausbau bieten:
+                </h3>
             </div>
         </div>
         <div class="row">
@@ -131,8 +142,8 @@
                         @svg('img/icons/filter.svg','filter')
                     </span>
                     </div>
-                    <h4>Datenfilter</h4>
-                    <p>Lorem ipsum... </p>
+                    <h4>Filter & Visualisierungen</h4>
+                    <p>Daten einfach erkunden</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -143,7 +154,7 @@
                     </span>
                     </div>
                     <h4>Benachrichtigungen</h4>
-                    <p>Lorem ipsum... </p>
+                    <p>per Email individuelle Updates erhalten</p>
                 </div>
             </div>
             <div class="col-md-4">
@@ -153,8 +164,8 @@
                         @svg('img/icons/export_w.svg','export')
                     </span>
                     </div>
-                    <h4>Exportmöglichkeiten</h4>
-                    <p>Lorem ipsum... </p>
+                    <h4>Daten-Export</h4>
+                    <p>für tiefergehende Analysen</p>
                 </div>
             </div>
         </div>
