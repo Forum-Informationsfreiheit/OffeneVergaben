@@ -97,47 +97,64 @@ class ReProcessContractors extends Command
         // following code more or less duplicate from App\Jobs\Process
         $data = $preProcessor->getData();
 
+        $organizations = [];
+
         // Handle contractors
         // AWARD contractors
         if ($data->awardContract && $data->awardContract->contractors) {
             foreach($data->awardContract->contractors as $ac) {
-                $contractor = new Contractor();
-                $contractor->dataset_id = $dataset->id;
-                $contractor->national_id = $ac->nationalId;
-                $contractor->name = $ac->officialName;
+                $organization = $this->matchOrCreateOrganization($ac->nationalId, $ac->officialName);
 
-                $organization = $this->matchOrCreateOrganization($contractor->national_id, $contractor->name);
-                $contractor->organization_id = $organization ? $organization->id : null;
+                // restrict the saved contractors so that
+                // the same organization is only used once per dataset
+                if ($organization && !in_array($organization->id,$organizations)) {
+                    $organizations[] = $organization->id;
 
-                $contractor->save();
+                    $contractor = new Contractor();
+                    $contractor->dataset_id = $dataset->id;
+                    $contractor->national_id = $ac->nationalId;
+                    $contractor->name = $ac->officialName;
+                    $contractor->organization_id = $organization ? $organization->id : null;
+                    $contractor->save();
+                }
             }
         }
         // MODIFICATIONS contractors
         if ($data->modificationsContract && $data->modificationsContract->contractors) {
             foreach($data->modificationsContract->contractors as $mc) {
-                $contractor = new Contractor();
-                $contractor->dataset_id = $dataset->id;
-                $contractor->national_id = $mc->nationalId;
-                $contractor->name = $mc->officialName;
+                $organization = $this->matchOrCreateOrganization($mc->nationalId, $mc->officialName);
 
-                $organization = $this->matchOrCreateOrganization($contractor->national_id, $contractor->name);
-                $contractor->organization_id = $organization ? $organization->id : null;
+                // restrict the saved contractors so that
+                // the same organization is only used once per dataset
+                if ($organization && !in_array($organization->id,$organizations)) {
+                    $organizations[] = $organization->id;
 
-                $contractor->save();
+                    $contractor = new Contractor();
+                    $contractor->dataset_id = $dataset->id;
+                    $contractor->national_id = $mc->nationalId;
+                    $contractor->name = $mc->officialName;
+                    $contractor->organization_id = $organization ? $organization->id : null;
+                    $contractor->save();
+                }
             }
         }
         // AWARDED PRIZE winners (=contractors)~
         if ($data->awardedPrize && $data->awardedPrize->winners) {
             foreach($data->awardedPrize->winners as $w) {
-                $contractor = new Contractor();
-                $contractor->dataset_id = $dataset->id;
-                $contractor->national_id = $w->nationalId;
-                $contractor->name = $w->officialName;
+                $organization = $this->matchOrCreateOrganization($w->nationalId, $w->officialName);
 
-                $organization = $this->matchOrCreateOrganization($contractor->national_id, $contractor->name);
-                $contractor->organization_id = $organization ? $organization->id : null;
+                // restrict the saved contractors so that
+                // the same organization is only used once per dataset
+                if ($organization && !in_array($organization->id,$organizations)) {
+                    $organizations[] = $organization->id;
 
-                $contractor->save();
+                    $contractor = new Contractor();
+                    $contractor->dataset_id = $dataset->id;
+                    $contractor->national_id = $w->nationalId;
+                    $contractor->name = $w->officialName;
+                    $contractor->organization_id = $organization ? $organization->id : null;
+                    $contractor->save();
+                }
             }
         }
     }
