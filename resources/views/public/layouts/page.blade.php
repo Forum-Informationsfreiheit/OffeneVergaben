@@ -13,6 +13,13 @@
 
     <title>@yield('page:title')| {{ config('app.name', 'Laravel') }}</title>
 
+    <!-- Manifest / Favicons -->
+    <link rel="manifest" href="{{ url('/img/favicons/manifest.json') }}">
+    <link rel="apple-touch-icon" sizes="180x180" href="{{ url('/img/favicons/apple-touch-icon.png') }}">
+    <link rel="icon" type="image/png" sizes="16x16" href="{{ url('/img/favicons/favicon-16x16.png') }}">
+    <link rel="icon" type="image/png" sizes="32x32" href="{{ url('/img/favicons/favicon-32x32.png') }}">
+    <link rel='shortcut icon' type='image/x-icon' href='{{ url('/img/favicons/favicon.ico') }}'>
+
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
     <link href="https://fonts.googleapis.com/css?family=Archivo" rel="stylesheet">

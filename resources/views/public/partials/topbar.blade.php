@@ -1,7 +1,7 @@
 <nav class="topbar navbar navbar-expand-md bg-white navbar-light shadow-sm">
     <div class="container">
         <a class="navbar-brand" href="{{ url('/') }}">
-            @svg('img/icons/logo_offenevergaben.svg','test')
+            @svg('img/icons/logo_beta_offenevergaben.svg','logo')
         </a>
 
         <form class="search-form float-left" action="{{ route('public::suchen') }}" method="GET">
