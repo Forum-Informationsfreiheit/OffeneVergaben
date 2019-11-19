@@ -51,7 +51,7 @@
                         </span>
                         @if($dataset->title !== $dataset->description)
                             <span class="result-text" style="color: grey">
-                                {!! ui_shorten(ui_highlight_tokens($dataset->description,$tokens,'strong'),150) !!}
+                                {!! ui_highlight_tokens(ui_shorten($dataset->description,150),$tokens,'strong') !!}
                             </span>
                         @endif
                     </li>
