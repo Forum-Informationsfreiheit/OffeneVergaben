@@ -119,7 +119,7 @@ if (! function_exists('ui_shorten')) {
         }
 
         if (strlen($text) > $length) {
-            return substr($text,0,$length) . '...';
+            return mb_substr($text,0,$length) . '...';
         } else {
             return $text;
         }

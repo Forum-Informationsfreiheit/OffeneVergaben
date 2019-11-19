@@ -71,6 +71,41 @@ class Dataset extends Model
     }
 
     /**
+     * Very simple title and description search.
+     * Adds information as is_offeror and is_contractor about the type of organization.
+     *
+     * @param $tokens
+     * @return mixed
+     */
+    public static function searchTitleAndDescriptionQuery($tokens) {
+
+        if (!$tokens) {
+            return null;
+        }
+
+        $query = self::select([
+            'datasets.id',
+            'datasets.title',
+            'datasets.description',
+            //DB::raw('(SELECT 1 FROM offerors    o WHERE o.organization_id = organizations.id LIMIT 1) as "is_offeror"'),
+            //DB::raw('(SELECT 1 FROM contractors c WHERE c.organization_id = organizations.id LIMIT 1) as "is_contractor"')
+        ]);
+
+        $query->where(function($q) use ($tokens) {
+            foreach($tokens as $token) {
+                $q->where('title','like','%'. $token .'%');
+            }
+        });
+        $query->orWhere(function($q) use ($tokens) {
+            foreach($tokens as $token) {
+                $q->where('description','like','%'. $token .'%');
+            }
+        });
+
+        return $query;
+    }
+
+    /**
      * Use this method if order is important when loading datasets by id
      *
      * @param $orderedIds

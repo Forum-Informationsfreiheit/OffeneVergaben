@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Contractor;
+use App\Dataset;
 use App\Offeror;
 use App\Organization;
 use App\Page;
@@ -35,7 +36,8 @@ class PageController extends Controller
 
         if ($search) {
             $organizations = Organization::searchNameQuery($tokens)->limit(101)->get();
-            // todo search datasets
+
+            $datasets = Dataset::searchTitleAndDescriptionQuery($tokens)->limit(100)->get();
         }
 
         $totalItems = count($organizations);

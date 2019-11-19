@@ -18,7 +18,8 @@
     </div>
     @endif
     <div class="row">
-        <div class="col">
+        <div class="col-md-6">
+            <h3>Auftraggeber & Lieferanten</h3>
             @if(count($organizations))
             <ul class="results">
                 @foreach($organizations as $org)
@@ -31,6 +32,27 @@
                         @endif
                         @if($org->is_contractor)
                             <a class="badge badge-danger" href="{{ route('public::lieferant',$org->id) }}">Lieferant</a>
+                        @endif
+                    </li>
+                @endforeach
+            </ul>
+            @else
+                <em>keine Ergebnisse gefunden</em>
+            @endif
+        </div>
+        <div class="col-md-6">
+            <h3>Aufträge</h3>
+            @if(count($datasets))
+            <ul class="results">
+                @foreach($datasets as $dataset)
+                    <li class="result-item">
+                        <span class="result-text">
+                            <a style="color: #333" href="{{ route('public::auftrag',$dataset->id) }}">{!! ui_highlight_tokens($dataset->title,$tokens,'strong') !!}</a>
+                        </span>
+                        @if($dataset->title !== $dataset->description)
+                            <span class="result-text" style="color: grey">
+                                {!! ui_shorten(ui_highlight_tokens($dataset->description,$tokens,'strong'),150) !!}
+                            </span>
                         @endif
                     </li>
                 @endforeach

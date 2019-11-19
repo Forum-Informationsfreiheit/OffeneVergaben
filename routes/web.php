@@ -56,6 +56,10 @@ Route::group(['prefix' => 'test'], function () {
         return;
     }
 
+    Route::get('/write_to_log',function() {
+        \Illuminate\Support\Facades\Log::debug('Test Log Meldung '.\Carbon\Carbon::now());
+    });
+
     Route::get('/search_name',function() {
 
         $name = request('search');
