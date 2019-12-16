@@ -57,6 +57,8 @@ class Offeror extends Model
         if ($type == 'count') {
             $query = self::select(['offerors.organization_id', DB::raw('count(*) as datasets_count')]);
             $query->join('datasets','offerors.dataset_id','=','datasets.id');
+            $query->join('dataset_types','datasets.type_code','=','dataset_types.code');
+            $query->where('dataset_types.end',1);
             $query->where('datasets.is_current_version',1);
             $query->groupBy('offerors.organization_id');
             $query->orderBy('datasets_count','desc');
@@ -65,6 +67,8 @@ class Offeror extends Model
         if ($type == 'sum') {
             $query = self::select(['offerors.organization_id', DB::raw('sum(val_total) as sum_total_val')]);
             $query->join('datasets','offerors.dataset_id','=','datasets.id');
+            $query->join('dataset_types','datasets.type_code','=','dataset_types.code');
+            $query->where('dataset_types.end',1);
             $query->where('datasets.is_current_version',1);
             $query->groupBy('offerors.organization_id');
             $query->orderBy('sum_total_val','desc');
