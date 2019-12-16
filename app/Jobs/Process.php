@@ -402,7 +402,7 @@ class Process
 
             // Check if we could find all referenced in db, otherwise error
             if (count($uniqueAdditionalCpvs) != count($checkAddCpvs)) {
-                $this->dumpAndLogValidationError($source, $record, 'At least one unknown additional cpv code.',$data->objectContract->additionalCpvs);
+                $this->dumpAndLogValidationError($source, $record, 'At least one unknown additional cpv code.',['additional_cpvs' => $data->objectContract->additionalCpvs]);
                 $validationError = true;
             }
         }
@@ -587,11 +587,15 @@ class Process
      * @param $source
      * @param $message
      * @param string $logLevel (info,warning,error etc.), @see Monolog documentation
+     * @param $context
+     * @param $logLevel
      */
-    protected function dumpAndLogValidationError($source, $record, $message, $logLevel = 'warning') {
-        dump('Failed validation for datasource o'.$source->origin->id.':'.$source->id.':v'.$record->version);
-        dump('   '.$message);
+    protected function dumpAndLogValidationError($source, $record, $message, $context = [], $logLevel = 'warning') {
+        $context['message'] = $message;
 
-        $this->log->{$logLevel}('Failed validation for datasource o'.$source->origin->id.':'.$source->id.':v'.$record->version,['message' => $message]);
+        dump('Failed validation for datasource o'.$source->origin->id.':'.$source->id.':v'.$record->version);
+        dump($context);
+
+        $this->log->{$logLevel}('Failed validation for datasource o'.$source->origin->id.':'.$source->id.':v'.$record->version,$context);
     }
 }
