@@ -122,13 +122,13 @@ class Process
         $source = Datasource::where('origin_id',$record->origin_id)
             ->where('reference_id',$record->reference_id)->first();
 
-        if (!$this->validateDatasource($data, $source, $record)) {
-            return false;
-        }
-
-        // write dataset
         try {
+            // Skip record if validation fails
+            if (!$this->validateDatasource($data, $source, $record)) {
+                return false;
+            }
 
+            // WRITE dataset -------------------------------------------------------------------------------------------
             // use db transaction as we have to fill multiple database tables
             DB::beginTransaction();
 

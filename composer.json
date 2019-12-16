@@ -16,7 +16,8 @@
         "laracasts/flash": "3.*",
         "laracasts/utilities": "~3.0",
         "unisharp/laravel-filemanager": "~1.8",
-        "kblais/query-filter": "~1.5"
+        "kblais/query-filter": "~1.5",
+        "doctrine/dbal": "~2.9"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",
