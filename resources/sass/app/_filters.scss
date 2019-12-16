@@ -39,5 +39,20 @@
         display: none;
       }
     }
+
+    &.volume-range {
+      input {
+        display: inline-block;
+        font-size: 0.85rem;
+        width: 110px;
+        padding: .375rem .375rem;
+        text-align: center;
+      }
+      .dash {
+        display: inline-block;
+        padding: 0 .25rem;
+      }
+    }
   }
+
 }

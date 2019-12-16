@@ -90,6 +90,22 @@ class DatasetFilter extends QueryFilter
         return $this->builder;
     }
 
+    public function volumeFrom($value) {
+        if (!is_numeric($value)) {
+            return $this->builder;
+        }
+
+        return $this->builder->where('val_total','>=',$value * 100);
+    }
+
+    public function volumeTo($value) {
+        if (!is_numeric($value)) {
+            return $this->builder;
+        }
+
+        return $this->builder->where('val_total','<=',$value * 100);
+    }
+
     /**
      * Shortcut helper method for blade views
      * so in view it can be checked wether or not a filter was set

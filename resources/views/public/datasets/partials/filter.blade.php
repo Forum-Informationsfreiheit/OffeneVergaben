@@ -60,6 +60,18 @@
                 </div>
             </div>
         </div>
+        <div class="col-md-3">
+            <div class="filter-group volume-range">
+                <div class="filter-group-label">
+                    Auftragsvolumen
+                </div>
+                <div class="filter-group-inputs">
+                    <input class="form-control" type="text" name="volume_from" value="{{ request('volume_from') }}">
+                    <span class="dash">&ndash;</span>
+                    <input class="form-control" type="text" name="volume_to" value="{{ request('volume_to') }}">
+                </div>
+            </div>
+        </div>
     </div>
     <button style="margin: 10px 0 0 0;" type="submit" class="btn btn-primary">Filtern</button>
 </form>
