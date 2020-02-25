@@ -14,6 +14,11 @@ class Page extends Model
         'slug'
     ];
 
+    // RELATIONS -------------------------------------------------------------------------------------------------------
+    public function author() {
+        return $this->belongsTo('App\User','author_id');
+    }
+
     // SCOPES ----------------------------------------------------------------------------------------------------------
     public static function scopePublished($query) {
         return $query->whereNotNull('published_at');

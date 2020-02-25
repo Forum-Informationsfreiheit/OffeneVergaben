@@ -30,6 +30,7 @@ Route::get('/suchen','PageController@searchResultsPage')->name('public::suchen')
 Route::get('/impressum',   'PageController@reserved');
 Route::get('/datenschutz', 'PageController@reserved');
 Route::get('/überuns',     'PageController@reserved');
+Route::get('/page/{slug}', 'PageController@page')->name('public::show-page');
 
 // Auth routes, only /login is open, others (register,passwort reset and email verification are not)
 if (App::environment('production')) {

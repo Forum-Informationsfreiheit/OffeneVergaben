@@ -41,6 +41,9 @@
                         <td>{{ $post->updated_at->format('d.m.Y') }}</td>
                         @can('update-tags')
                             <td>
+                                <a class="action-link show disabled" href="#" onclick="alert('Frontend not implemented.')">
+                                    <i class="fas fa-w fa-external-link-alt"></i>
+                                </a>
                                 <a class="action-link" href="{{ route('admin::edit-post',$post->id) }}" role="button">
                                     <i class="fas fa-w fa-pencil-alt"></i>
                                 </a>

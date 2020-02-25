@@ -37,11 +37,14 @@
                         <td>{!! !$page->published_at ? "<i class='fas fa-lock'></i>" : "" !!}</td>
                         <td>{{ $page->title }}</td>
                         <td>{{ $page->slug }}</td>
-                        <td>{{ $page->created_at->format('d.m.Y') }} <span class="btn btn-primary btn-circle btn-xs">{{ strtoupper(Auth::user()->initials) }}</span></td>
+                        <td>{{ $page->created_at->format('d.m.Y') }} <span class="btn btn-primary btn-circle btn-xs">{{ strtoupper($page->author->initials) }}</span></td>
                         <td>{{ $page->updated_at->format('d.m.Y') }}</td>
                         @can('update-tags')
                             <td>
-                                <a class="action-link" href="{{ route('admin::edit-page',$page->id) }}" role="button">
+                                <a class="action-link show" href="{{ route('public::show-page',$page->slug) }}" title="Anzeigen">
+                                    <i class="fas fa-w fa-external-link-alt"></i>
+                                </a>
+                                <a class="action-link" href="{{ route('admin::edit-page',$page->id) }}" role="button" title="Bearbeiten">
                                     <i class="fas fa-w fa-pencil-alt"></i>
                                 </a>
                                 <a class="action-link publish"
@@ -53,8 +56,9 @@
                                    data-publish-title="{{ $page->published_at ? 'Veröffentlichung zurücknehmen' : 'Page veröffentlichen' }}"
                                    data-toggle="modal"
                                    data-target="#confirmPublishPageModal"
-                                   href="#" role="button">
-                                    <i title="{{ !$page->published_at ? 'Publish' : 'Unpublish' }}" class="fas fa-w {{ !$page->published_at ? 'fa-lock-open' : 'fa-lock' }}"></i>
+                                   href="#" role="button"
+                                   title="{{ !$page->published_at ? 'Publish' : 'Unpublish' }}">
+                                    <i class="fas fa-w {{ !$page->published_at ? 'fa-lock-open' : 'fa-lock' }}"></i>
                                 </a>
                                 <a class="action-link delete"
                                    data-confirm-delete
@@ -62,7 +66,8 @@
                                    data-delete-string="{{ $page->titel }}"
                                    data-toggle="modal"
                                    data-target="#confirmDeletePageModal"
-                                   href="#" role="button">
+                                   href="#" role="button"
+                                   title="Löschen">
                                     <i class="fas fa-w fa-times"></i>
                                 </a>
                             </td>
