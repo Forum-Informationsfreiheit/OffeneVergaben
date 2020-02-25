@@ -87,7 +87,7 @@
         path_absolute : "",
         selector: "#body",
         plugins: [
-            "link image table"
+            "link image table code"
         ],
         image_caption: true,
         relative_urls: false,
