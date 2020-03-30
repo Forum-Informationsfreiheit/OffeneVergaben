@@ -57,6 +57,19 @@ Route::group(['prefix' => 'test'], function () {
         return;
     }
 
+    Route::get('/scraperconn', function() {
+        $res = \Illuminate\Support\Facades\DB::connection('mysql_scraper')->table('quellen')->select()->get();
+        dd($res);
+    });
+
+    Route::get('/scraper/quellen', function() {
+        dd(\App\ScraperQuellen::active()->get()->pluck('name'));
+    });
+
+    Route::get('/scraper/kerndaten', function() {
+        dd(\App\ScraperKerndaten::unprocessed()->get()->pluck('item_url'));
+    });
+
     Route::get('/write_to_log',function() {
         \Illuminate\Support\Facades\Log::debug('Test Log Meldung '.\Carbon\Carbon::now());
     });
