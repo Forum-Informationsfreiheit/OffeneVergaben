@@ -2,19 +2,24 @@
 
 namespace App\Console\Commands;
 
-use App\ScraperKerndaten;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;
 
-class Process extends Command
+/**
+ * @deprecated
+ *
+ * Class ProcessOld
+ * @package App\Console\Commands
+ */
+class ProcessOld extends Command
 {
     /**
      * The name and signature of the console command.
      *
      * @var string
      */
-    protected $signature = 'fif:process {--kerndaten_id=}';
+    protected $signature = 'fif:process_deprecated';
 
     /**
      * The console command description.
@@ -44,28 +49,11 @@ class Process extends Command
         $this->info('Starting Process Job');
         Log::channel('processor_daily')->info('Starting Process Job');
 
-        $kerndatenIds = $this->getKerndatenToBeProcessed();
-
-        $params = [ 'ids' => $kerndatenIds ];
-
-        $job = app()->make('App\Jobs\Process',$params);
+        $job = app()->make('App\Jobs\Process');
         dispatch($job);
         $runtime = $start->diffInSeconds(Carbon::now());
 
         $this->info('Finished Process Job in '.$runtime.' seconds');
         Log::channel('processor_daily')->info('Finished Process Job in '.$runtime.' seconds');
-    }
-
-    protected function getKerndatenToBeProcessed() {
-        // 1. check console parameter
-        // single or multiple ids seperated by comma
-        $kerndatenId = $this->option('kerndaten_id');
-
-        if ($kerndatenId) {
-            return array_map('trim',explode(',',$kerndatenId));
-        }
-
-        // 2. default: everything that has not been processed
-        return ScraperKerndaten::unprocessed()->pluck('id')->toArray();
     }
 }
