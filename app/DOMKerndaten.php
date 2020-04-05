@@ -323,6 +323,13 @@ class DOMKerndaten
         $domAcRoot = $this->getFirstElementByTagName($this->document->documentElement, 'AWARD_CONTRACT');
         $domAc     = $this->getFirstElementByTagName($domAcRoot, 'AWARDED_CONTRACT');
 
+        if (!$domAc) {
+            // This is possible on error OR if no contract has been awarded, as indicated by
+            // AWARD_CONTRACT --> NO_AWARDED_CONTRACT
+            // @see quelle=ausschreibungat item_id=CEB8FDA48287BACB
+            return;
+        }
+
         $ac = new \stdClass();
 
         $ac->dateConclusionContract = null;
@@ -355,7 +362,9 @@ class DOMKerndaten
         $ac->contractors       = [];
         if ($this->elementExists($domAc, 'CONTRACTOR')) {
             foreach($domAc->getElementsByTagName('CONTRACTOR') as $domContractor) {
-                $ac->contractors[] = $this->loadAddressContractor($domContractor, 'ADDRESS_CONTRACTOR');
+                if ($this->elementExists($domContractor, 'ADDRESS_CONTRACTOR')) {
+                    $ac->contractors[] = $this->loadAddressContractor($domContractor, 'ADDRESS_CONTRACTOR');
+                }
             }
         }
 
@@ -399,7 +408,9 @@ class DOMKerndaten
         $mc->contractors       = [];
         if ($domDp && $this->elementExists($domDp, 'CONTRACTOR')) {
             foreach($domDp->getElementsByTagName('CONTRACTOR') as $domContractor) {
-                $mc->contractors[] = $this->loadAddressContractor($domContractor, 'ADDRESS_CONTRACTOR');
+                if ($domDp && $this->elementExists($domContractor, 'ADDRESS_CONTRACTOR')) {
+                    $mc->contractors[] = $this->loadAddressContractor($domContractor, 'ADDRESS_CONTRACTOR');
+                }
             }
         }
 
@@ -479,7 +490,9 @@ class DOMKerndaten
         $re->winners       = [];
         if ($this->elementExists($domAp, 'WINNER')) {
             foreach($domAp->getElementsByTagName('WINNER') as $domWinner) {
-                $re->winners[] = $this->loadAddressContractor($domWinner, 'ADDRESS_WINNER');
+                if ($this->elementExists($domWinner, 'ADDRESS_WINNER')) {
+                    $re->winners[] = $this->loadAddressContractor($domWinner, 'ADDRESS_WINNER');
+                }
             }
         }
 

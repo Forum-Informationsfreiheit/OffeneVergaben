@@ -55,7 +55,7 @@ class Process
         $this->log->debug('Process ' . count($this->recordIds)." kerndaten");
 
         // Use "block sized" processing to prevent any kind of memory issues
-        $blockSize = 100;
+        $blockSize = 50;
         $index = 0;
 
         // Collection of App\ScraperKerndaten
@@ -474,16 +474,15 @@ class Process
         $validationError = false;
 
         $checkCPVCode  = $data->objectContract->cpv  ? CPV::find($data->objectContract->cpv) : true;
-        $checkNUTSCode = $data->objectContract->nuts ? NUTS::find($data->objectContract->nuts) : true;
-
         if (!$checkCPVCode) {
             $this->dumpAndLogValidationError($record, 'Unknown CPV #'.$data->objectContract->cpv.'#');
             $validationError = true;
         }
 
+        $checkNUTSCode = $data->objectContract->nuts ? NUTS::find($data->objectContract->nuts) : true;
         if (!$checkNUTSCode) {
-            $this->dumpAndLogValidationError($record, 'Unknown NUTS #'.$data->objectContract->nuts.'#');
-            $validationError = true;
+            $this->dumpAndLogValidationWarning($record, 'Unknown NUTS #'.$data->objectContract->nuts.'#. Code removed and set to NULL.');
+            $data->objectContract->nuts = null;
         }
 
         if ($data->contractingBody->urlDocumentIsRestricted && $data->contractingBody->urlDocumentIsFull) {
