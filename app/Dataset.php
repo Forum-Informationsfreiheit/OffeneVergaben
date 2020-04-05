@@ -134,12 +134,18 @@ class Dataset extends Model
         return $query->where('is_current_version',1);
     }
 
+    /*
     public function datasource() {
         return $this->belongsTo('App\Datasource');
     }
+    */
 
     public function type() {
         return $this->belongsTo('App\DatasetType','type_code');
+    }
+
+    public function metaset() {
+        return $this->belongsTo('App\Metaset');
     }
 
     public function offeror() {
@@ -208,7 +214,7 @@ class Dataset extends Model
         return $this->xml;
     }
     public function getOtherVersionsAttribute() {
-        $others = $this->datasource->datasets()->where('version','!=',$this->version)->orderBy('version','asc')->get();
+        $others = $this->metaset->datasets()->where('version','!=',$this->version)->orderBy('version','asc')->get();
 
         return count($others) ? $others : null;
     }
