@@ -113,6 +113,22 @@ class DOMKerndaten
         $this->loadLefti();
     }
 
+    public function getData() {
+        $data = new \stdClass();
+
+        $data->type = $this->type;
+        $data->contractingBody = $this->contractingBody;
+        $data->objectContract = $this->objectContract;
+        $data->procedure = $this->procedure;
+        $data->awardContract = $this->awardContract;
+        $data->modificationsContract = $this->modificationsContract;
+        $data->results = $this->results;
+        $data->additionalCoreData = $this->additionalCoreData;
+        $data->lefti = $this->lefti;
+
+        return $data;
+    }
+
     /**
      *
      */
@@ -527,6 +543,7 @@ class DOMKerndaten
 
         $acd->rdNotification = $this->getBooleanByTagName($domAcdRoot,'RD_NOTIFICATION');
 
+        $acd->objectContractModifications = null;
         if ($this->elementExists($domAcdRoot, 'OBJECT_CONTRACT_MODIFICATIONS')) {
             $domOcm = $this->getFirstElementByTagName($domAcdRoot, 'OBJECT_CONTRACT_MODIFICATIONS');
 

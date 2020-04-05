@@ -15,8 +15,17 @@ class ScraperKerndaten extends Model
 
     protected $table = 'kerndaten';
 
-    // RELATIONS -------------------------------------------------------------------------------------------------------
+    protected $dates = [
+        'app_processed_at'
+    ];
 
+    public $timestamps = false;
+
+    // RELATIONS -------------------------------------------------------------------------------------------------------
+    // Sonderfall weil attribut ebenfalls quelle heisst, daher methode umbenannt auf rel_quelle (anstatt quelle)
+    public function rel_quelle() {
+        return $this->belongsTo('App\ScraperQuelle','quelle','alias');
+    }
 
     // SCOPES ----------------------------------------------------------------------------------------------------------
     public static function scopeUnprocessed($query) {

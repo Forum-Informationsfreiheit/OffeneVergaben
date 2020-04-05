@@ -63,7 +63,7 @@ Route::group(['prefix' => 'test'], function () {
     });
 
     Route::get('/scraper/quellen', function() {
-        dd(\App\ScraperQuellen::active()->get()->pluck('name'));
+        dd(\App\ScraperQuelle::active()->get()->pluck('name'));
     });
 
     Route::get('/scraper/kerndaten', function() {
