@@ -4,7 +4,7 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 
-class ScraperQuellen extends Model
+class ScraperQuelle extends Model
 {
     /**
      * The database connection used to connect to the scrapers database.
