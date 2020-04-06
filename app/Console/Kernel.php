@@ -26,10 +26,14 @@ class Kernel extends ConsoleKernel
      */
     protected function schedule(Schedule $schedule)
     {
+        /*
+         * 20200406 - Scraper running now individually
+         *
         $scrapeAt = env('APP_SCHEDULE_SCRAPE_AT_TIMESTRING');
         if ($scrapeAt && $this->validateTimeString($scrapeAt)) {
             $schedule->command('fif:scrape')->at($scrapeAt);
         }
+        */
 
         $processAt = env('APP_SCHEDULE_PROCESS_AT_TIMESTRING');
         if ($processAt && $this->validateTimeString($processAt)) {
