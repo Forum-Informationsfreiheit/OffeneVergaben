@@ -475,8 +475,8 @@ class Process
 
         $checkCPVCode  = $data->objectContract->cpv  ? CPV::find($data->objectContract->cpv) : true;
         if (!$checkCPVCode) {
-            $this->dumpAndLogValidationError($record, 'Unknown CPV #'.$data->objectContract->cpv.'#');
-            $validationError = true;
+            $this->dumpAndLogValidationWarning($record, 'Unknown CPV #'.$data->objectContract->cpv.'#. Code removed and set to NULL.');
+            $data->objectContract->cpv = null;
         }
 
         $checkNUTSCode = $data->objectContract->nuts ? NUTS::find($data->objectContract->nuts) : true;

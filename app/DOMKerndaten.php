@@ -213,13 +213,16 @@ class DOMKerndaten
         // OC --> CPV MAIN
         $oc->cpv = null;
         if ($this->elementExists($domOc, 'CPV_MAIN')) {
-            $oc->cpv = $this->getFirstElementByTagName($this->getFirstElementByTagName($domOc, 'CPV_MAIN'), 'CPV_CODE')->getAttribute('CODE');
+            $domCpvMain = $this->getFirstElementByTagName($domOc, 'CPV_MAIN');
+            if ($this->elementExists($domCpvMain, 'CPV_CODE')) {
+                $oc->cpv = $this->getAttributeString($this->getFirstElementByTagName($domCpvMain, 'CPV_CODE'),'CODE');
+            }
         }
 
         // OC --> TYPE_CONTRACT
         $oc->type = null;
         if ($this->elementExists($domOc, 'TYPE_CONTRACT')) {
-            $oc->type = $this->getFirstElementByTagName($domOc, 'TYPE_CONTRACT')->getAttribute('CTYPE');
+            $oc->type = $this->getAttributeString($this->getFirstElementByTagName($domOc, 'TYPE_CONTRACT'),'CTYPE');
         }
 
         // OC --> REFERENCE_NUMBER
@@ -235,14 +238,17 @@ class DOMKerndaten
         // OC --> OBJECT DESCRIPTION --> NUTS
         $oc->nuts = null;
         if ($domOdescr && $this->elementExists($domOdescr, 'NUTS')) {
-            $oc->nuts = $this->getFirstElementByTagName($domOdescr, 'NUTS')->getAttribute('CODE');
+            $oc->nuts = $this->getAttributeString($this->getFirstElementByTagName($domOdescr, 'NUTS'),'CODE');
         }
 
         // OC --> OBJECT DESCRIPTION --> CPV_ADDITIONAL[]
         $oc->additionalCpvs = [];
         if ($domOdescr && $this->elementExists($domOdescr, 'CPV_ADDITIONAL')) {
             foreach($domOdescr->getElementsByTagName('CPV_ADDITIONAL') as $cpvAdd) {
-                $oc->additionalCpvs[] = $this->getFirstElementByTagName($cpvAdd, 'CPV_CODE')->getAttribute('CODE');
+                $cpv = $this->getAttributeString($this->getFirstElementByTagName($cpvAdd, 'CPV_CODE'),'CODE');
+                if ($cpv) {
+                    $oc->additionalCpvs[] = $cpv;
+                }
             }
         }
 
@@ -306,7 +312,6 @@ class DOMKerndaten
         if ($this->elementExists($domPr,'PT_IMPLEMENTATION')) { $p->procedures[] = 'PT_IMPLEMENTATION'; }
         if ($this->elementExists($domPr,'DPS')) { $p->procedures[] = 'DPS'; }
 
-        $p->procedures = count($p->procedures) > 0 ? $p->procedures : null;
         $p->isFramework = $this->elementExists($domPr, 'FRAMEWORK');
 
         $this->procedure = $p;
@@ -355,7 +360,7 @@ class DOMKerndaten
             $valTotal = $this->getFirstElementByTagName($domAc, 'VAL_TOTAL');
 
             $ac->valTotal = $this->getString($valTotal);
-            $ac->valTotalCurrency = $valTotal->getattribute('CURRENCY');
+            $ac->valTotalCurrency = $this->getAttributeString($valTotal,'CURRENCY');
         }
 
         // AWARDED_CONTRACT --> AWARD_CONTRACT --> CONTRACTOR --> ADDRESS_CONTRACTOR
@@ -387,14 +392,20 @@ class DOMKerndaten
         // MODIFICATIONS_CONTRACT --> DESCRIPTION_PROCUREMENT --> CPV_MAIN
         $mc->cpv = null;
         if ($domDp && $this->elementExists($domDp,'CPV_MAIN')) {
-            $mc->cpv = $this->getFirstElementByTagName($this->getFirstElementByTagName($domDp, 'CPV_MAIN'), 'CPV_CODE')->getAttribute('CODE');
+            $domCpvMain = $this->getFirstElementByTagName($domDp, 'CPV_MAIN');
+            if ($this->elementExists($domCpvMain, 'CPV_CODE')) {
+                $mc->cpv = $this->getAttributeString($this->getFirstElementByTagName($domCpvMain, 'CPV_CODE'),'CODE');
+            }
         }
 
         //                                                        CPV_ADDITIONAL
         $mc->additionalCpvs = [];
         if ($domDp && $this->elementExists($domDp, 'CPV_ADDITIONAL')) {
             foreach($domDp->getElementsByTagName('CPV_ADDITIONAL') as $cpvAdd) {
-                $mc->additionalCpvs[] = $this->getFirstElementByTagName($cpvAdd, 'CPV_CODE')->getAttribute('CODE');
+                $cpv = $this->getAttributeString($this->getFirstElementByTagName($cpvAdd, 'CPV_CODE'),'CODE');
+                if ($cpv) {
+                    $mc->additionalCpvs[] = $cpv;
+                }
             }
         }
 
@@ -435,7 +446,7 @@ class DOMKerndaten
             $valTotalBefore = $this->getFirstElementByTagName($domIm, 'VAL_TOTAL_BEFORE');
 
             $mc->valTotalBefore = $this->getString($valTotalBefore);
-            $mc->valTotalBeforeCurrency = $valTotalBefore->getattribute('CURRENCY');
+            $mc->valTotalBeforeCurrency = $this->getAttributeString($valTotalBefore,'CURRENCY');
         }
 
         //                                                   VAL_TOTAL_AFTER
@@ -445,7 +456,7 @@ class DOMKerndaten
             $valTotalAfter = $this->getFirstElementByTagName($domIm, 'VAL_TOTAL_AFTER');
 
             $mc->valTotalAfter = $this->getString($valTotalAfter);
-            $mc->valTotalAfterCurrency = $valTotalAfter->getattribute('CURRENCY');
+            $mc->valTotalAfterCurrency = $this->getAttributeString($valTotalAfter,'CURRENCY');
         }
 
         $this->modificationsContract = $mc;
@@ -484,7 +495,7 @@ class DOMKerndaten
             $valPrize = $this->getFirstElementByTagName($domAp, 'VAL_PRIZE');
 
             $re->valPrize = $this->getString($valPrize);
-            $re->valPrizeCurrency = $valPrize->getattribute('CURRENCY');
+            $re->valPrizeCurrency = $this->getAttributeString($valPrize,'CURRENCY');
         }
 
         $re->winners       = [];
@@ -569,7 +580,7 @@ class DOMKerndaten
 
             $ocm->type = null;
             if ($this->elementExists($domOcm, 'TYPE_CONTRACT')) {
-                $ocm->type = $this->getFirstElementByTagName($domOcm, 'TYPE_CONTRACT')->getAttribute('CTYPE');
+                $ocm->type = $this->getAttributeString($this->getFirstElementByTagName($domOcm, 'TYPE_CONTRACT'),'CTYPE');
             }
 
             $acd->objectContractModifications = $ocm;
@@ -621,6 +632,21 @@ class DOMKerndaten
     public function getString($element) {
         if ($element) {
             $value = trim(strip_tags($element->nodeValue));
+
+            return $value ? $value : null;
+        }
+
+        return null;
+    }
+
+    /**
+     * @param \DOMElement $element
+     * @param String $attribute
+     * @return null|string
+     */
+    public function getAttributeString($element, $attribute) {
+        if ($element && $element->hasAttribute($attribute)) {
+            $value = trim($element->getAttribute($attribute));
 
             return $value ? $value : null;
         }
