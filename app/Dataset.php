@@ -25,7 +25,8 @@ class Dataset extends Model
         'date_conclusion_contract',
         'deadline_standstill',
         'datetime_receipt_tenders',
-        'datetime_last_change'
+        'datetime_last_change',
+        'item_lastmod'
     ];
 
     /**
@@ -50,22 +51,37 @@ class Dataset extends Model
     /**
      * Use query builder to build up the index query for /aufträge main table
      *
+     * @param array $options
+     *
      * @return mixed
      */
-    public static function indexQuery() {
+    public static function indexQuery($options = []) {
+        $defaultOptions = [
+            'allOfferors' => false,     // ignore extra offerors by default
+            'allContractors' => false,  // ignore extra contractors by default
+        ];
+        $options = array_merge($defaultOptions, $options);
+
         // build up the basic query here
         // do the micro management for where clause and order clause later
         $query = self::select(['datasets.id']);
-        $query->join('offerors',function($join) {
-            $join->on('datasets.id', '=', 'offerors.dataset_id')
-                ->where('offerors.is_extra','=',0);
+        // direct join here as every dataset as at least one offeror
+        $query->join('offerors',function($join) use($options) {
+            $join->on('datasets.id', '=', 'offerors.dataset_id');
+            if (!($options['allOfferors'])) {
+                $join->where('offerors.is_extra','=',0);
+            }
         });
-        // this could lead to future problems
-        // data at hand says there is max. one contractor per dataset
-        // but this is not enforced by the application. the relationship is actualy 1:n
-        // so this join _could_ potentially load more than one contractor record
-        // per dataset, possible solution like is_extra on offerors
-        $query->leftJoin('contractors','datasets.id','=','contractors.dataset_id');
+        // left join here because not every dataset has a contractor
+        $query->leftJoin('contractors',function($join) use ($options) {
+            $join->on('datasets.id', '=', 'contractors.dataset_id');
+            if (!($options['allContractors'])) {
+                $join->where('contractors.is_extra','=',0);
+            }
+        });
+
+        // 20200409 - wieso war das bisher nicht im query??????
+        $query->where('is_current_version',1);
 
         return $query;
     }
@@ -108,15 +124,19 @@ class Dataset extends Model
     /**
      * Use this method if order is important when loading datasets by id
      *
-     * @param $orderedIds
+     * @param array $orderedIds
      * @return mixed
      */
     public static function loadInOrder($orderedIds) {
+        if (!count($orderedIds)) {
+            // nothing to load? return empty query
+            return Dataset::query();
+        }
+
         $str = join(',',$orderedIds);
 
         return Dataset::whereIn('id',$orderedIds)
-            ->orderByRaw(DB::raw("FIELD(id, $str)")) // https://stackoverflow.com/a/26704767/718980
-            ->get();
+            ->orderByRaw(DB::raw("FIELD(id, $str)")); // https://stackoverflow.com/a/26704767/718980
     }
 
     /**

@@ -36,14 +36,20 @@ class ContractorController extends Controller
 
         // re-use the main index query for datasets, but restricted to the
         // organization id of the contractor
-        $query = Dataset::indexQuery()
+        $query = Dataset::indexQuery(['allContractors' => true])
             ->filter($filters)
             ->where('contractors.organization_id',$org->id);
 
         $totalItems = $query->count();
         $data       = $query->paginate(20);     // data holds the pagination-aware builder
 
-        $items = Dataset::loadInOrder($data->pluck('id')->toArray());
+        if (count($data)) {
+            $items = Dataset::loadInOrder($data->pluck('id')->toArray())
+                ->withCount('offerors')
+                ->get();
+        } else {
+            $items = [];
+        }
 
         return view('public.contractors.show',compact('items','totalItems','org','filters','data'));
     }

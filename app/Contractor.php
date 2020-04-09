@@ -10,11 +10,9 @@ class Contractor extends Model
 {
     use FilterableTrait;
 
-    /*
     protected $casts = [
         'is_extra' => 'boolean',
     ];
-    */
 
     public function organization() {
         return $this->belongsTo('App\Organization');

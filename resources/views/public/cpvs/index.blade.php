@@ -47,7 +47,10 @@
                         Bezeichnung
                     </th>
                     <th>
-                        Wert
+                        Anzahl Aufträge
+                    </th>
+                    <th>
+                        Auftragsvolumen
                     </th>
                 </tr>
                 </thead>
@@ -60,15 +63,12 @@
                         <td class="name">
                             {{ $cpvMap[$item->cpv]->name }}
                         </td>
-                        @if($params->type == 'volume')
-                            <td class="value">
-                                {{ ui_format_money($item->sum) }}
-                            </td>
-                            @else
-                            <td class="count">
-                                {{ $item->count }}
-                            </td>
-                        @endif
+                        <td class="count">
+                            <a title="Aufträge mit CPV Code {{ $item->cpv }} anzeigen" href="{{ route('public::auftraege',[ 'cpv' => $item->cpv, 'cpv_like' => 1 ]) }}">{{ $item->count }}</a>
+                        </td>
+                        <td class="value">
+                            {{ ui_format_money($item->sum) }}
+                        </td>
                     </tr>
                 @endforeach
                 </tbody>

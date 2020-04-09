@@ -289,6 +289,10 @@ class Process
 
             // Handle contractors
             // AWARD contractors
+
+            // keep track of contractors, treat the first contractor as 'main', others as 'extra'
+            $countContractors = 0;
+
             if ($data->awardContract && $data->awardContract->contractors) {
                 foreach($data->awardContract->contractors as $ac) {
                     $organization = $this->matchOrCreateOrganization($ac->nationalId, $ac->officialName);
@@ -303,7 +307,10 @@ class Process
                         $contractor->national_id = $ac->nationalId;
                         $contractor->name = $ac->officialName;
                         $contractor->organization_id = $organization ? $organization->id : null;
+                        $contractor->is_extra = $countContractors > 0;
                         $contractor->save();
+
+                        $countContractors++;
                     }
                 }
             }
@@ -323,7 +330,10 @@ class Process
                         $contractor->national_id = $mc->nationalId;
                         $contractor->name = $mc->officialName;
                         $contractor->organization_id = $organization ? $organization->id : null;
+                        $contractor->is_extra = $countContractors > 0;
                         $contractor->save();
+
+                        $countContractors++;
                     }
                 }
             }
@@ -343,7 +353,10 @@ class Process
                         $contractor->national_id = $w->nationalId;
                         $contractor->name = $w->officialName;
                         $contractor->organization_id = $organization ? $organization->id : null;
+                        $contractor->is_extra = $countContractors > 0;
                         $contractor->save();
+
+                        $countContractors++;
                     }
                 }
             }

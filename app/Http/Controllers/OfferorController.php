@@ -34,7 +34,7 @@ class OfferorController extends Controller
     public function show(DatasetFilter $filters, $id) {
         $org = Organization::findOrFail($id);
 
-        $query = Dataset::indexQuery()
+        $query = Dataset::indexQuery(['allOfferors' => true])
             ->filter($filters)
             ->where('offerors.organization_id',$org->id);
 
@@ -42,7 +42,9 @@ class OfferorController extends Controller
         $data       = $query->paginate(20);
 
         // now load the appropriate models for the view
-        $items = Dataset::loadInOrder($data->pluck('id')->toArray());
+        $items = Dataset::loadInOrder($data->pluck('id')->toArray())
+            ->withCount('contractors')
+            ->get();
 
         return view('public.offerors.show',compact('items','totalItems','org','filters','data'));
     }

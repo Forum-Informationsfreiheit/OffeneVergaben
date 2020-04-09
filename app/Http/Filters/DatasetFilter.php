@@ -2,6 +2,7 @@
 
 namespace App\Http\Filters;
 
+use App\CPV;
 use App\DatasetType;
 use Illuminate\Database\Query\Builder;
 use Kblais\QueryFilter\QueryFilter;
@@ -15,6 +16,8 @@ class DatasetFilter extends QueryFilter
     protected $sortDirection = null;
 
     public function sort($field) {
+
+        // TODO there needs to be a white list of sortable parameters!
 
         $this->sortDirection = substr($field, 0, 1) == '-' ? 'desc' : 'asc';
         $this->sortedBy = substr($field, 0, 1) == '-' ? substr($field,1) : $field;
@@ -104,6 +107,22 @@ class DatasetFilter extends QueryFilter
         }
 
         return $this->builder->where('val_total','<=',$value * 100);
+    }
+
+    public function cpv($value) {
+        if (!is_numeric($value) || !intval($value)) {
+            return $this->builder;
+        }
+
+        // trim, but leave at least 2 characters
+        $value = rtrim($value,'0');
+        $value = strlen($value) == 1 ? $value . '0' : $value;
+
+        if ($this->request->has('cpv_like')) {
+            return $this->builder->where('cpv_code','like',$value.'%');
+        } else {
+            return $this->builder->where('cpv_code',CPV::zeroFill($value));
+        }
     }
 
     /**

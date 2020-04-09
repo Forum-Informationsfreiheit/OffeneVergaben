@@ -42,11 +42,24 @@ class DatasetController extends Controller
     public function index(DatasetFilter $filters) {
         $query = Dataset::indexQuery()->filter($filters);
 
+        if (!$filters->has('sort')) {
+            // apply default sorting, item aktualisierungsdatum
+            $query->orderBy('item_lastmod','desc');
+        }
+
         $totalItems = $query->count();
         $data       = $query->paginate(20);
 
-        // now load the appropriate models for the view
-        $items = Dataset::loadInOrder($data->pluck('id')->toArray());
+        if (count($data) > 0) {
+            // now load the appropriate models for the view
+            $items = Dataset::loadInOrder($data->pluck('id')->toArray())
+                ->withCount('contractors')
+                ->withCount('offerors')
+                ->get();
+        } else {
+            $items = [];
+        }
+
 
         return view('public.datasets.index',compact('items','totalItems','filters','data'));
     }

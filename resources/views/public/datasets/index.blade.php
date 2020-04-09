@@ -22,7 +22,8 @@
     <div class="row">
         <div class="col">
             <div class="results-meta">
-                <span class="count">ungefähr {{ $totalItems }} Ergebnisse</span>
+                {{-- Auf hunderter runden --}}
+                <span class="count">{{ $totalItems > 100 ? 'ungefähr ' . round($totalItems,-2) : $totalItems }} Ergebnisse</span>
             </div>
         </div>
     </div>
@@ -53,7 +54,7 @@
                     </th>
                     <th>
                         Aktualisiert
-                        @include('public.datasets.partials.sort',['field' => 'datetime_last_change'])
+                        @include('public.datasets.partials.sort',['field' => 'item_lastmod'])
                     </th>
                 </tr>
                 </thead>
@@ -65,17 +66,24 @@
                         </td>
                         <td class="name">
                             <a href="{{ route('public::show-auftraggeber',$item->offeror->organization_id) }}">{{ $item->offeror->name }}</a>
+                            @if($item->offerors_count > 1)
+                                <span class="badge badge-pill badge-light">+&nbsp;{{ $item->offerors_count -1 }} weitere Auftraggeber</span>
+                            @endif
                         </td>
                         <td class="name">
                             @if($item->contractor)
                                 <a href="{{ route('public::lieferant',$item->contractor->organization_id) }}">{{ $item->contractor->name }}</a>
+                                @if($item->contractors_count && $item->contractors_count > 1)
+                                    <span class="badge badge-pill badge-light">+&nbsp;{{ $item->contractors_count -1 }} weitere Lieferanten</span>
+                                @endif
                                 @else
                                 &nbsp;
-                                @endif
+                            @endif
                         </td>
                         <td class="nb">{{ $item->nb_tenders_received }}</td>
                         <td class="value">{{ $item->valTotalFormatted }}</td>
-                        <td class="date" title="{{ $item->datetime_last_change ? $item->datetime_last_change->format('d.m.Y h:i') : '' }}">{{ $item->datetime_last_change ? $item->datetime_last_change->format('d.m.Y') : '' }}</td>
+                        {{-- <td class="date" title="{{ $item->datetime_last_change ? $item->datetime_last_change->format('d.m.Y h:i') : '' }}">{{ $item->datetime_last_change ? $item->datetime_last_change->format('d.m.Y') : '' }}</td> --}}
+                        <td class="date" title="{{ $item->item_lastmod ? $item->item_lastmod->format('d.m.Y h:i') : '' }}">{{ $item->item_lastmod ? $item->item_lastmod->format('d.m.Y') : '' }}</td>
                     </tr>
                 @endforeach
                 </tbody>

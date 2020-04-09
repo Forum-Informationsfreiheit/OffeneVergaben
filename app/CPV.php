@@ -18,6 +18,14 @@ class CPV extends Model
 
     public $timestamps = false;
 
+    public static function zeroFill($value) {
+        return str_pad($value,self::STR_CODE_LENGTH,'0',STR_PAD_RIGHT);
+    }
+
+    public static function trim($value) {
+
+    }
+
     public function toString() {
         return $this->code . ' ' . $this->name;
     }

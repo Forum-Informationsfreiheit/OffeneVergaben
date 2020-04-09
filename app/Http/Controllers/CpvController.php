@@ -75,6 +75,8 @@ class CpvController extends Controller
 
         $items = $result;
 
+        //dd($result);
+
         JavaScriptFacade::put([
             'parameters' => $params,
             'cpvMap' => $cpvMap,
@@ -118,14 +120,33 @@ class CpvController extends Controller
     }
 
     protected function query($params) {
+        /*
         if ($params->type == 'volume') {
             return $this->volumeQuery($params->root);
         }
         if ($params->type == 'anzahl') {
             return $this->countQuery($params->root);
         }
+        */
 
-        return null;
+        $query = DB::table('datasets')
+            ->select([DB::raw('sum(val_total) as sum'), DB::raw('count(*) as count')])
+            ->where('datasets.is_current_version',1)
+            ->where('datasets.cpv_code','<>',null);
+        //->where('datasets.val_total','<>',null);
+
+        if ($params->root == null) {
+            $query->addSelect(DB::raw('LEFT(datasets.cpv_code,2) as cpv'));
+            $query->groupBy(DB::raw('LEFT(datasets.cpv_code,2)'));
+        } else {
+            $query->addSelect(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level + 1).') as cpv'));
+            $query->groupBy(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level + 1).')'));
+            $query->where(DB::raw('LEFT(datasets.cpv_code,'.$params->root->level.')'),$params->root->trimmed_code);
+        }
+
+        $result = $query->get();
+
+        return $result;
     }
 
     protected function volumeQuery($root) {

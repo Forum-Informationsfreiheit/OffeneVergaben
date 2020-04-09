@@ -44,9 +44,12 @@
                         <td class="name">
                             @if($item->contractor)
                                 <a href="{{ route('public::lieferant',$item->contractor->organization_id) }}">{{ $item->contractor->name }}</a>
-                                @else
-                                &nbsp;
+                                @if($item->contractors_count && $item->contractors_count > 1)
+                                    <span class="badge badge-pill badge-light">+&nbsp;{{ $item->contractors_count -1 }} weitere Lieferanten</span>
                                 @endif
+                            @else
+                                &nbsp;
+                            @endif
                         </td>
                         <td class="name">{{ $item->cpv->toString() }}</td>
                         <td class="nb">{{ $item->nb_tenders_received }}</td>

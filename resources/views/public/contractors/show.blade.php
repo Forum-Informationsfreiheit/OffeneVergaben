@@ -43,6 +43,9 @@
                         <td class="name"><a href="{{ route('public::auftrag',$item->id) }}">{{ $item->title }}</a></td>
                         <td class="name">
                             <a href="{{ route('public::show-auftraggeber',$item->offeror->organization_id) }}">{{ $item->offeror->name }}</a>
+                            @if($item->offerors_count > 1)
+                                <span class="badge badge-pill badge-light">+&nbsp;{{ $item->offerors_count -1 }} weitere Lieferanten</span>
+                            @endif
                         </td>
                         <td class="name">{{ $item->cpv->toString() }}</td>
                         <td class="nb">{{ $item->nb_tenders_received }}</td>
