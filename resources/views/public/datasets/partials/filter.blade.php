@@ -13,22 +13,57 @@
         </div>
         -->
         <div class="col-md-3">
-            <div class="filter-group">
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="filter-group">
                 <span class="filter-group-label">
                     Auftragsart
                 </span>
-                <div class="filter-group-inputs">
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="ausschreibung" name="types[]" id="filterAusschreibung" {{ $filters->has('types','ausschreibung') ? 'checked' : ''}}>
-                        <label class="form-check-label" for="filterAusschreibung">
-                            Ausschreibung
-                        </label>
+                        <div class="filter-group-inputs">
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="ausschreibung" name="types[]" id="filterAusschreibung" {{ $filters->has('types','ausschreibung') ? 'checked' : ''}}>
+                                <label class="form-check-label" for="filterAusschreibung">
+                                    Ausschreibung
+                                </label>
+                            </div>
+                            <div class="form-check">
+                                <input class="form-check-input" type="checkbox" value="auftrag" name="types[]" id="filterAuftrag" {{ $filters->has('types','auftrag') ? 'checked' : '' }}>
+                                <label class="form-check-label" for="filterAuftrag">
+                                    Auftrag
+                                </label>
+                            </div>
+                        </div>
                     </div>
-                    <div class="form-check">
-                        <input class="form-check-input" type="checkbox" value="auftrag" name="types[]" id="filterAuftrag" {{ $filters->has('types','auftrag') ? 'checked' : '' }}>
-                        <label class="form-check-label" for="filterAuftrag">
-                            Auftrag
-                        </label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-sm-12">
+                    <div class="filter-group date-range">
+                        <div class="filter-group-label">
+                            Zeitraum
+                        </div>
+                        <div class="filter-group-inputs form-row">
+                            <div class="col-sm-4"><span class="block-input-label-sm">von</span></div>
+                            <div class="col-sm-8"><input class="form-control form-control-sm mb-1" type="date" name="date_from" value="{{ $filters->has('date_from') ? request('date_from') : '' }}"></div>
+                        </div>
+                        <div class="filter-group-inputs form-row">
+                            <div class="col-sm-4"><span class="block-input-label-sm">bis</span></div>
+                            <div class="col-sm-8"><input class="form-control form-control-sm mb-1" type="date" name="date_to" value="{{ $filters->has('date_to') ? request('date_to') : '' }}"></div>
+                        </div>
+                        <div class="filter-group-inputs form-row">
+                            <div class="col-sm-4"><span class="block-input-label-sm">Parameter</span></div>
+                            <div class="col-sm-8">
+                                <select class="form-control form-control-sm mb-1" name="date_type">
+                                    <option {{ $filters->has('date_type') ? '' : 'selected="selected"' }} value="default">Datensatz aktualisiert</option>
+                                    <option {{ $filters->has('date_type','dateRte') ? 'selected="selected"' : '' }} value="dateRte">Schlusstermin für den Eingang</option>
+                                    <option {{ $filters->has('date_type','dateFPu') ? 'selected="selected"' : '' }} value="dateFPu">Erstmalige Verfügbarkeit</option>
+                                    <option {{ $filters->has('date_type','dateSta') ? 'selected="selected"' : '' }} value="dateSta">Ausführungsbeginn</option>
+                                    <option {{ $filters->has('date_type','dateEnd') ? 'selected="selected"' : '' }} value="dateEnd">Erfüllungszeitpunkt</option>
+                                    <option {{ $filters->has('date_type','dateCCo') ? 'selected="selected"' : '' }} value="dateCCo">Tag Vertragsabschluss</option>
+                                    <option {{ $filters->has('date_type','dateLCh') ? 'selected="selected"' : '' }} value="dateLCh">Letzte Änderung</option>
+                                </select>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -66,9 +101,19 @@
                     Auftragsvolumen
                 </div>
                 <div class="filter-group-inputs">
-                    <input class="form-control" type="text" name="volume_from" value="{{ request('volume_from') }}">
+                    <input class="form-control form-control-sm" type="text" name="volume_from" value="{{ request('volume_from') }}" placeholder="von...">
                     <span class="dash">&ndash;</span>
-                    <input class="form-control" type="text" name="volume_to" value="{{ request('volume_to') }}">
+                    <input class="form-control form-control-sm" type="text" name="volume_to" value="{{ request('volume_to') }}" placeholder="...bis">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="filter-group">
+                <div class="filter-group-label">
+                    Kategorie (CPV Hauptteil)
+                </div>
+                <div class="filter-group-inputs">
+                    <input class="form-control form-control-sm" type="text" name="cpv" value="{{ request('cpv') }}{{ request('cpv_like') ? '*' : '' }}">
                 </div>
             </div>
         </div>

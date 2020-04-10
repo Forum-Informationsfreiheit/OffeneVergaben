@@ -246,7 +246,7 @@
                 </tbody>
             </table>
             <div class="meta">
-                Version {{ $dataset->version }}@if($dataset->otherVersions)&nbsp;(<span class="version-links-inline">{!! $dataset->versionLinks !!}</span>)@endif, zuletzt aktualisiert: {{ $dataset->updated_at->format('d.m.Y') }}
+                Version {{ $dataset->version }}@if($dataset->otherVersions)&nbsp;(<span class="version-links-inline">{!! $dataset->versionLinks !!}</span>)@endif, zuletzt aktualisiert: {{ $dataset->item_lastmod->format('d.m.Y') }}
             </div>
         </div>
     </div>
