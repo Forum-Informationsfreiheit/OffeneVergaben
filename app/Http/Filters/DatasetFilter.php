@@ -6,6 +6,7 @@ use App\CPV;
 use App\DatasetType;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Kblais\QueryFilter\QueryFilter;
 
 class DatasetFilter extends QueryFilter
@@ -30,6 +31,13 @@ class DatasetFilter extends QueryFilter
         'dateFPu' => 'date_first_publication',
         'dateLCh' => 'datetime_last_change',
         'dateDSt' => 'deadline_standstill'
+    ];
+
+    protected $nutsArray = [
+        'NAT',
+        'AT11','AT12','AT13',
+        'AT21','AT22',
+        'AT31','AT32','AT33','AT34'
     ];
 
     public function sort($field) {
@@ -202,6 +210,40 @@ class DatasetFilter extends QueryFilter
         // value of $this->request('date_param') will be used in dateFrom/dateTo methods
     }
 
+    public function nuts($value) {
+        if (!$value || !is_array($value) || count($value) === 0) {
+            return $this->builder;
+        }
+
+        $this->filters[] = 'nuts';
+
+        $international = in_array('NAT',$value);
+
+        // check the input against a whitelisted values, also remove NAT (not a real nuts code)
+        $filtered = array_filter($value,function($elem) {
+            return in_array($elem,$this->nutsArray) && $elem !== 'NAT';
+        });
+
+        // slightly complicated where clause ahead
+        // as we need where grouping because of the special 'NOT' clause
+        // build up the where clause, the international one makes it slightly complicated
+        // also we have to use 'or where like x' clauses for each bundesland
+        $where = $this->builder->where(function($query) use ($filtered, $international) {
+            if (!$international) {
+                return $query->whereIn(DB::raw('LEFT(nuts_code,4)'),$filtered);
+            } else {
+                if (count($filtered) === 0) {
+                    return $query->where(DB::raw('LEFT(nuts_code,2)'),'<>','AT');
+                } else {
+                    return $query->whereIn(DB::raw('LEFT(nuts_code,4)'),$filtered)
+                        ->orWhere(DB::raw('LEFT(nuts_code,2)'),'<>','AT');
+                }
+            }
+        });
+
+        return $where;
+    }
+
     /**
      * Shortcut helper method for blade views
      * so in view it can be checked wether or not a filter was set
@@ -218,14 +260,12 @@ class DatasetFilter extends QueryFilter
      * @return bool
      */
     public function has($keyOne, $keyTwo = null) {
-        if ($keyOne == 'types') {
+        // these are all arrays
+        if ($keyOne == 'types' || $keyOne == 'contract_types' || $keyOne == 'nuts') {
             return $this->request->has($keyOne) && in_array($keyTwo,$this->request->input($keyOne));
         }
 
-        if ($keyOne == 'contract_types') {
-            return $this->request->has($keyOne) && in_array($keyTwo,$this->request->input($keyOne));
-        }
-
+        // this one is not
         if ($keyOne == 'date_type') {
             return $this->request->has($keyOne) && $this->request->input($keyOne) === $keyTwo;
         }

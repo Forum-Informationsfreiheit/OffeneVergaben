@@ -106,14 +106,61 @@
                     <input class="form-control form-control-sm" type="text" name="volume_to" value="{{ request('volume_to') }}" placeholder="...bis">
                 </div>
             </div>
-        </div>
-        <div class="col-md-3">
             <div class="filter-group">
                 <div class="filter-group-label">
                     Kategorie (CPV Hauptteil)
                 </div>
                 <div class="filter-group-inputs">
                     <input class="form-control form-control-sm" type="text" name="cpv" value="{{ request('cpv') }}{{ request('cpv_like') ? '*' : '' }}">
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="filter-group">
+                <div class="filter-group-label">
+                    Erfüllungsort
+                </div>
+                <div class="filter-group-inputs">
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" value="NAT" name="nuts[]" id="filterNutsInt" {{ $filters->has('nuts','NAT') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterNutsInt">International</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="AT11" name="nuts[]" id="filterNuts11" {{ $filters->has('nuts','AT11') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterNuts11">Burgenland</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="AT21" name="nuts[]" id="filterNuts21" {{ $filters->has('nuts','AT21') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterNuts21">Kärnten</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="AT12" name="nuts[]" id="filterNuts12" {{ $filters->has('nuts','AT12') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterNuts12">Niederösterreich</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="AT31" name="nuts[]" id="filterNuts31" {{ $filters->has('nuts','AT31') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterNuts31">Oberösterreich</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="AT32" name="nuts[]" id="filterNuts32" {{ $filters->has('nuts','AT32') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterNuts32">Salzburg</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="AT22" name="nuts[]" id="filterNuts22" {{ $filters->has('nuts','AT22') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterNuts22">Steiermark</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="AT33" name="nuts[]" id="filterNuts33" {{ $filters->has('nuts','AT33') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterNuts33">Tirol</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="AT34" name="nuts[]" id="filterNuts34" {{ $filters->has('nuts','AT34') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterNuts34">Vorarlberg</label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="AT13" name="nuts[]" id="filterNuts13" {{ $filters->has('nuts','AT13') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterNuts13">Wien</label>
+                    </div>
                 </div>
             </div>
         </div>
