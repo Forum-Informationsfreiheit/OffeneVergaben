@@ -76,8 +76,7 @@ class Organization extends Model
         }
 
         $query = self::select([
-            'organizations.id',
-            'organizations.name',
+            'organizations.*',
             DB::raw('(SELECT 1 FROM offerors    o WHERE o.organization_id = organizations.id LIMIT 1) as "is_offeror"'),
             DB::raw('(SELECT 1 FROM contractors c WHERE c.organization_id = organizations.id LIMIT 1) as "is_contractor"')
         ]);
@@ -152,5 +151,27 @@ class Organization extends Model
         }
 
         return "?";
+    }
+
+    public function getIdentifiersAttribute() {
+        $identifiers = [];
+
+        if ($this->gln != null) {
+            $identifiers['gln'] = $this->gln;
+        }
+
+        if ($this->fn != null) {
+            $identifiers['fn'] = $this->fn;
+        }
+
+        if ($this->gkz != null) {
+            $identifiers['gkz'] = $this->gkz;
+        }
+
+        if ($this->ukn != null) {
+            $identifiers['ukn'] = $this->ukn;
+        }
+
+        return $identifiers;
     }
 }

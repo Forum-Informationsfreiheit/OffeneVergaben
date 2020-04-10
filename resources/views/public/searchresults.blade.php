@@ -23,10 +23,12 @@
             @if(count($organizations))
             <ul class="results">
                 @foreach($organizations as $org)
-                    <li class="result-item">
+                    <li class="result-item organizations">
                         <span class="result-text">
-                            {!! ui_highlight_tokens($org->name,$tokens,'strong') !!}
+                            {!! ui_highlight_tokens($org->name,$tokens,'strong') !!} <small><span class="identifiers">{{ join(',',$org->identifiers) }}</span></small>
                         </span>
+                        @if($org->is_identified)
+                        @endif
                         @if($org->is_offeror)
                             <a class="badge badge-primary" href="{{ route('public::show-auftraggeber',$org->id) }}">Auftraggeber</a>
                         @endif
@@ -45,12 +47,12 @@
             @if(count($datasets))
             <ul class="results">
                 @foreach($datasets as $dataset)
-                    <li class="result-item">
+                    <li class="result-item datasets">
                         <span class="result-text">
-                            <a style="color: #333" href="{{ route('public::auftrag',$dataset->id) }}">{!! ui_highlight_tokens($dataset->title,$tokens,'strong') !!}</a>
+                            <a href="{{ route('public::auftrag',$dataset->id) }}">{!! ui_highlight_tokens($dataset->title,$tokens,'strong') !!}</a>
                         </span>
                         @if($dataset->title !== $dataset->description)
-                            <span class="result-text" style="color: grey">
+                            <span class="result-text dataset-text">
                                 {!! ui_highlight_tokens(ui_shorten($dataset->description,150),$tokens,'strong') !!}
                             </span>
                         @endif

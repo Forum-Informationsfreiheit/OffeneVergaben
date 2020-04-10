@@ -22,6 +22,21 @@ body.searchresults {
       &:last-of-type {
         border-bottom: none;
       }
+
+      &.organizations {
+        .identifiers {
+          color: $grey;
+        }
+      }
+
+      &.datasets {
+        .result-text a {
+          color: #333;
+        }
+        .result-text.dataset-text {
+          color: $grey;
+        }
+      }
     }
 
     strong {
