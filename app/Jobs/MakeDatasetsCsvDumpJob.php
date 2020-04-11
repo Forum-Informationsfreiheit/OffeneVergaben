@@ -1,0 +1,171 @@
+<?php
+
+namespace App\Jobs;
+
+use App\Dataset;
+use Carbon\Carbon;
+use Illuminate\Bus\Queueable;
+use Illuminate\Queue\SerializesModels;
+use Illuminate\Queue\InteractsWithQueue;
+use Illuminate\Contracts\Queue\ShouldQueue;
+use Illuminate\Foundation\Bus\Dispatchable;
+use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Storage;
+
+class MakeDatasetsCsvDumpJob implements ShouldQueue
+{
+    use Dispatchable;
+
+    const STORAGE_OUTPUT_DIRECTORY = "kerndaten_dumps";
+
+    protected $parameters = [
+        'ids' => null,
+    ];
+
+    /**
+     * Create a new job instance.
+     *
+     * @param null|array $ids
+     *
+     * @return void
+     */
+    public function __construct($ids = null)
+    {
+        /*
+        $ids = [ 5, 10, 11, 20000 ]; // TODO DELETEME
+        foreach($ids as &$id) {
+            $id+=136556;
+        }
+        */
+
+        if ($ids && is_array($ids)) {
+            $this->parameters['ids'] = $ids;
+        }
+    }
+
+    /**
+     * IMPORTANT: CALL THIS FUNCTION IN A LOOP AND MODIFY OFFSET/BLOCKSIZE ACCORDINGLY
+     *            OR YOU WILL END IN A ENDLESS LOOP.
+     *
+     * @param int $offset
+     * @param int $blockSize
+     * @return null
+     */
+    protected function datasetsStream($offset = 0, $blockSize = 200) {
+        $query = Dataset::current()->with('offerors')->with('contractors');
+
+        if ($this->parameters['ids']) {
+            $query->whereIn('id',$this->parameters['ids']);
+        }
+
+        $query->offset($offset)->limit($blockSize);
+
+        $records = $query->get();
+
+        return $records->count() > 0 ? $records : null;
+    }
+
+    /**
+     * Execute the job.
+     *
+     * @return void
+     */
+    public function handle()
+    {
+        if ($this->parameters['ids']) {
+            dump('MakeDatasetsCsvDumpJob called with predefined ids. Count='.count($this->parameters['ids']));
+            Log::info('MakeDatasetsCsvDumpJob called with predefined ids. Count='.count($this->parameters['ids']));
+        } else {
+            $count = Dataset::current()->count();
+            dump('MakeDatasetsCsvDumpJob called with no ids --> dump all current datasets count='.$count);
+            Log::info('MakeDatasetsCsvDumpJob called with no ids --> dump all current datasets count='.$count);
+        }
+
+        $this->make();
+    }
+
+    /**
+     * Create the CSV, use a blocked approach to not overload our precious memory
+     */
+    protected function make() {
+        $idx = 0;
+
+        $rootDir = storage_path('app' . DIRECTORY_SEPARATOR .self::STORAGE_OUTPUT_DIRECTORY);
+        if (!file_exists($rootDir)) {
+            mkdir($rootDir);
+        }
+
+        // use a temporary directory (clean up afterwards) for creating and compressing the file
+        $tempDir = $rootDir . DIRECTORY_SEPARATOR . 'temp_' . Carbon::now()->format('Ymd_Hiu');
+        mkdir($tempDir);
+
+        $csvPath = $tempDir . DIRECTORY_SEPARATOR . 'kerndaten_csv_dump_' . Carbon::now()->format('Ymd_Hi') . '.csv';
+        $csvName = basename($csvPath);
+
+        $fHandle = fopen($csvPath, 'w');
+
+        // write header first
+        fputcsv($fHandle, [
+            'id', 'art', 'aktualisiert', 'cpv_code', 'nuts_code', 'titel', 'beschreibung', 'auftraggeber', 'lieferant', 'wert'
+        ], ';');
+
+        while($datasets = $this->datasetsStream($idx)) {
+            dump('index '.$idx);
+
+            foreach($datasets as $dataset) {
+                $this->writeDatasetToCsv($fHandle, $dataset);
+
+                $idx++;
+            }
+        }
+
+        fclose($fHandle);
+
+        // success ?
+        if ($idx === 0) {
+            // oops
+            dump('No datasets written to csv');
+            Log::error('No datasets written to csv');
+        }
+
+        // zip it
+        $tempZipPath = str_replace('.csv','.zip',$csvPath);
+        $zipName = basename($tempZipPath);
+        $zip = new \ZipArchive();
+        $zip->open($tempZipPath, \ZipArchive::CREATE | \ZipArchive::OVERWRITE);
+        $zip->addFile($csvPath, $csvName);
+        $zip->close();
+
+        // move it
+        $zipPath = $rootDir . DIRECTORY_SEPARATOR . $zipName;
+        // (use php rename() to do it instead of Storage::move as Storage wants to operate in relative paths)
+        rename($tempZipPath, $zipPath);
+
+        // delete it (just kidding, only the temp directory)
+        unlink($csvPath);
+        rmdir($tempDir);
+
+        if (file_exists($zipPath)) {
+            // todo log file size
+            Log::info('Datasets csv dump created successfully:'. $zipName);
+            dump('Datasets csv dump created successfully:'. $zipName);
+        }
+    }
+
+    protected function writeDatasetToCsv($file, $dataset) {
+        // write one row
+        fputcsv($file, [
+            $dataset->id,
+            $dataset->type_code,
+            $dataset->item_lastmod->format('d.m.Y'),
+            $dataset->cpv_code,
+            $dataset->nuts_code,
+            $dataset->title,
+            $dataset->description,
+            $dataset->offeror->name,
+            $dataset->contractors->pluck('name')->join('\n'),
+            $dataset->val_total ? $dataset->val_total / 100 : null,
+        ], ';');
+    }
+}
