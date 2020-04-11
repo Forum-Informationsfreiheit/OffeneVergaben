@@ -89,16 +89,14 @@ class DatasetFilter extends QueryFilter
     }
 
     public function contractTypes($values) {
-        $count = count($values);
-
-        if ($count == 0 || $count >= 3) {
-            // do nothing
+        if (!$values || !is_array($values) || count($values) === 0) {
             return $this->builder;
         }
 
         $this->filters[] = 'contract_types';
 
         $contractTypes = [];
+        $contractTypesOcm = [];
 
         if (in_array('works',$values)) {
             $contractTypes[] = 'WORKS';
@@ -110,8 +108,20 @@ class DatasetFilter extends QueryFilter
             $contractTypes[] = 'SUPPLIES';
         }
 
-        if (count($contractTypes) > 0) {
-            return $this->builder->whereIn('contract_type',$contractTypes);
+        if (in_array('ocm_works',$values)) {
+            $contractTypesOcm[] = 'WORKS';
+        }
+        if (in_array('ocm_services',$values)) {
+            $contractTypesOcm[] = 'SERVICES';
+        }
+        if (in_array('ocm_supplies',$values)) {
+            $contractTypesOcm[] = 'SUPPLIES';
+        }
+
+        if (count($contractTypes) > 0 || count($contractTypesOcm) > 0) {
+            return $this->builder->where(function($query) use ($contractTypes, $contractTypesOcm) {
+                return $query->whereIn('contract_type',$contractTypes)->orWhereIn('ocm_contract_type',$contractTypesOcm);
+            });
         }
 
         // ignore any other value

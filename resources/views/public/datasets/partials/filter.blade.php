@@ -86,10 +86,28 @@
                             Dienstleistungsauftrag
                         </label>
                     </div>
-                    <div class="form-check">
+                    <div class="form-check mb-2">
                         <input class="form-check-input" type="checkbox" value="supplies" name="contract_types[]" id="filterSupplies" {{ $filters->has('contract_types','supplies') ? 'checked' : '' }} >
                         <label class="form-check-label" for="filterSupplies">
                             Lieferauftrag
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="ocm_works" name="contract_types[]" id="filterWorksOcm" {{ $filters->has('contract_types','ocm_works') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterWorksOcm">
+                            Baukonzession
+                        </label>
+                    </div>
+                    <div class="form-check">
+                        <input class="form-check-input" type="checkbox" value="ocm_services" name="contract_types[]" id="filterServicesOcm" {{ $filters->has('contract_types','ocm_services') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterServicesOcm">
+                            Dienstleistungskonzession
+                        </label>
+                    </div>
+                    <div class="form-check mb-1">
+                        <input class="form-check-input" type="checkbox" value="ocm_supplies" name="contract_types[]" id="filterSuppliesOcm" {{ $filters->has('contract_types','ocm_supplies') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterSuppliesOcm">
+                            Lieferkonzession
                         </label>
                     </div>
                 </div>
