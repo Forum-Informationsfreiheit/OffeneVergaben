@@ -3,8 +3,8 @@
 @section('body:class','page')
 
 @section('page:header')
-    <section class="header">
-        404
+    <section class="header xl">
+        <h1>404</h1>
     </section>
 @stop
 

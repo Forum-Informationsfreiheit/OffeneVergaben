@@ -26,6 +26,9 @@ Route::get('/branchen','CpvController@index')->name('public::branchen');
 
 Route::get('/suchen','PageController@searchResultsPage')->name('public::suchen');
 
+Route::get('/downloads','DownloadController@index')->name('public::downloads');
+Route::get('/downloads/{fileName}','DownloadController@downloadStaticFile')->name('public::download-static-file');
+
 // reserved routes for dynamic page content, directly under domain (no other url prefix)
 Route::get('/impressum',   'PageController@reserved');
 Route::get('/datenschutz', 'PageController@reserved');

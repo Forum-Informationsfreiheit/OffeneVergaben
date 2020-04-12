@@ -44,6 +44,8 @@
 
             <!-- Begin Page Content -->
             <div class="container page-content">
+                @include('flash::message')
+
                 @yield('page:content')
             </div>
 
