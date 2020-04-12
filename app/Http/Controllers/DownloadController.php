@@ -10,6 +10,11 @@ use Laracasts\Flash\Flash;
 
 class DownloadController extends Controller
 {
+    /**
+     * The path inside the <root>/public/       (web accessible) directory
+     * that holds the temporary system links.
+     */
+    const PATH_PUBLIC_TMP = 'tmp';
 
     protected $supportedFormat = [
         'csv'

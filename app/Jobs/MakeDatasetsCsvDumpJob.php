@@ -18,10 +18,27 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
 {
     use Dispatchable;
 
+    /**
+     * This is a storage path, use in combination with
+     * storage_path(<const>) to get the absolute path.
+     *
+     * The relative path from the root directory can be build with
+     * ./storage/app/<const>
+     */
     const STORAGE_OUTPUT_DIRECTORY = "kerndaten_dumps";
 
+    /**
+     * Cache entries used to remember 'forever' the most current file path
+     * for a data dump. This is to avoid scanning the directory for the correct file.
+     */
     const CACHE_CURRENT_PATH_ABSOLUTE = "kerndaten_dump_current_path_absolute";
     const CACHE_CURRENT_PATH_STORAGE  = "kerndaten_dump_current_path_storage";
+
+    /**
+     * The timestamp of the creation of the latest file. So one can have an easy way
+     * to retrieve the datetime without having to look at the actual file modification date
+     * or having to parse the file name.
+     */
     const CACHE_CURRENT_FILE_TIMESTAMP = "kerndaten_dump_current_file_timestamp";
 
     protected $parameters = [
@@ -29,20 +46,16 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
     ];
 
     /**
-     * Create a new job instance.
-     *
-     * @param null|array $ids
-     *
-     * @return void
+     * @param null|array $ids - DONT USE THIS RIGHT NOW!
+     *                          Job can be called with a given set of dataset ids
+     *                          use with caution as this will override the cache entries.
+     *                          (Can be a useful feature but some more programming needs to be done)
      */
     public function __construct($ids = null)
     {
-        /*
-        $ids = [ 5, 10, 11, 20000 ]; // TODO DELETEME
-        foreach($ids as &$id) {
-            $id+=136556;
+        if ($ids != null) {
+            throw new \InvalidArgumentException('This feature is not yet fit for production.');
         }
-        */
 
         if ($ids && is_array($ids)) {
             $this->parameters['ids'] = $ids;

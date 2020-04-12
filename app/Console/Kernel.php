@@ -35,10 +35,14 @@ class Kernel extends ConsoleKernel
         }
         */
 
+        // XML processing ----------------------------------------
         $processAt = env('APP_SCHEDULE_PROCESS_AT_TIMESTRING');
         if ($processAt && $this->validateTimeString($processAt)) {
             $schedule->command('fif:process')->at($processAt);
         }
+
+        // TMP files clean up ------------------------------------
+        $schedule->command('fif:clean-up-tmp-links')->everyThirtyMinutes();
     }
 
     /**
