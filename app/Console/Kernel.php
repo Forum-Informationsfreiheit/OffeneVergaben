@@ -38,7 +38,13 @@ class Kernel extends ConsoleKernel
         // XML processing ----------------------------------------
         $processAt = env('APP_SCHEDULE_PROCESS_AT_TIMESTRING');
         if ($processAt && $this->validateTimeString($processAt)) {
-            $schedule->command('fif:process')->at($processAt);
+            $schedule->command('fif:process')->dailyAt($processAt);
+        }
+
+        // Make CSV Dump
+        $dumpAt = env('APP_SCHEDULE_DUMP_AT_TIMESTRING');
+        if ($dumpAt && $this->validateTimeString($dumpAt)) {
+            $schedule->command('fif:dump-datasets')->dailyAt($dumpAt);
         }
 
         // TMP files clean up ------------------------------------
