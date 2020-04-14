@@ -75,7 +75,11 @@ class CpvController extends Controller
 
         $items = $result;
 
-        //dd($result);
+        // 2020-04-14: Damit in der Liste die Zahlen für den Root Node (falls vorhanden)
+        //             mit dem gleichen Schema funktionieren wie die untergeordneten Nodes
+        //             Sprich Gesamtanzahl anzeigen und Gesamtvolumen von RootNode*
+        //             Braucht es ein extra query
+        $rootNodeTotals = $params->root ? $this->rootNodeQuery($params) : null;
 
         JavaScriptFacade::put([
             'parameters' => $params,
@@ -83,7 +87,7 @@ class CpvController extends Controller
             'cpvRecords' => $result,
         ]);
 
-        return view('public.cpvs.index',compact('params','items','cpvMap'));
+        return view('public.cpvs.index',compact('params','items','cpvMap','rootNodeTotals'));
     }
 
     protected function cpvMap($result) {
@@ -145,6 +149,18 @@ class CpvController extends Controller
         }
 
         $result = $query->get();
+
+        return $result;
+    }
+
+    protected function rootNodeQuery($params) {
+        $query = DB::table('datasets')
+            ->select([DB::raw('sum(val_total) as sum'), DB::raw('count(*) as count')])
+            ->where('datasets.is_current_version',1)
+            ->where(DB::raw('LEFT(datasets.cpv_code,'.$params->root->level.')'),$params->root->trimmed_code)
+            ->groupBy(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level).')'));
+
+        $result = $query->first();
 
         return $result;
     }

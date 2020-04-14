@@ -58,16 +58,28 @@
                 @foreach($items as $item)
                     <tr data-id="{{ $item->cpv }}">
                         <td class="code">
-                            <a href="{{ route('public::branchen',[ 'node' => $cpvMap[$item->cpv]->code ]) }}">{{ $item->cpv }}</a>
+                            @if($item->isRoot)
+                                {{ $item->cpv }}
+                                @else
+                                <a href="{{ route('public::branchen',[ 'node' => $cpvMap[$item->cpv]->code ]) }}">{{ $item->cpv }}</a>
+                            @endif
                         </td>
                         <td class="name">
                             {{ $cpvMap[$item->cpv]->name }}
                         </td>
                         <td class="count">
-                            <a title="Aufträge mit CPV Code {{ $item->cpv }} anzeigen" href="{{ route('public::auftraege',[ 'cpv' => $item->cpv, 'cpv_like' => 1 ]) }}">{{ $item->count }}</a>
+                            @if($item->isRoot)
+                                <a title="Aufträge mit CPV Code {{ $item->cpv }} anzeigen" href="{{ route('public::auftraege',[ 'cpv' => $item->cpv, 'cpv_like' => 1 ]) }}">{{ $rootNodeTotals->count }}</a>
+                                @else
+                                <a title="Aufträge mit CPV Code {{ $item->cpv }} anzeigen" href="{{ route('public::auftraege',[ 'cpv' => $item->cpv, 'cpv_like' => 1 ]) }}">{{ $item->count }}</a>
+                            @endif
                         </td>
                         <td class="value">
-                            {{ ui_format_money($item->sum) }}
+                            @if($item->isRoot)
+                                {{ ui_format_money($rootNodeTotals->sum) }}
+                            @else
+                                {{ ui_format_money($item->sum) }}
+                            @endif
                         </td>
                     </tr>
                 @endforeach
