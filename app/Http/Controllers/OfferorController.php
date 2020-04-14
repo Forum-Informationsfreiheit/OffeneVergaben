@@ -38,6 +38,11 @@ class OfferorController extends Controller
             ->filter($filters)
             ->where('offerors.organization_id',$org->id);
 
+        if (!$filters->has('sort')) {
+            // apply default sorting, item aktualisierungsdatum
+            $query->orderBy('item_lastmod','desc');
+        }
+
         $totalItems = $query->count();
         $data       = $query->paginate(20);
 

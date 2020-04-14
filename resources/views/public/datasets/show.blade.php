@@ -135,13 +135,13 @@
                             <td>{{ $dataset->date_conclusion_contract->format('d.m.Y') }}</td>
                         </tr>
                     @endif
-                    @if($dataset->nb_tenders_received)
+                    @if($dataset->nb_tenders_received !== null)
                         <tr>
                             <th>Anzahl eingegangener Angebote</th>
                             <td>{{ $dataset->nb_tenders_received }}</td>
                         </tr>
                     @endif
-                    @if($dataset->nb_sme_tender)
+                    @if($dataset->nb_sme_tender !== null)
                         <tr>
                             <th>Anzahl eingegangener Angebote (KMU)</th>
                             <td>{{ $dataset->nb_sme_tender }}</td>

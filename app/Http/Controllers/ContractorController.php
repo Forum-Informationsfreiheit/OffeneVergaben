@@ -40,6 +40,11 @@ class ContractorController extends Controller
             ->filter($filters)
             ->where('contractors.organization_id',$org->id);
 
+        if (!$filters->has('sort')) {
+            // apply default sorting, item aktualisierungsdatum
+            $query->orderBy('item_lastmod','desc');
+        }
+
         $totalItems = $query->count();
         $data       = $query->paginate(20);     // data holds the pagination-aware builder
 
