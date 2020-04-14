@@ -19,3 +19,33 @@ body.contractors {
     }
   }
 }
+body.contractor {
+  table {
+    td {
+      padding: 12px;
+    }
+
+    td.title {
+      width: auto;
+    }
+    td.offeror {
+      width: 17%;
+    }
+    td.contractors {
+      width: 17%;
+    }
+    td.cpv {
+      width: 12%;
+    }
+    td.nb {
+      width: 7%;
+    }
+    td.value {
+      width: 11%;
+      text-align: right;
+    }
+    td.date {
+      width: 10%;
+    }
+  }
+}

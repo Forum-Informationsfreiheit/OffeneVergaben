@@ -1,6 +1,6 @@
 @extends('public.layouts.default')
 
-@section('body:class','datasets')
+@section('body:class','contractor')
 
 @section('page:content')
     <h1 class="page-title">
@@ -20,7 +20,10 @@
                         @include('public.datasets.partials.sort',['field' => 'offeror'])
                     </th>
                     <th>
-                        Kategorie (CPV Hauptteil)
+                        Weitere Lieferanten
+                    </th>
+                    <th>
+                        Kategorie
                         @include('public.datasets.partials.sort',['field' => 'cpv'])
                     </th>
                     <th>
@@ -40,14 +43,22 @@
                 <tbody>
                 @foreach($items as $item)
                     <tr>
-                        <td class="name"><a href="{{ route('public::auftrag',$item->id) }}">{{ $item->title }}</a></td>
-                        <td class="name">
+                        <td class="title"><a href="{{ route('public::auftrag',$item->id) }}">{{ $item->title }}</a></td>
+                        <td class="offeror">
                             <a href="{{ route('public::show-auftraggeber',$item->offeror->organization_id) }}">{{ $item->offeror->name }}</a>
                             @if($item->offerors_count > 1)
                                 <span class="badge badge-pill badge-light">+&nbsp;{{ $item->offerors_count -1 }} weitere Lieferanten</span>
                             @endif
                         </td>
-                        <td class="name">{{ $item->cpv->toString() }}</td>
+                        <td class="contractors">
+                            @foreach($item->contractors as $contractor)
+                                @if($contractor->organization_id == $org->id)
+                                    @continue
+                                @endif
+                                <a href="{{ route('public::lieferant',$contractor->organization_id) }}">{{ ui_shorten($contractor->name) }}</a>@if(!$loop->last), @endif
+                            @endforeach
+                        </td>
+                        <td class="cpv">{{ $item->cpv->toString() }}</td>
                         <td class="nb">{{ $item->nb_tenders_received }}</td>
                         <td class="value">{{ $item->valTotalFormatted }}</td>
                         <td class="date" title="{{ $item->item_lastmod ? $item->item_lastmod->format('d.m.Y h:i') : '' }}">{{ $item->item_lastmod ? $item->item_lastmod->format('d.m.Y') : '' }}</td>
