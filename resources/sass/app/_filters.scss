@@ -42,7 +42,8 @@
       }
     }
 
-    &.volume-range {
+    &.volume-range,
+    &.tenders-range {
       input {
         display: inline-block;
         font-size: 0.85rem;

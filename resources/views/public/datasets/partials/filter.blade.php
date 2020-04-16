@@ -124,6 +124,16 @@
                     <input class="form-control form-control-sm" type="text" name="volume_to" value="{{ request('volume_to') }}" placeholder="...bis">
                 </div>
             </div>
+            <div class="filter-group tenders-range">
+                <div class="filter-group-label">
+                    Bieter
+                </div>
+                <div class="filter-group-inputs">
+                    <input class="form-control form-control-sm" type="text" name="tenders_from" value="{{ request('tenders_from') }}" placeholder="von...">
+                    <span class="dash">&ndash;</span>
+                    <input class="form-control form-control-sm" type="text" name="tenders_to" value="{{ request('tenders_to') }}" placeholder="...bis">
+                </div>
+            </div>
             <div class="filter-group">
                 <div class="filter-group-label">
                     Kategorie (CPV Hauptteil)

@@ -148,6 +148,26 @@ class DatasetFilter extends QueryFilter
         return $this->builder->where('val_total','<=',$value * 100);
     }
 
+    public function tendersFrom($value) {
+        if (!is_numeric($value)) {
+            return $this->builder;
+        }
+
+        $this->filters[] = 'tenders_from';
+
+        return $this->builder->where('nb_tenders_received','>=',$value);
+    }
+
+    public function tendersTo($value) {
+        if (!is_numeric($value)) {
+            return $this->builder;
+        }
+
+        $this->filters[] = 'tenders_to';
+
+        return $this->builder->where('nb_tenders_received','<=',$value);
+    }
+
     public function cpv($value) {
         if (!intval($value)) {
             return $this->builder;

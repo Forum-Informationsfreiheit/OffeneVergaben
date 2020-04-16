@@ -6,7 +6,7 @@
     <h1 class="page-title">
         Aufträge
     </h1>
-    <div id="filterWrapper" class="filter-wrapper {{ $filters->hasAny() ? '' : 'collapsed' }}">
+    <div id="filterWrapper" class="filter-wrapper {{-- $filters->hasAny() ? '' : 'collapsed' --}}">
         <div class="filter-head">
             <a href="#" id="filterToggle" class="filter-toggle" data-status="hidden">
                 <span class="icon-wrapper filter">
