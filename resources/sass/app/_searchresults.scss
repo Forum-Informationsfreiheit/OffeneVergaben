@@ -24,6 +24,10 @@ body.searchresults {
       }
 
       &.organizations {
+        .badge {
+          width: 158px;
+        }
+
         .identifiers {
           color: $grey;
         }

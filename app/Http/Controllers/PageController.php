@@ -37,6 +37,12 @@ class PageController extends Controller
         if ($search) {
             $organizations = Organization::searchNameQuery($tokens)->limit(101)->get();
 
+            // 2020-04-16 changed Organization query to actually return the offeror/contractor count
+            // need php to sort the result by the sum of these to count values
+            $organizations = $organizations->sortByDesc(function($orga){
+                return $orga->is_offeror + $orga->is_contractor;
+            });
+
             $datasets = Dataset::searchTitleAndDescriptionQuery($tokens)->limit(100)->get();
         }
 

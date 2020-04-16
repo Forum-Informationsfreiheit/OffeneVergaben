@@ -30,10 +30,10 @@
                         @if($org->is_identified)
                         @endif
                         @if($org->is_offeror)
-                            <a class="badge badge-primary" href="{{ route('public::show-auftraggeber',$org->id) }}">Auftraggeber</a>
+                            <a class="badge badge-primary" href="{{ route('public::show-auftraggeber',$org->id) }}">Auftraggeber&nbsp;&nbsp;<small>{{ $org->is_offeror }} Aufträge</small></a>
                         @endif
                         @if($org->is_contractor)
-                            <a class="badge badge-danger" href="{{ route('public::lieferant',$org->id) }}">Lieferant</a>
+                            <a class="badge badge-danger" href="{{ route('public::lieferant',$org->id) }}">Lieferant&nbsp;&nbsp;<small>{{ $org->is_contractor }} Aufträge</small></a>
                         @endif
                     </li>
                 @endforeach

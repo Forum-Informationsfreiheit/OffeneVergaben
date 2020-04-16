@@ -81,6 +81,16 @@ class Organization extends Model
             DB::raw('(SELECT 1 FROM contractors c WHERE c.organization_id = organizations.id LIMIT 1) as "is_contractor"')
         ]);
 
+        $query = self::select([
+            'organizations.*',
+            DB::raw('(SELECT count(*) FROM offerors o
+                        JOIN datasets d on o.dataset_id = d.id
+                        WHERE o.organization_id = organizations.id and d.is_current_version = 1 LIMIT 1) as "is_offeror"'),
+            DB::raw('(SELECT count(*) FROM contractors c
+                        JOIN datasets d on c.dataset_id = d.id
+                        WHERE c.organization_id = organizations.id and d.is_current_version = 1 LIMIT 1) as "is_contractor"')
+        ]);
+
         foreach($tokens as $token) {
             $query->where('name','like','%'. $token .'%');
         }
