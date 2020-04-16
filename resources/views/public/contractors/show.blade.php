@@ -11,13 +11,18 @@
         Lieferant {{ $org->name }}
     </h1>
     <div class="row">
-        <div class="col-md-8">
-            <div class="info-block data-commentary">
+        <div class="col-md-12">
+            <div class="info-block data-commentary mb-3">
                 <i class="fa fa-info-circle"></i>
-                <p>
-                    Unten angeführte Summen beschreiben den Gesamtwert eines Auftrages:<br>
-                    bei Rahmenverträgen wird das volle Liefer-Volumen mitunter nicht ausgeschöpft;<br>
-                    bei Ausschreibungen mit mehreren Losen und Lieferanten ist nur der Gesamtwert aller Lose verfügbar.
+                <p class="mb-0">
+                    Unten angeführte Summen beschreiben den Gesamtwert eines Auftrages – dieser muss nicht dem tatsächlich erhaltenen Betrag entsprechen:
+                </p>
+                <ul class="my-1">
+                    <li>bei Rahmenverträgen wird das volle Liefer-Volumen mitunter nicht ausgeschöpft;</li>
+                    <li>bei Ausschreibungen mit mehreren Losen und Lieferanten ist nur der Gesamtwert aller Lose verfügbar;</li>
+                </ul>
+                <p class="mb-0">
+                    etwaige spätere Vertragsänderungen sind oft nicht in den Daten reflektiert.
                 </p>
             </div>
         </div>

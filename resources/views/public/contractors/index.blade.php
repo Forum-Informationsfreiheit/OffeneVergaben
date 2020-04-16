@@ -2,30 +2,35 @@
 
 @section('body:class','contractors')
 
+@section('head:append')
+    <link rel="stylesheet" href="{{ link_to_stylesheet('vendor/fontawesome/all.min',false) }}">
+@stop
+
 @section('page:content')
     <h1 class="page-title">
         Lieferanten
     </h1>
-    <!--
-    <div id="filterWrapper" class="filter-wrapper collapsed">
-        <div class="filter-head">
-            <a href="#" id="filterToggle" class="filter-toggle" data-status="hidden">
-                <span class="icon-wrapper filter">
-                    @svg('/img/icons/filter.svg','filter')
-                </span>
-                <span class="action-text">Ergebnisse einschränken</span>
-            </a>
-        </div>
-        <div class="filter-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="filter-group">
-                    </div>
-                </div>
+    <div class="row">
+        <div class="col-md-12">
+            <div class="info-block data-commentary mb-3">
+                <i class="fa fa-info-circle"></i>
+                <p class="mb-0">
+                    Das Gesamtvolumen beschreibt die Gesamtsummen aller Aufträge, bei denen ein Lieferant einen Zuschlag erhalten hat – dies muss nicht den tatsächlich erhaltenen Beträgen entsprechen:
+                </p>
+                <ul class="my-1">
+                    <li>
+                        bei Rahmenverträgen wird das volle Liefer-Volumen mitunter nicht ausgeschöpft;
+                    </li>
+                    <li>
+                        bei Ausschreibungen mit mehreren Losen und Lieferanten ist nur der Gesamtwert aller Lose verfügbar;
+                    </li>
+                </ul>
+                <p class="mb-0">
+                    etwaige spätere Vertragsänderungen sind oft nicht in den Daten reflektiert.
+                </p>
             </div>
         </div>
     </div>
-    -->
     <div class="row">
         <div class="col">
             <div class="results-meta">

@@ -262,6 +262,11 @@ table.ov-table {
   position: relative;
 
   p {
+    padding-left: 1.6rem;
+    font-size: .8rem;
+    line-height: 1.5;
+  }
+  li {
     font-size: .8rem;
     line-height: 1.5;
   }
@@ -272,9 +277,5 @@ table.ov-table {
     top: -2px;
     color: $blue;
     font-size: 1.3rem;
-  }
-
-  p:first-of-type {
-    text-indent: 1.6rem;
   }
 }
