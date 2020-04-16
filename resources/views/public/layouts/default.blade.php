@@ -30,6 +30,8 @@
 
     <!-- Scripts -->
     <script src="{{ link_to_script('app',true) }}"></script>
+
+    @yield('head:append')
 </head>
 <body class="@yield('body:class')">
 <div id="wrapper">

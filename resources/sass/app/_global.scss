@@ -257,3 +257,24 @@ table.ov-table {
     }
   }
 }
+
+.info-block.data-commentary {
+  position: relative;
+
+  p {
+    font-size: .8rem;
+    line-height: 1.5;
+  }
+
+  i.fa.fa-info-circle {
+    position: absolute;
+    left: 0;
+    top: -2px;
+    color: $blue;
+    font-size: 1.3rem;
+  }
+
+  p:first-of-type {
+    text-indent: 1.6rem;
+  }
+}

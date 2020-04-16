@@ -2,10 +2,26 @@
 
 @section('body:class','contractor')
 
+@section('head:append')
+    <link rel="stylesheet" href="{{ link_to_stylesheet('vendor/fontawesome/all.min',false) }}">
+@stop
+
 @section('page:content')
     <h1 class="page-title">
         Lieferant {{ $org->name }}
     </h1>
+    <div class="row">
+        <div class="col-md-8">
+            <div class="info-block data-commentary">
+                <i class="fa fa-info-circle"></i>
+                <p>
+                    Unten angeführte Summen beschreiben den Gesamtwert eines Auftrages:<br>
+                    bei Rahmenverträgen wird das volle Liefer-Volumen mitunter nicht ausgeschöpft;<br>
+                    bei Ausschreibungen mit mehreren Losen und Lieferanten ist nur der Gesamtwert aller Lose verfügbar.
+                </p>
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col">
             <table class="table ov-table table-sm table-bordered table-striped">
