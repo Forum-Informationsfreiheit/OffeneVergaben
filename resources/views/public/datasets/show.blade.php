@@ -246,7 +246,7 @@
                 </tbody>
             </table>
             <div class="meta">
-                Version {{ $dataset->version }}@if($dataset->otherVersions)&nbsp;(<span class="version-links-inline">{!! $dataset->versionLinks !!}</span>)@endif, zuletzt aktualisiert: {{ $dataset->item_lastmod->format('d.m.Y') }}
+                Version {{ $dataset->version }}@if($dataset->otherVersions)&nbsp;(<span class="version-links-inline">{!! $dataset->versionLinks !!}</span>)@endif, <a target="_blank" href="{{ route('public::auftragsxml',[ 'id' => $dataset->id ]) }}">XML</a>, zuletzt aktualisiert: {{ $dataset->item_lastmod->format('d.m.Y') }}
             </div>
         </div>
     </div>

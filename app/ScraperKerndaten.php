@@ -31,4 +31,21 @@ class ScraperKerndaten extends Model
     public static function scopeUnprocessed($query) {
         return $query->where('app_processed_at',null)->where('app_dataset_id',null);
     }
+
+    /**
+     * For displaying (embedding in an html document) use the htmlentities(...) function
+     *
+     * @return string
+     */
+    public function getXmlFormattedHtmlAttribute() {
+
+        $doc = new \DOMDocument();
+        $doc->preserveWhiteSpace = false;
+        $doc->formatOutput = true;
+        $doc->loadXML($this->xml);
+
+        $string = $doc->saveXML();
+
+        return $string;
+    }
 }

@@ -15,6 +15,7 @@ Route::get('/', 'PageController@frontpage');
 
 Route::get('/aufträge','DatasetController@index')->name('public::auftraege');
 Route::get('/aufträge/{id}','DatasetController@show')->name('public::auftrag');
+Route::get('/aufträge/{id}/xml','DatasetController@showXml')->name('public::auftragsxml');
 
 Route::get('/lieferanten','ContractorController@index')->name('public::lieferanten');
 Route::get('/lieferanten/{id}','ContractorController@show')->name('public::lieferant');

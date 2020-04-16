@@ -168,6 +168,10 @@ class Dataset extends Model
         return $this->belongsTo('App\Metaset');
     }
 
+    public function scraperKerndaten() {
+        return $this->belongsTo('App\ScraperKerndaten','scraper_kerndaten_id','id');
+    }
+
     public function offeror() {
         return $this->hasOne('App\Offeror')->where('is_extra',0);
     }

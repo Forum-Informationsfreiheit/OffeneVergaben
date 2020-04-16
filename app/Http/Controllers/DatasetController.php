@@ -145,4 +145,10 @@ class DatasetController extends Controller
 
         return view('public.datasets.show',compact('dataset'));
     }
+
+    public function showXml($id) {
+        $dataset = Dataset::findOrFail($id);
+
+        return response($dataset->scraperKerndaten->xml)->header('content-type','text/xml');
+    }
 }
