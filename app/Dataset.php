@@ -189,11 +189,11 @@ class Dataset extends Model
     }
 
     public function contractors() {
-        return $this->hasMany('App\Contractor')->where('is_extra',1);
+        return $this->hasMany('App\Contractor');
     }
 
     public function contractorsAdditional() {
-        return $this->hasMany('App\Contractor');
+        return $this->hasMany('App\Contractor')->where('is_extra',1);
     }
 
     public function nuts() {
