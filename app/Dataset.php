@@ -180,24 +180,36 @@ class Dataset extends Model
         return $this->hasMany('App\Offeror');
     }
 
+    public function offerorsAdditional(){
+        return $this->hasMany('App\Offeror')->where('is_extra',1);
+    }
+
     public function contractor() {
-        return $this->hasOne('App\Contractor');
+        return $this->hasOne('App\Contractor')->where('is_extra',0);
     }
 
     public function contractors() {
-        return $this->hasMany('App\Contractor');
+        return $this->hasMany('App\Contractor')->where('is_extra',1);
     }
 
-    public function cpv() {
-        return $this->belongsTo('App\CPV','cpv_code');
+    public function contractorsAdditional() {
+        return $this->hasMany('App\Contractor');
     }
 
     public function nuts() {
         return $this->belongsTo('App\NUTS','nuts_code');
     }
 
+    public function cpv() {
+        return $this->belongsTo('App\CPV','cpv_code');
+    }
+
     public function cpvs() {
         return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code');
+    }
+
+    public function cpvsAdditional() {
+        return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code')->where('main',0);
     }
 
     public function procedures() {

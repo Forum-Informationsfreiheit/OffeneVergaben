@@ -19,6 +19,12 @@ return [
         'SUPPLIES' => 'Lieferauftrag',
     ],
 
+    'ocm_contract_types' => [
+        'SERVICES' => 'Dienstleistungskonzession',
+        'WORKS' => 'Baukonzession',
+        'SUPPLIES' => 'Lieferkonzession',
+    ],
+
     'val_total' => [
         'KD_7_2_Z1' => 'Wert der Konzession',
         'KD_8_2_Z1' => 'Auftragswert',
