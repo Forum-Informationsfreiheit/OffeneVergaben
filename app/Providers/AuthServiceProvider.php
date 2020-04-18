@@ -72,5 +72,8 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('update-posts',function($user) {
             return $user->role_id >= Role::EDITOR;
         });
+        Gate::define('update-datasets',function($user) {
+            return $user->role_id >= Role::EDITOR;
+        });
     }
 }

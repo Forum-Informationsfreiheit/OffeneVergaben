@@ -77,6 +77,8 @@
     @include('admin.modals.delete.page')
     @include('admin.modals.delete.post')
 
+    @yield('modals:append')
+
     <script src="{{ link_to_script('sb-admin-2') }}"></script>
 
 </body>

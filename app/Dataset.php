@@ -26,7 +26,8 @@ class Dataset extends Model
         'deadline_standstill',
         'datetime_receipt_tenders',
         'datetime_last_change',
-        'item_lastmod'
+        'item_lastmod',
+        'disabled_at'
     ];
 
     /**

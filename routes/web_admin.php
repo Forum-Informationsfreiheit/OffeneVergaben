@@ -45,3 +45,6 @@ Route::post  ('/posts/store',  'PostController@store')->name('admin::store-post'
 Route::patch ('/posts/update',  'PostController@update')->name('admin::update-post');
 Route::patch ('/posts/publish','PostController@publish')->name('admin::publish-post');
 Route::delete('/posts/destroy','PostController@destroy')->name('admin::destroy-post');
+
+Route::get   ('/datasets',         'DatasetController@index')->name('admin::datasets');
+Route::patch ('/datasets/disable', 'DatasetController@disable')->name('admin::disable-dataset');

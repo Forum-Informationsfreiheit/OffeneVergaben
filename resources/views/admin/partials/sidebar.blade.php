@@ -18,6 +18,11 @@
             <i class="fas fa-fw fa-tachometer-alt"></i>
             <span>Dashboard</span></a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('admin::datasets') }}">
+            <i class="fas fa-fw fa-book"></i>
+            <span>Kerndaten</span></a>
+    </li>
 
     <!-- Divider -->
     <hr class="sidebar-divider">
