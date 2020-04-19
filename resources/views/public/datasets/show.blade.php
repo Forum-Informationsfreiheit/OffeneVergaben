@@ -7,6 +7,18 @@
         <!-- auftrag oder ausschreibung ??? -->
         {{ $dataset->title }}
     </h1>
+    @if(\Illuminate\Support\Facades\Auth::user() && $dataset->disabled_at)
+        <div class="row">
+            <div class="col">
+                <div class="alert alert-warning alert-dismissible">
+                    Dieser Auftrag wurde am {{ $dataset->disabled_at->format('d.m.Y') }} <strong>deaktiviert</strong>. <a href="{{ route('admin::datasets',[ 'id' => $dataset->id ]) }}">Rückgängig machen</a>
+                    <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+                        <span aria-hidden="true">&times;</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    @endif
     <div class="row">
         <div class="col">
             <table class="table ov-table ov-table-vertical table-sm table-bordered">

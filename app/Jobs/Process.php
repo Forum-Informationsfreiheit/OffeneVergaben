@@ -374,7 +374,7 @@ class Process
                 $currentDataset->save();
             }
             */
-            $currentDataset = Dataset::where('metaset_id',$dataset->metaset_id)
+            $currentDataset = Dataset::withoutGlobalScope('not_disabled')->where('metaset_id',$dataset->metaset_id)
                 ->where('is_current_version',1)
                 ->where('id','<>',$dataset->id)
                 ->first();

@@ -135,7 +135,7 @@ class CpvController extends Controller
 
         $query = DB::table('datasets')
             ->select([DB::raw('sum(val_total) as sum'), DB::raw('count(*) as count')])
-            ->where('datasets.is_current_version',1)
+            ->where('datasets.is_current_version',1)->where('datasets.disabled_at',null)
             ->where('datasets.cpv_code','<>',null);
         //->where('datasets.val_total','<>',null);
 
@@ -156,7 +156,7 @@ class CpvController extends Controller
     protected function rootNodeQuery($params) {
         $query = DB::table('datasets')
             ->select([DB::raw('sum(val_total) as sum'), DB::raw('count(*) as count')])
-            ->where('datasets.is_current_version',1)
+            ->where('datasets.is_current_version',1)->where('datasets.disabled_at',null)
             ->where(DB::raw('LEFT(datasets.cpv_code,'.$params->root->level.')'),$params->root->trimmed_code)
             ->groupBy(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level).')'));
 
@@ -165,10 +165,11 @@ class CpvController extends Controller
         return $result;
     }
 
+    /*
     protected function volumeQuery($root) {
         $query = DB::table('datasets')
             ->select(DB::raw('sum(val_total) as sum'))
-            ->where('datasets.is_current_version',1)
+            ->where('datasets.is_current_version',1)->where('datasets.disabled_at',null)
             ->where('datasets.cpv_code','<>',null)
             ->where('datasets.val_total','<>',null);
 
@@ -189,7 +190,7 @@ class CpvController extends Controller
     protected function countQuery($root) {
         $query = DB::table('datasets')
             ->select(DB::raw('count(*) as count'))
-            ->where('datasets.is_current_version',1)
+            ->where('datasets.is_current_version',1)->where('datasets.disabled_at',null)
             ->where('datasets.cpv_code','<>',null);
 
         if ($root == null) {
@@ -205,4 +206,5 @@ class CpvController extends Controller
 
         return $result;
     }
+    */
 }

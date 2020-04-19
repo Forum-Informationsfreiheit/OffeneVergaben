@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
@@ -29,6 +30,184 @@ class Dataset extends Model
         'item_lastmod',
         'disabled_at'
     ];
+
+    // SCOPES ----------------------------------------------------------------------------------------------------------
+    /**
+     * By default add a global scope to each query
+     * Only select datasets that are 'enabled' (= NOT disabled)
+     * @see https://laravel.com/docs/5.8/eloquent#global-scopes
+     */
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::addGlobalScope('not_disabled', function (Builder $builder) {
+            $builder->where('disabled_at', null);
+        });
+    }
+
+    public static function scopeCurrent($query) {
+        return $query->where('is_current_version',1);
+        //return $query->where('is_current_version',1);
+    }
+
+    public static function scopeEnabled($query) {
+        return $query->where('disabled_at',null);
+    }
+
+    // RELATIONS -------------------------------------------------------------------------------------------------------
+    public function type() {
+        return $this->belongsTo('App\DatasetType','type_code');
+    }
+
+    public function metaset() {
+        return $this->belongsTo('App\Metaset');
+    }
+
+    public function scraperKerndaten() {
+        return $this->belongsTo('App\ScraperKerndaten','scraper_kerndaten_id','id');
+    }
+
+    public function offeror() {
+        return $this->hasOne('App\Offeror')->where('is_extra',0);
+    }
+
+    public function offerors() {
+        return $this->hasMany('App\Offeror');
+    }
+
+    public function offerorsAdditional(){
+        return $this->hasMany('App\Offeror')->where('is_extra',1);
+    }
+
+    public function contractor() {
+        return $this->hasOne('App\Contractor')->where('is_extra',0);
+    }
+
+    public function contractors() {
+        return $this->hasMany('App\Contractor');
+    }
+
+    public function contractorsAdditional() {
+        return $this->hasMany('App\Contractor')->where('is_extra',1);
+    }
+
+    public function nuts() {
+        return $this->belongsTo('App\NUTS','nuts_code');
+    }
+
+    public function cpv() {
+        return $this->belongsTo('App\CPV','cpv_code');
+    }
+
+    public function cpvs() {
+        return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code');
+    }
+
+    public function cpvsAdditional() {
+        return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code')->where('main',0);
+    }
+
+    public function procedures() {
+        return $this->belongsToMany('App\Procedure','dataset_procedure','dataset_id','procedure_code');
+    }
+
+    // ACCESSORS -------------------------------------------------------------------------------------------------------
+    public function getValTotalFormattedAttribute() {
+        if (!$this->val_total) {
+            return null;
+        }
+
+        return $this->formatMoney($this->val_total);
+    }
+    public function getValTotalBeforeFormattedAttribute() {
+        if (!$this->val_total_before) {
+            return null;
+        }
+
+        return $this->formatMoney($this->val_total_before);
+    }
+    public function getValTotalAfterFormattedAttribute() {
+        if (!$this->val_total_after) {
+            return null;
+        }
+
+        return $this->formatMoney($this->val_total_after);
+    }
+    public function getXmlAttribute() {
+        if (!$this->xml) {
+            $this->xml = DB::table('scraper_results')
+                ->select(['content'])
+                ->where('id',$this->result_id)->pluck('content')->first();
+        }
+        return $this->xml;
+    }
+    public function getOtherVersionsAttribute() {
+        $others = $this->metaset->datasets()->where('version','!=',$this->version)->orderBy('version','asc')->get();
+
+        return count($others) ? $others : null;
+    }
+
+    public function getVersionLinksAttribute() {
+
+        $otherVersions = $this->otherVersions;
+
+        if (count($otherVersions) === 0) {
+            return '';
+        }
+
+        $html = '<ul>';
+
+        foreach($this->otherVersions as $other) {
+            $html .= '<li>';
+            $html .= '<a href="'.route('public::auftrag',$other->id).'">'.$other->version.'</a>';
+            $html .= '</li>';
+        }
+
+        $html .= '</ul>';
+
+        return $html;
+    }
+
+    public function getTitleFormattedAttribute() {
+        if (!$this->title) {
+            return $this->title;
+        }
+
+        return nl_to_br($this->title);
+    }
+
+    public function getDescriptionFormattedAttribute() {
+        if (!$this->description) {
+            return $this->description;
+        }
+
+        return nl_to_br($this->description);
+    }
+
+    public function getInfoModificationsFormattedAttribute() {
+        if (!$this->info_modifications) {
+            return $this->info_modifications;
+        }
+
+        return nl_to_br($this->info_modifications);
+    }
+
+    public function getJustificationFormattedAttribute() {
+        if (!$this->justification) {
+            return $this->justification;
+        }
+
+        return nl_to_br($this->justification);
+    }
+
+    public function getProcedureDescriptionFormattedAttribute() {
+        if (!$this->procedure_description) {
+            return $this->procedure_description;
+        }
+
+        return nl_to_br($this->procedure_description);
+    }
 
     /**
      * Some attributes of a dataset have different meaning/translations
@@ -151,171 +330,11 @@ class Dataset extends Model
         return self::labelStatic($attribute,$this->type_code);
     }
 
-    public function scopeCurrent($query) {
-        return $query->where('is_current_version',1);
-    }
-
-    /*
-    public function datasource() {
-        return $this->belongsTo('App\Datasource');
-    }
-    */
-
-    public function type() {
-        return $this->belongsTo('App\DatasetType','type_code');
-    }
-
-    public function metaset() {
-        return $this->belongsTo('App\Metaset');
-    }
-
-    public function scraperKerndaten() {
-        return $this->belongsTo('App\ScraperKerndaten','scraper_kerndaten_id','id');
-    }
-
-    public function offeror() {
-        return $this->hasOne('App\Offeror')->where('is_extra',0);
-    }
-
-    public function offerors() {
-        return $this->hasMany('App\Offeror');
-    }
-
-    public function offerorsAdditional(){
-        return $this->hasMany('App\Offeror')->where('is_extra',1);
-    }
-
-    public function contractor() {
-        return $this->hasOne('App\Contractor')->where('is_extra',0);
-    }
-
-    public function contractors() {
-        return $this->hasMany('App\Contractor');
-    }
-
-    public function contractorsAdditional() {
-        return $this->hasMany('App\Contractor')->where('is_extra',1);
-    }
-
-    public function nuts() {
-        return $this->belongsTo('App\NUTS','nuts_code');
-    }
-
-    public function cpv() {
-        return $this->belongsTo('App\CPV','cpv_code');
-    }
-
-    public function cpvs() {
-        return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code');
-    }
-
-    public function cpvsAdditional() {
-        return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code')->where('main',0);
-    }
-
-    public function procedures() {
-        return $this->belongsToMany('App\Procedure','dataset_procedure','dataset_id','procedure_code');
-    }
 /*
     public function getContractorAttribute() {
 
     }
 */
-    public function getValTotalFormattedAttribute() {
-        if (!$this->val_total) {
-            return null;
-        }
-
-        return $this->formatMoney($this->val_total);
-    }
-    public function getValTotalBeforeFormattedAttribute() {
-        if (!$this->val_total_before) {
-            return null;
-        }
-
-        return $this->formatMoney($this->val_total_before);
-    }
-    public function getValTotalAfterFormattedAttribute() {
-        if (!$this->val_total_after) {
-            return null;
-        }
-
-        return $this->formatMoney($this->val_total_after);
-    }
-    public function getXmlAttribute() {
-        if (!$this->xml) {
-            $this->xml = DB::table('scraper_results')
-                ->select(['content'])
-                ->where('id',$this->result_id)->pluck('content')->first();
-        }
-        return $this->xml;
-    }
-    public function getOtherVersionsAttribute() {
-        $others = $this->metaset->datasets()->where('version','!=',$this->version)->orderBy('version','asc')->get();
-
-        return count($others) ? $others : null;
-    }
-
-    public function getVersionLinksAttribute() {
-
-        $otherVersions = $this->otherVersions;
-
-        if (count($otherVersions) === 0) {
-            return '';
-        }
-
-        $html = '<ul>';
-
-        foreach($this->otherVersions as $other) {
-            $html .= '<li>';
-            $html .= '<a href="'.route('public::auftrag',$other->id).'">'.$other->version.'</a>';
-            $html .= '</li>';
-        }
-
-        $html .= '</ul>';
-
-        return $html;
-    }
-
-    public function getTitleFormattedAttribute() {
-        if (!$this->title) {
-            return $this->title;
-        }
-
-        return nl_to_br($this->title);
-    }
-
-    public function getDescriptionFormattedAttribute() {
-        if (!$this->description) {
-            return $this->description;
-        }
-
-        return nl_to_br($this->description);
-    }
-
-    public function getInfoModificationsFormattedAttribute() {
-        if (!$this->info_modifications) {
-            return $this->info_modifications;
-        }
-
-        return nl_to_br($this->info_modifications);
-    }
-
-    public function getJustificationFormattedAttribute() {
-        if (!$this->justification) {
-            return $this->justification;
-        }
-
-        return nl_to_br($this->justification);
-    }
-
-    public function getProcedureDescriptionFormattedAttribute() {
-        if (!$this->procedure_description) {
-            return $this->procedure_description;
-        }
-
-        return nl_to_br($this->procedure_description);
-    }
 
     protected function formatMoney($value) {
         return ui_format_money($value);

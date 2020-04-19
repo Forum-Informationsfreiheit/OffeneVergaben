@@ -48,7 +48,7 @@
                 </thead>
                 <tbody>
                 @foreach($datasets as $dataset)
-                    <tr>
+                    <tr data-id="{{ $dataset->id }}">
                         <td title="{{ $dataset->disabled_at ? 'Deaktiviert am ' . $dataset->disabled_at->format('d.m.Y H:i') : '' }}">{!! $dataset->disabled_at ? '<i class="fa fa-eye-slash"></i>' : ''  !!}</td>
                         <td title="{{ $dataset->title }}">{{ ui_shorten($dataset->title) }}</td>
                         <td title="{{ $dataset->offeror->name }}">{{ ui_shorten($dataset->offeror->name,35) }}</td>

@@ -26,7 +26,7 @@ class Contractor extends Model
         ]);
         $query->join('datasets','contractors.dataset_id','=','datasets.id');
         $query->join('organizations','contractors.organization_id','=','organizations.id');
-        $query->where('datasets.is_current_version',1);
+        $query->where('datasets.is_current_version',1)->where('datasets.disabled_at',null);
         // note actually there is no need to group on organization name
         // but newer mysql version needs it to be there so we can select it, or order by it
         $query->groupBy('contractors.organization_id','organizations.name');
@@ -51,7 +51,7 @@ class Contractor extends Model
             $query->join('datasets','contractors.dataset_id','=','datasets.id');
             $query->join('dataset_types','datasets.type_code','=','dataset_types.code');
             $query->where('dataset_types.end',1);
-            $query->where('datasets.is_current_version',1);
+            $query->where('datasets.is_current_version',1)->where('datasets.disabled_at',null);
             $query->groupBy('contractors.organization_id');
             $query->orderBy('datasets_count','desc');
         }
@@ -61,7 +61,7 @@ class Contractor extends Model
             $query->join('datasets','contractors.dataset_id','=','datasets.id');
             $query->join('dataset_types','datasets.type_code','=','dataset_types.code');
             $query->where('dataset_types.end',1);
-            $query->where('datasets.is_current_version',1);
+            $query->where('datasets.is_current_version',1)->where('datasets.disabled_at',null);
             $query->groupBy('contractors.organization_id');
             $query->orderBy('sum_total_val','desc');
         }

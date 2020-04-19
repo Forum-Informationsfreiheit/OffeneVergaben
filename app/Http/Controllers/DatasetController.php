@@ -8,7 +8,9 @@ use App\Http\Filters\DatasetFilter;
 use App\Organization;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Gate;
 
 class DatasetController extends Controller
 {
@@ -141,13 +143,21 @@ class DatasetController extends Controller
     }
 
     public function show($id) {
-        $dataset = Dataset::findOrFail($id);
+        if (Gate::allows('view-disabled-datasets')) {
+            $dataset = Dataset::withoutGlobalScope('not_disabled')->findOrFail($id);
+        } else {
+            $dataset = Dataset::findOrFail($id);
+        }
 
         return view('public.datasets.show',compact('dataset'));
     }
 
     public function showXml($id) {
-        $dataset = Dataset::findOrFail($id);
+        if (Gate::allows('view-disabled-datasets')) {
+            $dataset = Dataset::withoutGlobalScope('not_disabled')->findOrFail($id);
+        } else {
+            $dataset = Dataset::findOrFail($id);
+        }
 
         return response($dataset->scraperKerndaten->xml)->header('content-type','text/xml');
     }

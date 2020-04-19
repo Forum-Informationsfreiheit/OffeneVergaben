@@ -16,9 +16,11 @@ class DatasetController extends Controller
 
         if ($request->has('id') && is_numeric($request->input('id'))) {
             $query->where('id',$request->input('id'));
+            $query->withoutGlobalScope('not_disabled');
         }
         if ($request->has('inactive')) {
             $query->where('disabled_at','<>',null);
+            $query->withoutGlobalScope('not_disabled');
         }
 
         $query->orderBy('item_lastmod','desc');
@@ -33,9 +35,10 @@ class DatasetController extends Controller
     public function disable(Request $request) {
         $this->authorize('update-datasets');
 
-        $dataset = Dataset::findOrFail($request->input('id'));
+        $dataset = Dataset::withoutGlobalScope('not_disabled')->findOrFail($request->input('id'));
+        $allVersions = $dataset->metaset->datasets()->withoutGlobalScope('not_disabled')->get();
 
-        foreach($dataset->metaset->datasets as $datasetVersion) {
+        foreach($allVersions as $datasetVersion) {
             $datasetVersion->disabled_at = $request->input('mode') === 'disable' ? Carbon::now() : null;
             $datasetVersion->save();
         }
