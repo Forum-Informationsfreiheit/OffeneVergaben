@@ -43,6 +43,9 @@ if (App::environment('production')) {
     Auth::routes();
 }
 
+// Subscription routes
+Route::post('/subscribe', 'SubscriptionController@subscribe')->name('public::subscribe');
+
 // Temporary Earlybird routes still available in production but staff only please
 Route::group(['middleware' => 'web_admin'], function() {
     Route::get('/origins','EarlyBirdController@origins');

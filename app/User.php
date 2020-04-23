@@ -41,6 +41,10 @@ class User extends Authenticatable
         return $this->belongsTo('App\Role');
     }
 
+    public function subscriptions() {
+        return $this->hasMany('App\Subscription');
+    }
+
     public function getInitialsAttribute() {
         $nameArray = $this->name ? explode(' ',$this->name) : [];
 

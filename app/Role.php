@@ -8,6 +8,8 @@ class Role extends Model
 {
     const REGISTERED = 100;
 
+    const SUBSCRIBER = 200;
+
     const EDITOR     = 500;
 
     const ADMIN      = 900;
