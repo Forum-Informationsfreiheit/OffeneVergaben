@@ -54,7 +54,7 @@ class VerifySubscription extends Notification
                     ->line('jemand hat auf offenevergaben.at diese E-Mail-Adresse für regelmäßige Benachrichtigungen eingetragen.')
                     ->line('Um Ihre E-Mail-Adresse zu bestätigen und diese Benachrichtigungen zu aktivieren, klicken Sie bitte auf folgenden Button:')
                     ->action('E-Mail-Adresse bestätigen & Abo aktivieren', $verificationUrl)
-                    ->line('Danke für dein Interesse!');
+                    ->line('Danke für Ihr Interesse!');
                     //->salutation(null);
     }
 

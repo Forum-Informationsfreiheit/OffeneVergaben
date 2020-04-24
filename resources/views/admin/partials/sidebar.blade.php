@@ -23,6 +23,11 @@
             <i class="fas fa-fw fa-book"></i>
             <span>Kerndaten</span></a>
     </li>
+    <li class="nav-item">
+        <a class="nav-link" href="{{ route('admin::subscriptions') }}">
+            <i class="fas fa-fw fa-ghost"></i>
+            <span>Abos</span></a>
+    </li>
 
     <!-- Divider -->
     <hr class="sidebar-divider">

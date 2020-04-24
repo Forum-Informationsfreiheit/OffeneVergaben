@@ -66,6 +66,10 @@ class User extends Authenticatable
         return $this->role_id === Role::ADMIN;
     }
 
+    public function isSubscriber() {
+        return $this->role_id === Role::SUBSCRIBER;
+    }
+
     /**
      * @param \App\Subscription $subscription
      */

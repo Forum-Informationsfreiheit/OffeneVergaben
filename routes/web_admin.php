@@ -48,3 +48,7 @@ Route::delete('/posts/destroy','PostController@destroy')->name('admin::destroy-p
 
 Route::get   ('/datasets',         'DatasetController@index')->name('admin::datasets');
 Route::patch ('/datasets/disable', 'DatasetController@disable')->name('admin::disable-dataset');
+
+Route::get   ('/subscriptions',    'SubscriptionController@index')->name('admin::subscriptions');
+Route::patch ('/subscriptions/resend-verification-notification', 'SubscriptionController@resendVerificationNotification')->name('admin::resend-subscription-verification-notification');
+Route::delete('/subscriptions/destroy','SubscriptionController@destroy')->name('admin::destroy-subscription');

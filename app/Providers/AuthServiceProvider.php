@@ -62,6 +62,12 @@ class AuthServiceProvider extends ServiceProvider
         Gate::define('delete-user',function($user) {
             return $user->isAdmin();
         });
+        Gate::define('resend-subscription-verification-notification',function($user) {
+            return $user->isAdmin();
+        });
+        Gate::define('delete-subscription',function($user) {
+            return $user->isAdmin();
+        });
 
         Gate::define('update-tags',function($user) {
             return $user->role_id >= Role::EDITOR;

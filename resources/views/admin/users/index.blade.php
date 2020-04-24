@@ -37,7 +37,13 @@
                         <th scope="row">{{ $user->id }}</th>
                         <td>{{ $user->name }}</td>
                         <td>{{ $user->email }}</td>
-                        <td>{{ $user->role->name }}</td>
+                        <td>
+                            @if($user->isSubscriber())
+                                <a href="{{ route('admin::subscriptions',['subscriber_id' => $user->id]) }}">{{ $user->role->name }}</a>{!! $user->email_verified_at ? '&nbsp;<i class="fa fa-check" title="Verifiziert am '.$user->email_verified_at->format('d.m.Y H:i').'"></i>' : '' !!}
+                                @else
+                                {{ $user->role->name }}
+                            @endif
+                        </td>
                         <td>{{ $user->created_at->format('d.m.Y') }}</td>
                         @if(Auth::user()->isAdmin())
                             <td>

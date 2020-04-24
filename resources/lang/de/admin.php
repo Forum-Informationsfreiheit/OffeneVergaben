@@ -33,5 +33,9 @@ return [
         'deleted' => 'Post ":title" wurde gelöscht.',
         'published' => 'Post ":title" wurde veröffentlicht.',
         'unpublished' => 'Veröffentlichung des Posts ":title" wurde rückgängig gemacht.'
+    ],
+
+    'subscriptions' => [
+        'deleted' => 'Abo ":title" wurde gelöscht.',
     ]
 ];
