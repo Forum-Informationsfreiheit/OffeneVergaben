@@ -99,6 +99,7 @@
                         <div class="row">
                             <div class="col-md-6">
                                 {{ csrf_field() }}
+                                <input type="hidden" name="url" value="{{ url()->full() }}">
                                 <button class="btn btn-primary mt-3" type="submit">Aktivieren</button>
                             </div>
                         </div>

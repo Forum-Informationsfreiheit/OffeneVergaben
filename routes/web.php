@@ -44,7 +44,11 @@ if (App::environment('production')) {
 }
 
 // Subscription routes
-Route::post('/subscribe', 'SubscriptionController@subscribe')->name('public::subscribe');
+// NOTE that the verification route needs to be signed as indicated by the middleware
+Route::post('/subscribe',     'SubscriptionController@subscribe')->name('public::subscribe');
+Route::get('/subscription/{id}/verify/{email}', 'SubscriptionController@verify')
+    ->middleware('signed')
+    ->name('public::verify-subscription');
 
 // Temporary Earlybird routes still available in production but staff only please
 Route::group(['middleware' => 'web_admin'], function() {

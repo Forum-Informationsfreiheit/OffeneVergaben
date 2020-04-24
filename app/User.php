@@ -65,4 +65,11 @@ class User extends Authenticatable
     public function isAdmin() {
         return $this->role_id === Role::ADMIN;
     }
+
+    /**
+     * @param \App\Subscription $subscription
+     */
+    public function sendSubscriptionVerificationNotification($subscription) {
+        $this->notify(new Notifications\VerifySubscription($subscription));
+    }
 }
