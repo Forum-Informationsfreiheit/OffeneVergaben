@@ -52,7 +52,7 @@ class SubscriptionController extends Controller
 
             $user->sendSubscriptionVerificationNotification($subscription);
 
-            Flash::success('Benachrichtigung wurde erstellt. Um die Benachrichtigung zu aktivieren klicken Sie auf den Bestätigungs-Link den Sie in Kürze von uns per E-Mail erhalten. Sollten Sie keine E-Mail erhalten haben überprüfen Sie bitte Ihren Spam-Ordner.');
+            Flash::success('Benachrichtigung wurde erstellt. Um die Benachrichtigung zu aktivieren, klicken Sie auf den Bestätigungs-Link den Sie in Kürze von uns per E-Mail erhalten. Sollten Sie keine E-Mail erhalten haben überprüfen Sie bitte Ihren Spam-Ordner.');
 
         } catch(\Exception $ex) {
             Log::error('Exception occured on SubscriptionController:subscribe',[
