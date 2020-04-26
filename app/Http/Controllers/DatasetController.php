@@ -62,8 +62,13 @@ class DatasetController extends Controller
             $items = [];
         }
 
+        // Current query string will be stored within a hidden input field
+        // in case the user wants to subscribe
+        $appliedFilters = $filters->getAppliedFilters();
+        ksort($appliedFilters);
+        $queryString = http_build_query($appliedFilters);
 
-        return view('public.datasets.index',compact('items','totalItems','filters','data'));
+        return view('public.datasets.index',compact('items','totalItems','filters','data','queryString'));
     }
 
     public function indexWithEloquentQueryFilter(DatasetFilter $filters) {

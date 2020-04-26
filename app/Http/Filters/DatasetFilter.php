@@ -11,7 +11,12 @@ use Kblais\QueryFilter\QueryFilter;
 
 class DatasetFilter extends QueryFilter
 {
-    protected $filters = [];
+    /**
+     * @var array $appliedFilters
+     *
+     * Keep a key value store of the applied filters. Values have been validated.
+     */
+    protected $appliedFilters = [];
 
     // only single attribute sort implemented atm
     protected $sortedBy = null;
@@ -72,7 +77,7 @@ class DatasetFilter extends QueryFilter
             return $this->builder;
         }
 
-        $this->filters[] = 'types';
+        $this->appliedFilters['types'] = $values;
 
         if ($values[0] == 'ausschreibung') {
             $codes = DatasetType::ausschreibung()->pluck('code')->toArray();
@@ -93,7 +98,7 @@ class DatasetFilter extends QueryFilter
             return $this->builder;
         }
 
-        $this->filters[] = 'contract_types';
+        $this->appliedFilters['contract_types'] = $values;
 
         $contractTypes = [];
         $contractTypesOcm = [];
@@ -133,7 +138,7 @@ class DatasetFilter extends QueryFilter
             return $this->builder;
         }
 
-        $this->filters[] = 'volume_from';
+        $this->appliedFilters['volume_from'] = $value;
 
         return $this->builder->where('val_total','>=',$value * 100);
     }
@@ -143,7 +148,7 @@ class DatasetFilter extends QueryFilter
             return $this->builder;
         }
 
-        $this->filters[] = 'volume_to';
+        $this->appliedFilters['volume_to'] = $value;
 
         return $this->builder->where('val_total','<=',$value * 100);
     }
@@ -153,7 +158,7 @@ class DatasetFilter extends QueryFilter
             return $this->builder;
         }
 
-        $this->filters[] = 'tenders_from';
+        $this->appliedFilters['tenders_from'] = $value;
 
         return $this->builder->where('nb_tenders_received','>=',$value);
     }
@@ -163,7 +168,7 @@ class DatasetFilter extends QueryFilter
             return $this->builder;
         }
 
-        $this->filters[] = 'tenders_to';
+        $this->appliedFilters['tenders_to'] = $value;
 
         return $this->builder->where('nb_tenders_received','<=',$value);
     }
@@ -175,7 +180,7 @@ class DatasetFilter extends QueryFilter
 
         $like = substr($value,-1) === "*";
 
-        $this->filters[] = 'cpv';
+        $this->appliedFilters['cpv'] = $value;
 
         // trim, but leave at least 2 characters
         $value = $like ? rtrim(rtrim($value,'*'),'0') : rtrim($value,'0');
@@ -203,7 +208,7 @@ class DatasetFilter extends QueryFilter
             // to include the whole day
             $dateFrom  = Carbon::parse($value);
             $dateField = $this->datesMap[$this->request->input('date_type')];
-            $this->filters[] = 'date_from';
+            $this->appliedFilters['date_from'] = $value;
 
             return $this->builder->where($dateField,'>=',$dateFrom);
 
@@ -226,7 +231,7 @@ class DatasetFilter extends QueryFilter
             // to include the whole day we want to set the time to 23:59:59
             $dateTo  = Carbon::parse($value)->setHour(23)->setMinute(59)->setSecond(59);
             $dateField = $this->datesMap[$this->request->input('date_type')];
-            $this->filters[] = 'date_to';
+            $this->appliedFilters['date_to'] = $value;
 
             return $this->builder->where($dateField,'<=',$dateTo);
 
@@ -238,6 +243,10 @@ class DatasetFilter extends QueryFilter
     public function dateType($value) {
         // this param does nothing on its own
         // value of $this->request('date_param') will be used in dateFrom/dateTo methods
+        // only remember in combination with date_from or date_to
+        if ($this->request->input('date_from') || $this->request->input('date_to')) {
+            $this->appliedFilters['date_type'] = $value;
+        }
     }
 
     public function nuts($value) {
@@ -245,7 +254,7 @@ class DatasetFilter extends QueryFilter
             return $this->builder;
         }
 
-        $this->filters[] = 'nuts';
+        $this->appliedFilters['nuts'] = $value;
 
         $international = in_array('NAT',$value);
 
@@ -274,15 +283,12 @@ class DatasetFilter extends QueryFilter
         return $where;
     }
 
+    // HELPERS ---------------------------------------------------------------------------------------------------------
     /**
      * Shortcut helper method for blade views
      * so in view it can be checked wether or not a filter was set
      * with $filters->has('fieldname')
      *
-     * @param $key
-     */
-
-    /**
      * Method should be extended for each field that is used in the filter view
      *
      * @param $keyOne String, for arrays use name of array
@@ -303,14 +309,26 @@ class DatasetFilter extends QueryFilter
         return $this->request->has($keyOne);
     }
 
+    /**
+     * @return bool
+     */
     public function hasAny() {
-        return count($this->filters) > 0;
+        return count($this->appliedFilters) > 0;
     }
 
+    /**
+     * @param $field
+     * @return bool|null
+     */
     public function isSortedBy($field) {
         return $this->sortedBy == $field ? $this->sortDirection : false;
     }
 
+    /**
+     * @param $field
+     * @param $direction
+     * @return string
+     */
     public function makeSortUrl($field,$direction) {
 
         $url = url()->current();
@@ -318,5 +336,12 @@ class DatasetFilter extends QueryFilter
         $params['sort'] = ($direction == 'desc' ? '-' : '') . $field;
 
         return $url . '?' . http_build_query($params);
+    }
+
+    /**
+     * @return array
+     */
+    public function getAppliedFilters() {
+        return $this->appliedFilters;
     }
 }

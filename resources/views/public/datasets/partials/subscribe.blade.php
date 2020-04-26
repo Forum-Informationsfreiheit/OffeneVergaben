@@ -51,8 +51,16 @@
     <div class="row">
         <div class="col-md-6">
             {{ csrf_field() }}
-            <input type="hidden" name="url" value="{{ url()->full() }}">
-            <button class="btn btn-primary mt-3" type="submit">Aktivieren</button>
-        </div>
-    </div>
+            <input type="hidden" name="query" value="{{ $queryString }}">
+            @if(session('subscribed') === TRUE)
+                <button class="btn btn-primary mt-3" type="submit" disabled="disabled">
+                    <i class="far fa-check-circle"></i>&nbsp;Benachrichtigung eingerichtet
+                </button>
+                @else
+                <button class="btn btn-primary mt-3" type="submit">
+                    Aktivieren
+                </button>
+            @endif
+</div>
+</div>
 </form>

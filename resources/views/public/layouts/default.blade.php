@@ -27,6 +27,7 @@
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ link_to_stylesheet('app',true) }}">
+    <link rel="stylesheet" href="{{ link_to_stylesheet('vendor/fontawesome/all.min') }}">
 
     <!-- Scripts -->
     <script src="{{ link_to_script('app',true) }}"></script>
