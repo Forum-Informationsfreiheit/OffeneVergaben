@@ -24,6 +24,7 @@ class CreateSubscriptionsTable extends Migration
             $table->text('query');
 
             $table->timestamp('verified_at')->nullable();
+            $table->timestamp('last_notified_at')->nullable();
             $table->timestamps();
         });
     }

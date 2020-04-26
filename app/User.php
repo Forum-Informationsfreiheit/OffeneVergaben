@@ -37,14 +37,34 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
     ];
 
+    // RELATIONS -------------------------------------------------------------------------------------------------------
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
+     */
     public function role() {
         return $this->belongsTo('App\Role');
     }
 
+    /**
+     * @return \Illuminate\Database\Eloquent\Relations\HasMany
+     */
     public function subscriptions() {
         return $this->hasMany('App\Subscription');
     }
 
+    // SCOPES ----------------------------------------------------------------------------------------------------------
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public static function scopeWithVerifiedEmail($query) {
+        return $query->whereNotNull('email_verified_at');
+    }
+
+    // ACCESSORS -------------------------------------------------------------------------------------------------------
+    /**
+     * @return string
+     */
     public function getInitialsAttribute() {
         $nameArray = $this->name ? explode(' ',$this->name) : [];
 
@@ -54,18 +74,31 @@ class User extends Authenticatable
         return $initials != '' ? $initials : '??';
     }
 
+    /**
+     * @return string
+     */
     public function getFirstNameAttribute() {
         return $this->name ? explode(' ',$this->name)[0] : '';
     }
 
+    // OTHER -----------------------------------------------------------------------------------------------------------
+    /**
+     * @return bool
+     */
     public function isSuperAdmin() {
         return $this->id === 1;
     }
 
+    /**
+     * @return bool
+     */
     public function isAdmin() {
         return $this->role_id === Role::ADMIN;
     }
 
+    /**
+     * @return bool
+     */
     public function isSubscriber() {
         return $this->role_id === Role::SUBSCRIBER;
     }
