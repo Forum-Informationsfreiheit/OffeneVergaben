@@ -3,7 +3,7 @@
 
 Klicken Sie auf den Titel um zu den jeweiligen Ergebnissen auf offenevergaben.at zu gelangen.
 
-@component('mail::table')
+@component('mail::table',[ 'tableClass' => 'daily-update-summary-table' ])
 | Abo | neu  | abbestellen |
 |:----|:----:| :----------:|
 @foreach($subscriptions as $subscription)

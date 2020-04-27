@@ -203,6 +203,16 @@ img.header-logo {
     margin: 0;
 }
 
+.daily-update-summary-table th:first-of-type {
+    width: auto;
+}
+.daily-update-summary-table th:nth-of-type(2) {
+    width: 10%;
+}
+.daily-update-summary-table th:nth-of-type(3) {
+    width: 20%;
+}
+
 .content-cell {
     padding: 35px;
 }
