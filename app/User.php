@@ -109,4 +109,17 @@ class User extends Authenticatable
     public function sendSubscriptionVerificationNotification($subscription) {
         $this->notify(new Notifications\VerifySubscription($subscription));
     }
+
+    /**
+     * @param \Illuminate\Support\Collection $subscriptions
+     * @param array $updateInfo
+     */
+    public function sendSubscriptionUpdateSummaryNotification($subscriptions, $updateInfo) {
+        // safety check: only allow verified subscriptions of this subscriber
+        $subscriptions = $subscriptions->filter(function($subscription) {
+            return $this->id === $subscription->user_id && $subscription->verified_at != null;
+        });
+
+        $this->notify(new Notifications\SubscriptionUpdateSummary($subscriptions, $updateInfo));
+    }
 }

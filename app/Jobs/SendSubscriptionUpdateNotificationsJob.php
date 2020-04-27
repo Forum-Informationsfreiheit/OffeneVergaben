@@ -83,15 +83,16 @@ class SendSubscriptionUpdateNotificationsJob
             dump('Subscription:'.$subscription->id . ' = '.$numberOfUpdates. ' updates');
             Log::info('Subscription:'.$subscription->id . ' = '.$numberOfUpdates. ' updates');
 
-            $updateInfo[$subscription->id]['new_datasets_count'] = $numberOfUpdates;
+            $updateInfo[$subscription->id] = [
+                'new_datasets_count' => $numberOfUpdates
+            ];
 
             // store the current timestamp
             $subscription->last_notified_at = $now;
             $subscription->save();
         }
 
-        // TODO: actually send the emails (notifications)
-        // TODO too: inject subscriptions & updateinfo into mailable/notification
+        $subscriber->sendSubscriptionUpdateSummaryNotification($subscriptions, $updateInfo);
     }
 
     /**

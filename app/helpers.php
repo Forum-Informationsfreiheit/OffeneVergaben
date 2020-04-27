@@ -52,6 +52,20 @@ if (! function_exists('link_to_script')) {
     }
 }
 
+if (! function_exists('link_to_image')) {
+    /**
+     * Returns a the public url to image.
+     *
+     * @param $fileName
+     * @return string
+     */
+    function link_to_image($fileName) {
+        if (!$fileName) return '';
+
+        return url("img/{$fileName}");
+    }
+}
+
 if (! function_exists('contains_decimal')) {
     function contains_decimal($value) {
         if ( strpos( $value, "." ) !== false ) {

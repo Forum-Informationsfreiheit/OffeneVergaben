@@ -68,6 +68,20 @@ Route::group(['prefix' => 'test'], function () {
         return;
     }
 
+    Route::get('/email/updatesummary/{subscriberId}', function($subscriberId) {
+        $subscriber = \App\User::find($subscriberId);
+
+        $subscriptions = $subscriber->subscriptions()->whereNotNull('verified_at')->get();
+
+        $updateInfo = [];
+        foreach($subscriptions as $subscription) {
+            $updateInfo[$subscription->id] = [ 'new_datasets_count' => 1  ];
+        }
+
+        return (new App\Notifications\SubscriptionUpdateSummary($subscriptions,$updateInfo))
+            ->toMail($subscriber);
+    });
+
     Route::get('/scraperconn', function() {
         $res = \Illuminate\Support\Facades\DB::connection('mysql_scraper')->table('quellen')->select()->get();
         dd($res);
