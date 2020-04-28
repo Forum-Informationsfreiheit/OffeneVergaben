@@ -9,12 +9,16 @@ use App\Subscription;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Laracasts\Flash\Flash;
 
 class SubscriptionController extends Controller
 {
+    const ALL = 'all';
+
     public function subscribe(Request $request) {
         // Custom validator here, so errors can be stored in a named bag, for flexible display options
         $validator = Validator::make($request->all(), [
@@ -36,7 +40,7 @@ class SubscriptionController extends Controller
         $validator->after(function($validator) use($request) {
             $subscriber = User::where('email',$request->input('email'))->first();
             if ($subscriber && Subscription::where('user_id',$subscriber->id)->where('query',$request->input('query'))->first()) {
-                $validator->errors()->add('query','Eine Benachrichtigung für diese Abfrage existiert bereits.');
+                $validator->errors()->add('query','Die Benachrichtigung zu dieser Abfrage ist bereits eingerichtet.');
             }
         });
 
@@ -48,6 +52,12 @@ class SubscriptionController extends Controller
         // Looking good
         // Optional: store new user (if new email)
         try {
+            Log::info('Subscribe request received.',[
+                'email' => $request->input('email'),
+                'title' => $request->input('title'),
+                'query' => $request->input('query'),
+            ]);
+
             $user = User::where('email',$request->input('email'))->first();
             if (!$user) {
                 $user = new User();
@@ -90,12 +100,23 @@ class SubscriptionController extends Controller
         return back()->with(['subscribed' => false]);
     }
 
+    /**
+     * Signed route!
+     *
+     * Verify is called directly from a subscription verification email via a signed link.
+     * On successful verification user will be redirected to public aufträge page
+     * and see a flashed success message.
+     *
+     * @param $id
+     * @param $email
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
     public function verify($id, $email) {
         $subscription = Subscription::findOrFail($id);
         $subscriber   = User::where('email',$email)->first();
 
         if ($email != $subscriber->email) {
-            throw new \RuntimeException("Notification email and Subscriber email don't match.");
+            abort(404);
         }
 
         $now = Carbon::now();
@@ -108,16 +129,126 @@ class SubscriptionController extends Controller
             $subscriber->save();
         }
 
+        Log::info('Subscription verified.',[
+            'subscription_id' => $id,
+            'email' => $email,
+        ]);
+
         Flash::success('Abonnement '.$subscription->title.' wurde bestätigt. ');
 
-        return redirect(route('public::auftraege'));  // TODO where to redirect ???
+        return redirect(route('public::auftraege'));
     }
 
-    public function unsubscribe() {
-        dump('unsubscribe');
-        // todo validate GET signed url and actually unsubscribe
+    /**
+     * Signed route!
+     *
+     * Cancel is called directly from a subscription update notification email via a signed link.
+     * User will be presented a confirmation view to confirm the cancelling of the subscription.
+     *
+     * @param $id
+     * @param $email
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    public function cancel($id, $email) {
+        if ($id == 'all') {
+            return $this->cancelAll($email);
+        }
+
+        $subscription = Subscription::findOrFail($id);
+        $subscriber   = User::where('email',$email)->first();
+
+        if ($email != $subscriber->email) {
+            abort(404);
+        }
+
+        return view('public.subscriptions.cancel',compact('subscription'));
     }
 
+    /**
+     * Route not available for user roles other than SUBSCRIBER
+     * or in other words: make sure admins don't accidentally delete themselves
+     *
+     * @param $email
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
+     */
+    protected function cancelAll($email) {
+        $subscriber = User::where('email',$email)->where('role_id',Role::SUBSCRIBER)->first();
+        $subscriptions = $subscriber->subscriptions()->orderBy('title','asc')->get();
+
+        if (!$subscriber) {
+            abort(404);
+        }
+
+        return view('public.subscriptions.cancel-all',compact('subscriber','subscriptions'));
+    }
+
+    /**
+     * Signed route!
+     *
+     * Actually unsubscribe.
+     *
+     * @param $id
+     * @param $email
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    public function unsubscribe($id, $email) {
+        if ($id == self::ALL) {
+            return $this->unsubscribeAll($email);
+        }
+
+        $subscription = Subscription::findOrFail($id);
+        $subscriber   = User::where('email',$email)->where('role_id',Role::SUBSCRIBER)->first();
+
+        if ($email != $subscriber->email) {
+            abort(404);
+        }
+
+        $title = $subscription->title;
+        $subscriber = $subscription->email;
+        $query = $subscription->query;
+
+        // DELETE
+        DB::table('subscriptions')->where('id', $id)->delete();
+
+        // keep info in log file
+        Log::info('Subscription deleted by subscriber.',['subscriber' => $subscriber, 'title' => $title, 'query' => $query ]);
+
+        Flash::success("Abonnement {$title} beendet.");
+
+        return redirect(route('public::auftraege'));
+    }
+
+    /**
+     * Route not available for user roles other than SUBSCRIBER
+     * or in other words: make sure admins don't accidentally delete themselves
+     *
+     * @param $email
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     */
+    protected function unsubscribeAll($email) {
+        $subscriber = User::where('email',$email)->where('role_id',Role::SUBSCRIBER)->first();
+
+        if (!$subscriber) {
+            abort(404);
+        }
+
+        // keep info in log file
+        Log::info('Unsubscribe all request received.',[ 'subscriber' => $subscriber->email ]);
+
+        foreach($subscriber->subscriptions as $subscription) {
+            // keep info in log file
+            Log::info('Delete subscription through unsubscribe all.',['title' => $subscription->title, 'query' => $subscription->query ]);
+        }
+
+        // bye
+        $subscriber->delete();
+
+        Log::info('Subscriber and all subscriptions deleted.',[ 'subscriber' => $subscriber->email ]);
+
+        Flash::success("Alle Abonnements wurden beendet. Sie werden von uns keine weiteren E-Mail Benachrichtigungen erhalten.");
+
+        return redirect(route('public::auftraege'));
+    }
 
     /**
      * @param $queryString

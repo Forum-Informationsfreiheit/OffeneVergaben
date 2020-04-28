@@ -44,6 +44,7 @@ class SubscriptionUpdateSummary extends Notification
     {
         return (new MailMessage)
             ->markdown('mail.subscription.update-summary',[
+                'subscriber' => $notifiable,
                 'subscriptions' => $this->subscriptions,
                 'updateInfo' => $this->updateInfo,
             ]);

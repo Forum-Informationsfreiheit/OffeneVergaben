@@ -19,9 +19,11 @@
     @endisset
 
     {{-- Footer --}}
-    @slot('footer')
-        @component('mail::footer')
-            [offenevergaben.at]({{ url('/') }}) ist ein Projekt des Forum Informationsfreiheit und wird durch die [Internet Foundation Austria (IPA) / netidee.at](https://netidee.at) gefördert.
-        @endcomponent
-    @endslot
+    @isset($footer)
+        @slot('footer')
+            @component('mail::footer')
+                {{ $footer }}
+            @endcomponent
+        @endslot
+    @endisset
 @endcomponent

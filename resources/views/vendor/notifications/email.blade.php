@@ -60,4 +60,9 @@
 )
 @endslot
 @endisset
+
+{{-- Footer --}}
+@slot('footer')
+[offenevergaben.at]({{ url('/') }}) ist ein Projekt des Forum Informationsfreiheit und wird durch die [Internet Foundation Austria (IPA) / netidee.at](https://netidee.at) gefördert.<br>
+@endslot
 @endcomponent

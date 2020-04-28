@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Subscription;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Log;
 use Laracasts\Flash\Flash;
 
 class SubscriptionController extends Controller
@@ -52,12 +53,17 @@ class SubscriptionController extends Controller
         $id = $request->input('id');
 
         $subscription = Subscription::findOrFail($id);
-        $title = $subscription->subscriber->email . ' - ' . $subscription->title;
+        $email = $subscription->subscriber->email;
+        $title = $subscription->title;
+        $subscriber = $subscription->user_id;
 
-        // just do it right here:
+        // DELETE
         DB::table('subscriptions')->where('id', $id)->delete();
 
-        Flash::success(__("admin.subscriptions.deleted", [ 'title' => $title ]));
+        // keep info in log file, but don't log the email address
+        Log::info('Subscription deleted by admin.',['title' => $title, 'subscriber' => $subscriber ]);
+
+        Flash::success(__("admin.subscriptions.deleted", [ 'title' => $email . ' - ' . $title ]));
 
         return redirect(route('admin::subscriptions'));
     }

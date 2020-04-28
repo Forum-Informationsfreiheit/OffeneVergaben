@@ -26,6 +26,8 @@ class CreateSubscriptionsTable extends Migration
             $table->timestamp('verified_at')->nullable();
             $table->timestamp('last_notified_at')->nullable();
             $table->timestamps();
+
+            $table->foreign('user_id')->references('id')->on('users')->onDelete('cascade');
         });
     }
 

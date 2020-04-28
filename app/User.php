@@ -2,9 +2,11 @@
 
 namespace App;
 
+use App\Http\Controllers\SubscriptionController;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
+use Illuminate\Support\Facades\URL;
 
 class User extends Authenticatable
 {
@@ -79,6 +81,42 @@ class User extends Authenticatable
      */
     public function getFirstNameAttribute() {
         return $this->name ? explode(' ',$this->name)[0] : '';
+    }
+
+    /**
+     * Cancel All URL --> CONFIRM cancelling of all subscriptions
+     *
+     * Only available for Role SUBSCRIBER
+     *
+     * @return String signed cancel subscription url
+     */
+    public function getCancelAllSubscriptionsUrlAttribute() {
+        if ($this->role_id != Role::SUBSCRIBER) {
+            return null;
+        }
+
+        return URL::signedRoute(
+            'public::cancel-subscription',
+            [ 'id' => SubscriptionController::ALL, 'email' => $this->email ]
+        );
+    }
+
+    /**
+     * Unsubscribe All URL --> directly unsubscribe (=destroy) subscription
+     *
+     * Only available for Role SUBSCRIBER
+     *
+     * @return String signed unsubscribe url
+     */
+    public function getUnsubscribeAllUrlAttribute() {
+        if ($this->role_id != Role::SUBSCRIBER) {
+            return null;
+        }
+
+        return URL::signedRoute(
+            'public::unsubscribe',
+            [ 'id' => SubscriptionController::ALL, 'email' => $this->email ]
+        );
     }
 
     // OTHER -----------------------------------------------------------------------------------------------------------

@@ -46,9 +46,16 @@ if (App::environment('production')) {
 // Subscription routes
 // NOTE that the verification route needs to be signed as indicated by the middleware
 Route::post('/subscribe',     'SubscriptionController@subscribe')->name('public::subscribe');
-Route::get('/subscription/{id}/verify/{email}', 'SubscriptionController@verify')
+Route::get('/subscriptions/{id}/verify/{email}', 'SubscriptionController@verify')
     ->middleware('signed')
     ->name('public::verify-subscription');
+Route::get('/subscriptions/{id}/cancel/{email}', 'SubscriptionController@cancel')
+    ->middleware('signed')
+    ->name('public::cancel-subscription');
+Route::get('/subscriptions/{id}/unsubscribe/{email}', 'SubscriptionController@unsubscribe')
+    ->middleware('signed')
+    ->name('public::unsubscribe');
+
 
 // Temporary Earlybird routes still available in production but staff only please
 Route::group(['middleware' => 'web_admin'], function() {
@@ -70,6 +77,10 @@ Route::group(['prefix' => 'test'], function () {
 
     Route::get('/email/updatesummary/{subscriberId}', function($subscriberId) {
         $subscriber = \App\User::find($subscriberId);
+
+        if (!$subscriber) {
+            return 'kein user mit dieser ID vorhanden';
+        }
 
         $subscriptions = $subscriber->subscriptions()->whereNotNull('verified_at')->get();
 
