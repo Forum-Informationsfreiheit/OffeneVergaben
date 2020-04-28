@@ -42,6 +42,7 @@ class SubscriptionUpdateSummary extends Notification
      */
     public function toMail($notifiable)
     {
+        // notification text lines come from the blade template mail.subscription.update-summary
         return (new MailMessage)
             ->markdown('mail.subscription.update-summary',[
                 'subscriber' => $notifiable,

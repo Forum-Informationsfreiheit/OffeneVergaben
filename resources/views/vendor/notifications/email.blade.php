@@ -47,6 +47,9 @@
 {{ config('app.name') }}
 @endif
 
+PS: Finden Sie diesen Service nützlich?<br>
+Mit einer Spende an das Forum Informationsfreiheit [https://www.informationsfreiheit.at/spenden/] können Sie helfen, den Betrieb von OffeneVergaben.at sicherzustellen.
+
 {{-- Subcopy --}}
 @isset($actionText)
 @slot('subcopy')
@@ -63,6 +66,7 @@
 
 {{-- Footer --}}
 @slot('footer')
-[offenevergaben.at]({{ url('/') }}) ist ein Projekt des Forum Informationsfreiheit und wird durch die [Internet Foundation Austria (IPA) / netidee.at](https://netidee.at) gefördert.<br>
+[{{ config('app.name') }}]({{ url('/') }}) ist ein zivilgesellschaftliches Projekt des Forum Informationsfreiheit, ZVR 796723786, Kirchberggasse 7/4A, 1070 Wien. Email: [office@informationsfreiheit.at](mailto:office@informationsfreiheit.at)<br><br>
+Ermöglicht wurde die Umsetzung durch die [Netidee.at](https://netidee.at), eine Förderung der Internet Privatstiftung Austria (IPA).
 @endslot
 @endcomponent
