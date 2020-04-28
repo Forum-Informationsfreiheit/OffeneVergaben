@@ -50,12 +50,13 @@ class VerifySubscription extends Notification
         $verificationUrl = $this->verificationUrl($notifiable);
 
         return (new MailMessage)
+                    ->from($this->mailFromAddress(),config('app.name'))
+                    ->subject(config('app.name').' - Abo bestätigen')
                     ->greeting('Hallo!')
-                    ->line('jemand hat auf OffeneVergaben.at diese E-Mail-Adresse für regelmäßige Benachrichtigungen eingetragen.')
+                    ->line('jemand hat auf '.config('app.name').' diese E-Mail-Adresse für regelmäßige Benachrichtigungen eingetragen.')
                     ->line('Um Ihre E-Mail-Adresse zu bestätigen und diese Benachrichtigungen zu aktivieren, klicken Sie bitte auf folgenden Link:')
                     ->action('E-Mail-Adresse bestätigen & Abo aktivieren', $verificationUrl)
                     ->line('Danke für Ihr Interesse!');
-                    //->salutation(null);
     }
 
     /**
@@ -77,5 +78,9 @@ class VerifySubscription extends Notification
             Carbon::now()->addMinutes(60),
             [ 'id' => $this->subscription->id, 'email' => $notifiable->email ]
         );
+    }
+
+    protected function mailFromAddress() {
+        return env('APP_MAIL_ALERTS_FROM_ADDRESS',env('MAIL_FROM_ADDRESS'));
     }
 }

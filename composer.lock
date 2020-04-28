@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "446a22996d26f39b3afad4ab10bd8569",
+    "content-hash": "2fa6363ebf46ff87ff841464d42b3b5d",
     "packages": [
         {
             "name": "dnoegel/php-xdg-base-dir",
@@ -1413,6 +1413,175 @@
                 "storage"
             ],
             "time": "2020-04-16T13:21:26+00:00"
+        },
+        {
+            "name": "mailjet/laravel-mailjet",
+            "version": "2.1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mailjet/laravel-mailjet.git",
+                "reference": "7c36673139225b2af10593ec02ce2204a7efb5d8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mailjet/laravel-mailjet/zipball/7c36673139225b2af10593ec02ce2204a7efb5d8",
+                "reference": "7c36673139225b2af10593ec02ce2204a7efb5d8",
+                "shasum": ""
+            },
+            "require": {
+                "laravel/framework": ">=5",
+                "laravel/tinker": "~1.0",
+                "mailjet/mailjet-apiv3-php": "^1.2",
+                "mailjet/mailjet-swiftmailer": "^2.0",
+                "php": ">=7.1.3"
+            },
+            "require-dev": {
+                "fzaninotto/faker": "~1.4",
+                "mockery/mockery": "0.9.*",
+                "orchestra/testbench": "3.6",
+                "phpunit/phpunit": "~7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Mailjet\\LaravelMailjet\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Gaetan DELBART",
+                    "email": "gaetan@moltencore.io",
+                    "homepage": "https://github.com/gagaXD"
+                },
+                {
+                    "name": "Titouan BENOIT",
+                    "email": "titouan.benoit@gmx.fr",
+                    "homepage": "https://github.com/Nightbr"
+                },
+                {
+                    "name": "Mailjet API",
+                    "email": "api@mailjet.com",
+                    "homepage": "https://dev.mailjet.com/"
+                }
+            ],
+            "description": "Laravel package for Mailjet API V3 and Laravel Mailjet Mail Transport",
+            "homepage": "https://github.com/mailjet/laravel-mailjet",
+            "keywords": [
+                "Mailjet",
+                "framework",
+                "laravel",
+                "mailjet API",
+                "mailjet wrapper",
+                "transport"
+            ],
+            "time": "2020-01-21T08:12:49+00:00"
+        },
+        {
+            "name": "mailjet/mailjet-apiv3-php",
+            "version": "v1.4.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mailjet/mailjet-apiv3-php.git",
+                "reference": "9d89b9a424a9631bff8e499cbbe34058481e8102"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mailjet/mailjet-apiv3-php/zipball/9d89b9a424a9631bff8e499cbbe34058481e8102",
+                "reference": "9d89b9a424a9631bff8e499cbbe34058481e8102",
+                "shasum": ""
+            },
+            "require": {
+                "guzzlehttp/guzzle": "~6.0|~5.3",
+                "php": ">=5.4.0"
+            },
+            "require-dev": {
+                "php-coveralls/php-coveralls": "^1.0",
+                "phpunit/phpunit": "^4.8"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Mailjet": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Mailjet",
+                    "email": "dev@mailjet.com",
+                    "homepage": "https://dev.mailjet.com"
+                }
+            ],
+            "description": "PHP wrapper for the Mailjet API",
+            "homepage": "https://github.com/mailjet/mailjet-apiv3-php/",
+            "keywords": [
+                "Mailjet",
+                "api",
+                "email",
+                "php",
+                "v3"
+            ],
+            "time": "2018-10-31T13:24:45+00:00"
+        },
+        {
+            "name": "mailjet/mailjet-swiftmailer",
+            "version": "2.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/mailjet/MailjetSwiftMailer.git",
+                "reference": "300eb931b8b36c7f55349b54a41bfd763a182bff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/mailjet/MailjetSwiftMailer/zipball/300eb931b8b36c7f55349b54a41bfd763a182bff",
+                "reference": "300eb931b8b36c7f55349b54a41bfd763a182bff",
+                "shasum": ""
+            },
+            "require": {
+                "mailjet/mailjet-apiv3-php": "^1.2",
+                "php": ">=7.0",
+                "swiftmailer/swiftmailer": "~6.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^5.7",
+                "symfony/config": ">=2.0|~3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Mailjet\\MailjetSwiftMailer\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Titouan BENOIT",
+                    "email": "titouan.benoit@gmx.fr",
+                    "homepage": "https://github.com/Nightbr"
+                },
+                {
+                    "name": "Mailjet API",
+                    "email": "api@mailjet.com",
+                    "homepage": "https://dev.mailjet.com/"
+                }
+            ],
+            "description": "A SwiftMailer transport implementation for Mailjet",
+            "homepage": "https://github.com/mailjet/MailjetSwiftMailer",
+            "keywords": [
+                "Mailjet",
+                "swiftmailer"
+            ],
+            "time": "2019-06-13T12:40:37+00:00"
         },
         {
             "name": "monolog/monolog",

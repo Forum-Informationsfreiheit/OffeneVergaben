@@ -47,6 +47,12 @@ class Kernel extends ConsoleKernel
             $schedule->command('fif:dump-datasets')->dailyAt($dumpAt);
         }
 
+        // Send subscription update notifications
+        $sendAt = env('APP_SCHEDULE_SEND_SUBSCRIPTION_SUMMARY_UPDATE_AT_TIMESTRING');
+        if ($sendAt && $this->validateTimeString($sendAt)) {
+            $schedule->command('fif:send-subscription-updates')->dailyAt($sendAt);
+        }
+
         // TMP files clean up ------------------------------------
         $schedule->command('fif:clean-up-tmp-links')->everyThirtyMinutes();
     }

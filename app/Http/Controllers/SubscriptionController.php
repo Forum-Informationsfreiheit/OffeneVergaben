@@ -134,7 +134,7 @@ class SubscriptionController extends Controller
             'email' => $email,
         ]);
 
-        Flash::success('Abonnement '.$subscription->title.' wurde bestätigt. ');
+        Flash::success('Benachrichtigung '.$subscription->title.' wurde bestätigt. ');
 
         return redirect(route('public::auftraege'));
     }
@@ -213,7 +213,7 @@ class SubscriptionController extends Controller
         // keep info in log file
         Log::info('Subscription deleted by subscriber.',['subscriber' => $subscriber, 'title' => $title, 'query' => $query ]);
 
-        Flash::success("Abonnement {$title} beendet.");
+        Flash::success("Benachrichtigung {$title} beendet.");
 
         return redirect(route('public::auftraege'));
     }
@@ -245,7 +245,7 @@ class SubscriptionController extends Controller
 
         Log::info('Subscriber and all subscriptions deleted.',[ 'subscriber' => $subscriber->email ]);
 
-        Flash::success("Alle Abonnements wurden beendet. Sie werden von uns keine weiteren E-Mail Benachrichtigungen erhalten.");
+        Flash::success("Alle Benachrichtigungen wurden beendet, Sie werden von uns keine weiteren E-Mail Benachrichtigungen erhalten.");
 
         return redirect(route('public::auftraege'));
     }

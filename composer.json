@@ -9,15 +9,16 @@
     "license": "MIT",
     "require": {
         "php": "^7.1.3",
+        "doctrine/dbal": "~2.9",
         "fideloper/proxy": "^4.0",
-        "laravel/framework": "5.8.*",
-        "laravel/tinker": "^1.0",
         "guzzlehttp/guzzle": "6.3.*",
+        "kblais/query-filter": "~1.5",
         "laracasts/flash": "3.*",
         "laracasts/utilities": "~3.0",
-        "unisharp/laravel-filemanager": "~1.8",
-        "kblais/query-filter": "~1.5",
-        "doctrine/dbal": "~2.9"
+        "laravel/framework": "5.8.*",
+        "laravel/tinker": "^1.0",
+        "mailjet/laravel-mailjet": "^2.1",
+        "unisharp/laravel-filemanager": "~1.8"
     },
     "require-dev": {
         "beyondcode/laravel-dump-server": "^1.0",

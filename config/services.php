@@ -44,4 +44,10 @@ return [
         ],
     ],
 
+    // custom services --> mailjet
+    'mailjet' => [
+        'key' => env('MAILJET_APIKEY'),
+        'secret' => env('MAILJET_APISECRET'),
+    ],
+
 ];

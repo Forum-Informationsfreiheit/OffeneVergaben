@@ -166,6 +166,10 @@ return [
          * Package Service Providers...
          */
 
+        // custom --> Mailjet service providers added
+        Mailjet\LaravelMailjet\MailjetServiceProvider::class,
+        Mailjet\LaravelMailjet\MailjetMailServiceProvider::class,
+
         /*
          * Application Service Providers...
          */
@@ -226,6 +230,8 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
 
+        // custom
+        'Mailjet' => Mailjet\LaravelMailjet\Facades\Mailjet::class,
     ],
 
 ];

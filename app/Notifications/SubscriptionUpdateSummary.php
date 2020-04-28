@@ -44,6 +44,8 @@ class SubscriptionUpdateSummary extends Notification
     {
         // notification text lines come from the blade template mail.subscription.update-summary
         return (new MailMessage)
+            ->from($this->mailFromAddress(),config('app.name'))
+            ->subject('Neuigkeiten von '.config('app.name'))
             ->markdown('mail.subscription.update-summary',[
                 'subscriber' => $notifiable,
                 'subscriptions' => $this->subscriptions,
@@ -62,5 +64,9 @@ class SubscriptionUpdateSummary extends Notification
         return [
             //
         ];
+    }
+
+    protected function mailFromAddress() {
+        return env('APP_MAIL_DEFAULT_FROM_ADDRESS',env('MAIL_FROM_ADDRESS'));
     }
 }
