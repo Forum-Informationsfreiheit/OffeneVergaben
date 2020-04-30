@@ -13,7 +13,7 @@ Klicken Sie „abbestellen“, um keine Benachrichtigungen mehr zu erhalten.
 @endcomponent
 
 Finden Sie diesen Service nützlich?<br>
-Mit einer Spende an das Forum Informationsfreiheit [https://www.informationsfreiheit.at/spenden/] können Sie helfen, den Betrieb von {{ config('app.name') }} sicherzustellen.
+Mit einer [Spende an das Forum Informationsfreiheit](https://www.informationsfreiheit.at/spenden) können Sie helfen, den Betrieb von {{ config('app.name') }} sicherzustellen.
 
 Ihr Team von<br>
 {{ config('app.name') }}
