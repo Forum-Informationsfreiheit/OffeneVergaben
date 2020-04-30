@@ -29,10 +29,7 @@ class SendSubscriptionUpdateNotificationsJob
      */
     public function handle()
     {
-        $now = Carbon::now();
-
-        dump('SendSubscriptionUpdateNotificationsJob started at '.$now->toDateTimeString('millisecond'));
-        Log::info('SendSubscriptionUpdateNotificationsJob started at '.$now->toDateTimeString('millisecond'));
+        Log::info('SendSubscriptionUpdateNotificationsJob started at '.Carbon::now()->toDateTimeString('millisecond'));
 
         // Admins / Editors can be subscribers as well, but they need to have a verified email address
         $verifiedUsers = User::withVerifiedEmail()->get();
@@ -40,6 +37,8 @@ class SendSubscriptionUpdateNotificationsJob
         foreach($verifiedUsers as $subscriber) {
             $this->handleSubscriber($subscriber);
         }
+
+        Log::info('SendSubscriptionUpdateNotificationsJob finished at '.Carbon::now()->toDateTimeString('millisecond'));
     }
 
     /**
@@ -58,12 +57,11 @@ class SendSubscriptionUpdateNotificationsJob
 
         // No verified subscriptions? Skip this subscriber
         if (!count($subscriptions)) {
-            dump('No subscriptions found for subscriber (id:'.$subscriber->id.')');
-            Log::info('No subscriptions found for subscriber (id:'.$subscriber->id.')');
             return;
         }
 
         $updateInfo = [];
+        $totalUpdates = 0;
 
         foreach($subscriptions as &$subscription) {
             $now = Carbon::now();
@@ -79,9 +77,7 @@ class SendSubscriptionUpdateNotificationsJob
 
             // get it
             $numberOfUpdates = $this->getNumberOfSubscriptionUpdatesInTimeFrame($timeFrame, $subscription);
-
-            dump('Subscription:'.$subscription->id . ' = '.$numberOfUpdates. ' updates');
-            Log::info('Subscription:'.$subscription->id . ' = '.$numberOfUpdates. ' updates');
+            $totalUpdates += $numberOfUpdates;
 
             $updateInfo[$subscription->id] = [
                 'new_datasets_count' => $numberOfUpdates
@@ -92,7 +88,14 @@ class SendSubscriptionUpdateNotificationsJob
             $subscription->save();
         }
 
-        $subscriber->sendSubscriptionUpdateSummaryNotification($subscriptions, $updateInfo);
+        dump("$totalUpdates total updates for ".count($subscriptions)." subscriptions");
+        Log::info('No subscriptions found for subscriber (id:'.$subscriber->id.')');
+
+        if ($totalUpdates > 0) {
+            dump('Sending SubscriptionUpdateSummaryNotification to subscriber (id:'.$subscriber->id.')');
+            Log::info('Sending SubscriptionUpdateSummaryNotification to subscriber (id:'.$subscriber->id.')');
+            $subscriber->sendSubscriptionUpdateSummaryNotification($subscriptions, $updateInfo);
+        }
     }
 
     /**

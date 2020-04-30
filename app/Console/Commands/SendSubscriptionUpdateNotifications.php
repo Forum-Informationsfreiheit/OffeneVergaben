@@ -49,7 +49,7 @@ class SendSubscriptionUpdateNotifications extends Command
         dispatch($job);
         $runtime = $start->diffInSeconds(Carbon::now());
 
-        $this->info('Finished SendSubscriptionUpdateNotifications in '.$runtime.' seconds');
-        Log::info('Finished SendSubscriptionUpdateNotifications in '.$runtime.' seconds');
+        $this->info('Finished sending subscription update notifications in '.$runtime.' seconds.');
+        Log::info('Finished sending subscription update notifications in '.$runtime.' seconds.');
     }
 }
