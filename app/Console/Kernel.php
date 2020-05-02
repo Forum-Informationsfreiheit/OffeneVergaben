@@ -53,8 +53,11 @@ class Kernel extends ConsoleKernel
             $schedule->command('fif:send-subscription-updates')->dailyAt($sendAt);
         }
 
-        // TMP files clean up ------------------------------------
+        // TMP files clean up ---------------------------------------------
         $schedule->command('fif:clean-up-tmp-links')->everyThirtyMinutes();
+
+        // Generate sitemap daily -----------------------------------------
+        $schedule->command('fif:generate-sitemap')->dailyAt('03:00');
     }
 
     /**

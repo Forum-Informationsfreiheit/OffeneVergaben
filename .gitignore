@@ -2,6 +2,8 @@
 /public/hot
 /public/storage
 /public/tmp
+/public/sitemaps
+/public/sitemap.xml
 /storage/*.key
 /vendor
 /.idea
