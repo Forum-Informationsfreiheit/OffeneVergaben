@@ -329,6 +329,9 @@ class GenerateSitemapJob
         $files = scandir($this->sitemapsDir);
 
         foreach($files as $sitemap) {
+            if ($sitemap === '.' || $sitemap === '..') {
+                continue;
+            }
             $sitemapIndex->add('/sitemaps/'.basename($sitemap));
         }
 
