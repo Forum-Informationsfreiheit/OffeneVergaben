@@ -285,7 +285,7 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
             $dataset->justification,
             $dataset->rd_notification ? 'ja' : null,
 
-        ], ';');
+        ], ',');
     }
 
     /**

@@ -43,7 +43,7 @@
             <div class="form-check">
                 <input name="confirm" class="form-check-input {{ $errors->subscription->has('confirm') ? 'is-invalid' : '' }}" {!! old('confirm') ? 'checked="checked"' : '' !!} type="checkbox" value="1" id="subscribeCheck" autocomplete="off">
                 <label class="form-check-label" for="subscribeCheck">
-                    Ich habe die Datenschutzerklärung gelesen und stimme dieser zu.
+                    Ich habe die <a target="_blank" href="{{ url('/datenschutz') }}">Datenschutzerklärung</a> gelesen und stimme dieser zu.
                 </label>
             </div>
         </div>
