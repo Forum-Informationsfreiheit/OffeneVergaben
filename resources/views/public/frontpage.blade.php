@@ -160,9 +160,7 @@
             <div class="col-md-4">
                 <div class="feature-wrapper">
                     <div class="icon justify-content-center">
-                    <span class="mx-auto icon-wrapper export">
-                        @svg('img/icons/export_w.svg','export')
-                    </span>
+                        <a href="{{ route('public::downloads') }}"><span class="mx-auto icon-wrapper export">@svg('img/icons/export_w.svg','export')</span></a>
                     </div>
                     <h4>Daten-Export</h4>
                     <p>für tiefergehende Analysen</p>
