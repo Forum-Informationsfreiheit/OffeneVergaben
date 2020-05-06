@@ -283,6 +283,27 @@ class DatasetFilter extends QueryFilter
         return $where;
     }
 
+    public function search($value) {
+        if (!$value || strlen($value) <= 4) {
+            // ignore silently
+            return $this->builder;
+        }
+
+        $this->appliedFilters['search'] = $value;
+
+        $where = $this->builder->where(function($query) use ($value) {
+            return $query->where('title','like','%'.$value.'%')
+                ->orWhere('description','like','%'.$value.'%')
+                ->orWhere('offerors.name','like','%'.$value.'%')
+                ->orWhere('offerors.national_id',$value)
+                ->orWhere('offerors.reference_number',$value)
+                ->orWhere('contractors.name','like','%'.$value.'%')
+                ->orWhere('contractors.national_id',$value);
+        });
+
+        return $where;
+    }
+
     // HELPERS ---------------------------------------------------------------------------------------------------------
     /**
      * Shortcut helper method for blade views
