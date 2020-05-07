@@ -11,3 +11,5 @@ window.__ives = { };
 
 // build the custom __ives namespace
 require('./app_public/util.js');
+
+window.__ives.autocomplete = require('./app_public/autocomplete.js');

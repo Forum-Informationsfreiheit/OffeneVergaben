@@ -24,6 +24,7 @@ Route::get('/auftraggeber','OfferorController@index')->name('public::auftraggebe
 Route::get('/auftraggeber/{id}','OfferorController@show')->name('public::show-auftraggeber');
 
 Route::get('/branchen','CpvController@index')->name('public::branchen');
+Route::get('/branchen/search', 'CpvController@ajaxSearch')->name('public::ajax-cpv-search');
 
 Route::get('/suchen','PageController@searchResultsPage')->name('public::suchen');
 

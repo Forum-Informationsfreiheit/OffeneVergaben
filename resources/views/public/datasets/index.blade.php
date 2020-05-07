@@ -143,4 +143,47 @@
             return false;
         });
     </script>
+    <script>
+        (function(app) {
+            var $cpv = $('#cpvInput');
+            var $help = $('#cpvInputHelp');
+
+            app.autocomplete({
+                input: $cpv.get(0),
+                fetch: function(text, update) {
+                    text = text.toLowerCase();
+
+                    $.get('{{ route("public::ajax-cpv-search") }}',{
+                        query: text
+                    }).done(function(data) {
+                        if (!data) {
+                            update([]); return;
+                        }
+
+                        var suggestions = [];
+                        data.forEach(function(e) {
+                            suggestions.push({
+                                label: e.trimmed_code + " " + e.name,
+                                value: e.trimmed_code,
+                                code:  e.code,
+                                name:  e.name,
+                            });
+                        });
+
+                        update(suggestions);
+                    });
+                },
+                onSelect: function(item) {
+                    if (item.value.length === 8) {
+                        $cpv.val(item.value);
+                    } else {
+                        $cpv.val(item.value + "*");
+                    }
+
+                    $help.text(item.name);
+                },
+                preventSubmit: true,
+            });
+        })(__ives);
+    </script>
 @stop

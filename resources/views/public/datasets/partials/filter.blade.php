@@ -141,7 +141,8 @@
                             Kategorie (CPV Hauptteil)
                         </div>
                         <div class="filter-group-inputs">
-                            <input class="form-control form-control-sm" type="text" name="cpv" value="{{ request('cpv') }}{{ request('cpv_like') ? '*' : '' }}">
+                            <input class="form-control form-control-sm" type="text" name="cpv" id="cpvInput" value="{{ request('cpv') }}{{ request('cpv_like') ? '*' : '' }}" autocomplete="off" placeholder='z.B. "Bauarbeiten"'>
+                            <small id="cpvInputHelp" class="form-text text-muted"></small>
                         </div>
                     </div>
                 </div>
@@ -196,21 +197,6 @@
                 </div>
             </div>
         </div>
-    </div>
-    <div class="row">
-        <!-- template
-        <div class="col-md-3">
-            <div class="filter-group">
-                <div class="filter-group-label">
-
-                </div>
-                <div class="filter-group-inputs">
-
-                </div>
-            </div>
-        </div>
-        -->
-
     </div>
     <button style="margin: 10px 0 0 0;" type="submit" class="btn btn-primary">Filtern</button>
 </form>

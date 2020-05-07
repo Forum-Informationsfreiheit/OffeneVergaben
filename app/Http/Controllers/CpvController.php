@@ -90,6 +90,34 @@ class CpvController extends Controller
         return view('public.cpvs.index',compact('params','items','cpvMap','rootNodeTotals'));
     }
 
+    public function ajaxSearch(Request $request) {
+        if (!$request->ajax()) {
+            abort(403);
+        }
+
+        $search = $request->input('query');
+        $data = [];
+        if (!$search) {
+            return response()->json($data);
+        }
+
+        $search = rtrim($search,'*');
+
+        if (is_numeric($search)) {
+            $data = CPV::select(['code','trimmed_code','name'])->where('code','like',$search.'%')
+                ->orderBy('code','asc')
+                ->limit(100)
+                ->get();
+        } else {
+            $data = CPV::select(['code','trimmed_code','name'])->where('name','like','%'.$search.'%')
+                ->orderBy('code','asc')
+                ->limit(100)
+                ->get();
+        }
+
+        return response()->json($data);
+    }
+
     protected function cpvMap($result) {
         $cpvMap = CPV::whereIn('trimmed_code',
             $result->pluck('cpv')->map(function($i) {
