@@ -70,6 +70,7 @@ class ContractorController extends Controller
         $query = DB::table('datasets')
             ->join('contractors','contractors.dataset_id','=','datasets.id')
             ->where('contractors.organization_id',$orgId)
+            ->where('datasets.disabled_at',null)
             ->where('datasets.is_current_version',1);
         $stats->totalCount = $query->count();
 
@@ -82,6 +83,7 @@ class ContractorController extends Controller
             ->join('contractors','contractors.dataset_id','=','datasets.id')
             ->where('contractors.organization_id',$orgId)
             ->where('datasets.is_current_version',1)
+            ->where('datasets.disabled_at',null)
             ->groupBy('datasets.cpv_code')
             ->orderBy('cpv_count','desc')
             ->limit(5);
@@ -100,6 +102,7 @@ class ContractorController extends Controller
             ->join('contractors','contractors.dataset_id','=','datasets.id')
             ->where('contractors.organization_id',$orgId)
             ->where('datasets.is_current_version',1)
+            ->where('datasets.disabled_at',null)
             ->groupBy('offerors.organization_id')
             ->orderBy('offeror_count','desc')
             ->limit(5);

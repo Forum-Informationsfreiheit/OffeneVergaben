@@ -10,7 +10,7 @@
     <h1 class="page-title">
         Lieferant {{ $org->name }}
     </h1>
-    <div class="stats-wrapper mb-5">
+    <div class="stats-wrapper mb-4">
         <div class="row">
             <div class="col-md-4">
                 <div>
@@ -28,7 +28,7 @@
                     <ul>
                         @foreach($stats->topOfferors as $topOfferorItem)
                             <li>
-                                <span title="{{ $topOfferorItem->org->name }}">{{ ui_shorten($topOfferorItem->org->name,50) }}</span> ({{ $topOfferorItem->offeror_count }})
+                                <a href="{{ route('public::show-auftraggeber',$topOfferorItem->org->id) }}" title="{{ $topOfferorItem->org->name }}">{{ ui_shorten($topOfferorItem->org->name,48) }}</a> ({{ $topOfferorItem->offeror_count }})
                             </li>
                         @endforeach
                     </ul>

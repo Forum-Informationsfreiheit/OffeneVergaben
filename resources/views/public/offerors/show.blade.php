@@ -1,11 +1,53 @@
 @extends('public.layouts.default')
 
-@section('body:class','datasets')
+@section('body:class','offeror')
 
 @section('page:content')
     <h1 class="page-title">
         Auftraggeber {{ $org->name }}
     </h1>
+    <div class="stats-wrapper mb-4">
+        <div class="row">
+            <div class="col-md-4">
+                <div>
+                    <span class="stat-heading">Gesamtvolumen vergebener Aufträge</span>
+                    <span class="stat-value">{{ ui_format_money($stats->totalVal) }}</span>
+                </div>
+                <div>
+                    <span class="stat-heading">Durchschnittliche Bieteranzahl</span>
+                    <span class="stat-value">{{ round($stats->totalTenders / $stats->totalCount,1) }}</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <span class="stat-heading mb-2">Top 5 Lieferanten</span>
+                @if(count($stats->topContractors))
+                    <ul>
+                        @foreach($stats->topContractors as $topContractorItem)
+                            <li>
+                                <a href="{{ route('public::lieferant',$topContractorItem->org->id) }}" title="{{ $topContractorItem->org->name }}">{{ ui_shorten($topContractorItem->org->name,48) }}</a> ({{ $topContractorItem->contractor_count }})
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <em>keine Daten vorhanden</em>
+                @endif
+            </div>
+            <div class="col-md-4">
+                <span class="stat-heading mb-2">Top 5 Kategorien</span>
+                @if(count($stats->topCpvs))
+                    <ul>
+                        @foreach($stats->topCpvs as $topCpvItem)
+                            <li>
+                                {{ $topCpvItem->cpv->trimmed_code }} <span title="{{ $topCpvItem->cpv->name }}">{{ ui_shorten($topCpvItem->cpv->name) }}</span> ({{ $topCpvItem->cpv_count }})
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <em>keine Daten vorhanden</em>
+                @endif
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col">
             <table class="table ov-table table-sm table-bordered table-striped">
