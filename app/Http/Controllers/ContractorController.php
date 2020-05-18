@@ -81,6 +81,7 @@ class ContractorController extends Controller
         $query = DB::table('datasets')
             ->select(['datasets.cpv_code',DB::raw('COUNT(*) as "cpv_count"')])
             ->join('contractors','contractors.dataset_id','=','datasets.id')
+            ->where('datasets.cpv_code','<>',null)
             ->where('contractors.organization_id',$orgId)
             ->where('datasets.is_current_version',1)
             ->where('datasets.disabled_at',null)

@@ -82,6 +82,7 @@ class OfferorController extends Controller
             ->join('offerors','offerors.dataset_id','=','datasets.id')
             ->where('offerors.organization_id',$orgId)
             ->where('datasets.is_current_version',1)
+            ->where('datasets.cpv_code','<>',null)
             ->groupBy('datasets.cpv_code')
             ->orderBy('cpv_count','desc')
             ->limit(5);
