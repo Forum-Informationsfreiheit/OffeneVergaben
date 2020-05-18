@@ -20,6 +20,33 @@ body.contractors {
   }
 }
 body.contractor {
+  .stats-wrapper {
+
+    .stat-heading {
+      display: block;
+      line-height: 1;
+      font-size: 1rem;
+      color: $grey;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        padding: 0;
+        margin: 0;
+        line-height: 1.5;
+        font-size: 0.8rem;
+      }
+    }
+  }
+
   table {
     td {
       padding: 12px;

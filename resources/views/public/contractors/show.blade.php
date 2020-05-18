@@ -10,6 +10,48 @@
     <h1 class="page-title">
         Lieferant {{ $org->name }}
     </h1>
+    <div class="stats-wrapper mb-5">
+        <div class="row">
+            <div class="col-md-4">
+                <div>
+                    <span class="stat-heading">Gewonnene Aufträge</span>
+                    <span class="stat-value">{{ $stats->totalCount }}</span>
+                </div>
+                <div>
+                    <span class="stat-heading">Durchschnittliche Bieteranzahl</span>
+                    <span class="stat-value">{{ round($stats->totalTenders / $stats->totalCount,1) }}</span>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <span class="stat-heading mb-2">Top 5 Auftraggeber</span>
+                @if(count($stats->topOfferors))
+                    <ul>
+                        @foreach($stats->topOfferors as $topOfferorItem)
+                            <li>
+                                <span title="{{ $topOfferorItem->org->name }}">{{ ui_shorten($topOfferorItem->org->name,50) }}</span> ({{ $topOfferorItem->offeror_count }})
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <em>keine Daten vorhanden</em>
+                @endif
+            </div>
+            <div class="col-md-4">
+                <span class="stat-heading mb-2">Top 5 Kategorien</span>
+                @if(count($stats->topCpvs))
+                    <ul>
+                        @foreach($stats->topCpvs as $topCpvItem)
+                            <li>
+                                {{ $topCpvItem->cpv->trimmed_code }} <span title="{{ $topCpvItem->cpv->name }}">{{ ui_shorten($topCpvItem->cpv->name) }}</span> ({{ $topCpvItem->cpv_count }})
+                            </li>
+                        @endforeach
+                    </ul>
+                @else
+                    <em>keine Daten vorhanden</em>
+                @endif
+            </div>
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-12">
             <div class="info-block data-commentary mb-3">
