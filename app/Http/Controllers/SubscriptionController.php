@@ -197,7 +197,7 @@ class SubscriptionController extends Controller
         }
 
         $subscription = Subscription::findOrFail($id);
-        $subscriber   = User::where('email',$email)->where('role_id',Role::SUBSCRIBER)->first();
+        $subscriber   = User::where('email',$email)->first();
 
         if ($email != $subscriber->email) {
             abort(404);
@@ -219,14 +219,13 @@ class SubscriptionController extends Controller
     }
 
     /**
-     * Route not available for user roles other than SUBSCRIBER
-     * or in other words: make sure admins don't accidentally delete themselves
+     * On unsubscribe also delete the subscriber (user)
      *
      * @param $email
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
      */
     protected function unsubscribeAll($email) {
-        $subscriber = User::where('email',$email)->where('role_id',Role::SUBSCRIBER)->first();
+        $subscriber = User::where('email',$email)->first();
 
         if (!$subscriber) {
             abort(404);
@@ -240,8 +239,10 @@ class SubscriptionController extends Controller
             Log::info('Delete subscription through unsubscribe all.',['title' => $subscription->title, 'query' => $subscription->query ]);
         }
 
-        // bye
-        $subscriber->delete();
+        // DELETE the user here, but only iff the users role is subscriber
+        if ($subscriber->isSubscriber()) {
+            $subscriber->delete();
+        }
 
         Log::info('Subscriber and all subscriptions deleted.',[ 'subscriber' => $subscriber->email ]);
 

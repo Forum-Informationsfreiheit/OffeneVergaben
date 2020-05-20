@@ -86,15 +86,9 @@ class User extends Authenticatable
     /**
      * Cancel All URL --> CONFIRM cancelling of all subscriptions
      *
-     * Only available for Role SUBSCRIBER
-     *
      * @return String signed cancel subscription url
      */
     public function getCancelAllSubscriptionsUrlAttribute() {
-        if ($this->role_id != Role::SUBSCRIBER) {
-            return null;
-        }
-
         return URL::signedRoute(
             'public::cancel-subscription',
             [ 'id' => SubscriptionController::ALL, 'email' => $this->email ]
@@ -104,15 +98,9 @@ class User extends Authenticatable
     /**
      * Unsubscribe All URL --> directly unsubscribe (=destroy) subscription
      *
-     * Only available for Role SUBSCRIBER
-     *
      * @return String signed unsubscribe url
      */
     public function getUnsubscribeAllUrlAttribute() {
-        if ($this->role_id != Role::SUBSCRIBER) {
-            return null;
-        }
-
         return URL::signedRoute(
             'public::unsubscribe',
             [ 'id' => SubscriptionController::ALL, 'email' => $this->email ]
