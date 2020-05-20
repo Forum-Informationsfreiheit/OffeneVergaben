@@ -19,7 +19,7 @@
                 </div>
                 <div>
                     <span class="stat-heading">Durchschnittliche Bieteranzahl</span>
-                    <span class="stat-value">{{ round($stats->totalTenders / $stats->totalCount,1) }}</span>
+                    <span class="stat-value">{{ $stats->totalCount ? round($stats->totalTenders / $stats->totalCount,1) : '-' }}</span>
                 </div>
             </div>
             <div class="col-md-4">
@@ -121,7 +121,7 @@
                                 <a href="{{ route('public::lieferant',$contractor->organization_id) }}">{{ ui_shorten($contractor->name) }}</a>@if(!$loop->last), @endif
                             @endforeach
                         </td>
-                        <td class="cpv">{{ $item->cpv->toString() }}</td>
+                        <td class="cpv">{{ $item->cpv ? $item->cpv->toString() : '' }}</td>
                         <td class="nb">{{ $item->nb_tenders_received }}</td>
                         <td class="value">{{ $item->valTotalFormatted }}</td>
                         <td class="date" title="{{ $item->item_lastmod ? $item->item_lastmod->format('d.m.Y h:i') : '' }}">{{ $item->item_lastmod ? $item->item_lastmod->format('d.m.Y') : '' }}</td>

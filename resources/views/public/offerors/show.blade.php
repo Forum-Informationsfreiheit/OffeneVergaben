@@ -15,7 +15,7 @@
                 </div>
                 <div>
                     <span class="stat-heading">Durchschnittliche Bieteranzahl</span>
-                    <span class="stat-value">{{ round($stats->totalTenders / $stats->totalCount,1) }}</span>
+                    <span class="stat-value">{{ $stats->totalCount ? round($stats->totalTenders / $stats->totalCount,1) : '-' }}</span>
                 </div>
             </div>
             <div class="col-md-4">
