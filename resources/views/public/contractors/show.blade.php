@@ -42,7 +42,7 @@
                     <ul>
                         @foreach($stats->topCpvs as $topCpvItem)
                             <li>
-                                {{ $topCpvItem->cpv->trimmed_code }} <span title="{{ $topCpvItem->cpv->name }}">{{ ui_shorten($topCpvItem->cpv->name) }}</span> ({{ $topCpvItem->cpv_count }})
+                                <a href="{{ route('public::auftraege',[ 'cpv' => $topCpvItem->cpv->trimmed_code, 'cpv_like' => 1 ]) }}" title="{{ $topCpvItem->cpv->code }} {{ $topCpvItem->cpv->name }}">{{ $topCpvItem->cpv->trimmed_code }} {{ ui_shorten($topCpvItem->cpv->name) }}</a> ({{ $topCpvItem->cpv_count }})
                             </li>
                         @endforeach
                     </ul>
