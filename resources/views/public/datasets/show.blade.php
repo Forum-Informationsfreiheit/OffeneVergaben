@@ -33,7 +33,7 @@
                     </tr>
                     <tr>
                         <th>Kategorie (CPV Hauptteil)</th>
-                        <td>{{ $dataset->cpv->toString() }}</td>
+                        <td>{{ $dataset->cpv ? $dataset->cpv->toString() : '' }}</td>
                     </tr>
                     @if($dataset->nuts)
                     <tr>
