@@ -49,6 +49,10 @@
                 @yield('overview')
             </section>
 
+            <section class="news">
+                @yield('news')
+            </section>
+
             <section class="features">
                 @yield('features')
             </section>

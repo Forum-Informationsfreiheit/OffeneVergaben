@@ -122,6 +122,38 @@
     </div>
 @stop
 
+@section('news')
+    <div class="container">
+        <div class="row">
+            <div class="col">
+                <h3 class="mb-3">
+                    Neuigkeiten
+                </h3>
+            </div>
+        </div>
+        <div class="row">
+            @foreach($posts as $post)
+            <div class="col-md-4">
+                <div class="teaser-wrapper">
+                    <div class="teaser-meta">
+                        {{ $post->published_at->format('d.m.Y') }}
+                    </div>
+                    @if($post->image)
+                    <a href="{{ route('public::show-post',$post->slug) }}">
+                        <img class="teaser-image mb-2" src="{{ url($post->image) }}">
+                    </a>
+                    @endif
+                    <h4>{{ $post->title }}</h4>
+                    <div class="teaser-text" title="{!! strip_tags($post->summary) !!}">
+                        {!! ui_shorten(strip_tags($post->summary),160) !!}
+                    </div>
+                </div>
+            </div>
+            @endforeach
+        </div>
+    </div>
+@stop
+
 @section('features')
     <div class="container">
         <div class="row">

@@ -13,6 +13,12 @@
         <div class="d-flex">
             <ul class="mx-auto justify-content-center">
                 <li>
+                    <a href="{{ route('public::posts') }}">Neuigkeiten</a>
+                </li>
+                <li>
+                    <a href="{{ route('public::downloads') }}">Downloads</a>
+                </li>
+                <li>
                     <a href="{{ url('/überuns') }}">Über uns</a>
                 </li>
                 <li>

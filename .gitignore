@@ -4,6 +4,7 @@
 /public/tmp
 /public/sitemaps
 /public/sitemap.xml
+/public/uploads
 /storage/*.key
 /vendor
 /.idea

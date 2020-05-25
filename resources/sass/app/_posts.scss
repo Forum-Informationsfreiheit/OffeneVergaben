@@ -1,0 +1,29 @@
+body.posts.index {
+
+  .teaser-meta {
+    font-size: 90%;
+    color: $grey;
+  }
+
+  .teaser-meta:after{
+    display: block;
+    clear: both;
+    content: '';
+  }
+}
+
+body.posts.show {
+  .post-image {
+    width: 100%;
+  }
+
+  .post-meta {
+    font-size: 90%;
+    color: $grey;
+  }
+  .post-meta:after{
+    display: block;
+    clear: both;
+    content: '';
+  }
+}

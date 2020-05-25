@@ -7,6 +7,7 @@ use App\Dataset;
 use App\Offeror;
 use App\Organization;
 use App\Page;
+use App\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -22,7 +23,9 @@ class PageController extends Controller
         $topContractorsByCount = $this->fetchTopContractors('count',10);
         $topContractorsBySum = $this->fetchTopContractors('sum',10);
 
-        return view('public.frontpage',compact('topOfferorsByCount','topOfferorsBySum','topContractorsByCount','topContractorsBySum'));
+        $posts = $this->fetchLastPosts();
+
+        return view('public.frontpage',compact('topOfferorsByCount','topOfferorsBySum','topContractorsByCount','topContractorsBySum','posts'));
     }
 
     public function searchResultsPage(Request $request) {
@@ -100,6 +103,14 @@ class PageController extends Controller
             }
         }
         return $orgs;
+    }
+
+    protected function fetchLastPosts() {
+        $query = Post::published()->orderBy('published_at','desc')->limit(3);
+
+        $posts = $query->get();
+
+        return $posts;
     }
 
     /**
