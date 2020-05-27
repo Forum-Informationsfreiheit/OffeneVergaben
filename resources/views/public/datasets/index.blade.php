@@ -33,10 +33,10 @@
                 {{-- Auf hunderter runden --}}
                 <span class="count">{{ $totalItems > 100 ? 'ungefähr ' . round($totalItems,-2) : $totalItems }} Ergebnisse</span>
             </div>
-            <div class="float-right">
+            <div title='Um eine tägliche Email-Benachrichtigung zu erstellen: schränken Sie die Ergebnisse gemäß Ihrem Interesse ein und klicken Sie auf "Filtern".' class="float-right">
                 @svg('/img/icons/benachrichtigung.svg','subscribe')&nbsp;&nbsp;
                 @if( $filters->hasAny() )
-                    <a title='Um eine tägliche Email-Benachrichtigung zu erstellen: schränken Sie die Ergebnisse gemäß Ihrem Interesse ein und klicken Sie auf "Filtern".' id="subscribeToggle" href="#">Benachrichtigung für diese Suche einrichten</a>
+                    <a id="subscribeToggle" href="#">Benachrichtigung für diese Suche einrichten</a>
                     @else
                     <span class="text-muted">Benachrichtigung für diese Suche einrichten</span>
                 @endif
