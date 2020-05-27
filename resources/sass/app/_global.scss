@@ -185,6 +185,14 @@ table.ov-table {
       vertical-align: middle;
     }
   }
+
+  th.fixed-width,
+  td.fixed-width {
+    &.w-12 { width: 12%; }
+    &.w-13 { width: 13%; }
+    &.w-14 { width: 14%; }
+    &.w-15 { width: 15%; }
+  }
 }
 
 .pagination-wrapper {

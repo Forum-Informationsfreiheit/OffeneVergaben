@@ -24,14 +24,14 @@
                         Name
                         @include('public.datasets.partials.sort',['field' => 'name'])
                     </th>
-                    <th>
+                    <th class="fixed-width w-12">
                         National Id
                     </th>
-                    <th>
+                    <th class="fixed-width w-13">
                         Anzahl&nbsp;Aufträge
                         @include('public.datasets.partials.sort',['field' => 'count'])
                     </th>
-                    <th>
+                    <th class="fixed-width w-13">
                         Gesamtvolumen
                         @include('public.datasets.partials.sort',['field' => 'sum'])
                     </th>
