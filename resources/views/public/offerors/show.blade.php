@@ -93,7 +93,7 @@
                                 &nbsp;
                             @endif
                         </td>
-                        <td class="name">{{ $item->cpv->toString() }}</td>
+                        <td class="name">{{ $item->cpv ? $item->cpv->toString() : '' }}</td>
                         <td class="nb">{{ $item->nb_tenders_received }}</td>
                         <td class="value">{{ $item->valTotalFormatted }}</td>
                         <td class="date" title="{{ $item->item_lastmod ? $item->item_lastmod->format('d.m.Y h:i') : '' }}">{{ $item->item_lastmod ? $item->item_lastmod->format('d.m.Y') : '' }}</td>
