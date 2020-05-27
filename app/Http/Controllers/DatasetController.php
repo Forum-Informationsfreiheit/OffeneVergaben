@@ -68,7 +68,16 @@ class DatasetController extends Controller
         ksort($appliedFilters);
         $queryString = http_build_query($appliedFilters);
 
-        return view('public.datasets.index',compact('items','totalItems','filters','data','queryString'));
+        // in case user filtered by cpv we want to show cpv description on page load
+        $cpvName = null;
+        if ($filters->has('cpv')) {
+            $cpv = CPV::where('trimmed_code',rtrim($appliedFilters['cpv'],'*'))->first();
+            if ($cpv) {
+                $cpvName = $cpv->name;
+            }
+        }
+
+        return view('public.datasets.index',compact('items','totalItems','filters','data','queryString','cpvName'));
     }
 
     public function indexWithEloquentQueryFilter(DatasetFilter $filters) {

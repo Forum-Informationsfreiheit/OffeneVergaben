@@ -142,7 +142,7 @@
                         </div>
                         <div class="filter-group-inputs">
                             <input class="form-control form-control-sm" type="text" name="cpv" id="cpvInput" value="{{ request('cpv') }}{{ request('cpv_like') ? '*' : '' }}" autocomplete="off" placeholder='z.B. "Bauarbeiten"'>
-                            <small id="cpvInputHelp" class="form-text text-muted"></small>
+                            <small id="cpvInputHelp" class="form-text text-muted">{{ $cpvName ? $cpvName : '' }}</small>
                         </div>
                     </div>
                 </div>
