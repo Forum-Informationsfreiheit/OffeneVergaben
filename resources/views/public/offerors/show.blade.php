@@ -1,5 +1,7 @@
 @extends('public.layouts.default')
 
+@section('page:title','Auftraggeber ' . $org->name)
+
 @section('body:class','offeror')
 
 @section('page:content')

@@ -1,5 +1,7 @@
 @extends('public.layouts.page')
 
+@section('page:title',$title)
+
 @section('body:class','page download')
 
 @section('page:header')

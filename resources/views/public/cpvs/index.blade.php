@@ -1,5 +1,7 @@
 @extends('public.layouts.default')
 
+@section('page:title',$params->root ? $params->root->name : 'Branchen')
+
 @section('body:class','cpvs')
 
 @section('page:content')

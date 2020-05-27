@@ -1,5 +1,7 @@
 @extends('public.layouts.default')
 
+@section('page:title','Lieferanten')
+
 @section('body:class','contractors')
 
 @section('head:append')

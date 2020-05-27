@@ -11,7 +11,7 @@
         <meta name="robots" content="noindex, nofollow" />
     @endif
 
-    <title>@yield('page:title')| {{ config('app.name', 'Laravel') }}</title>
+    <title>@yield('page:title') | {{ config('app.name') }}</title>
 
     <!-- Manifest / Favicons -->
     <link rel="manifest" href="{{ url('/img/favicons/manifest.json') }}">

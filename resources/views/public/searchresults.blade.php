@@ -1,5 +1,7 @@
 @extends('public.layouts.default')
 
+@section('page:title','Such-Ergebnisse')
+
 @section('body:class','searchresults')
 
 @section('page:content')

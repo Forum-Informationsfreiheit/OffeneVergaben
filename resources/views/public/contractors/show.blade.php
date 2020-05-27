@@ -1,5 +1,7 @@
 @extends('public.layouts.default')
 
+@section('page:title','Lieferant ' . $org->name)
+
 @section('body:class','contractor')
 
 @section('head:append')

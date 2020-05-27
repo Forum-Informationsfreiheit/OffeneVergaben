@@ -1,48 +1,13 @@
 @extends('public.layouts.default')
 
+@section('page:title','Auftraggeber')
+
 @section('body:class','offerors')
 
 @section('page:content')
     <h1 class="page-title">
         Auftraggeber
     </h1>
-    <!--
-    <div id="filterWrapper" class="filter-wrapper collapsed">
-        <div class="filter-head">
-            <a href="#" id="filterToggle" class="filter-toggle" data-status="hidden">
-                <span class="icon-wrapper filter">
-                    @svg('/img/icons/filter.svg','filter')
-                </span>
-                <span class="action-text">Ergebnisse einschränken</span>
-            </a>
-        </div>
-        <div class="filter-body">
-            <div class="row">
-                <div class="col-md-3">
-                    <div class="filter-group">
-                        <span class="filter-group-label">
-                            Auftragsart
-                        </span>
-                        <div class="filter-group-inputs">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" name="ausschreibung" id="filterAusschreibung">
-                                <label class="form-check-label" for="filterAusschreibung">
-                                    Ausschreibung
-                                </label>
-                            </div>
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" value="" name="auftrag" id="filterAuftrag">
-                                <label class="form-check-label" for="filterAuftrag">
-                                    Auftrag
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-    -->
     <div class="row">
         <div class="col">
             <div class="results-meta">
