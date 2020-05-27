@@ -279,3 +279,13 @@ table.ov-table {
     font-size: 1.3rem;
   }
 }
+
+.org-identifier-inline {
+  font-size: 80%;
+  font-weight: 400;
+  color: $grey;
+}
+.org-identifier-inline:before {
+  content: ' | ';
+  color: scale-color($grey, $lightness: 60%);
+}

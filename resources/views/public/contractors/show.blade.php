@@ -8,7 +8,7 @@
 
 @section('page:content')
     <h1 class="page-title">
-        Lieferant {{ $org->name }}
+        Lieferant {{ $org->name }}{!! $org->is_identified ? '<span title="'.$org->nationalIdLabel.' '.$org->nationalId.'" class="org-identifier-inline">' . $org->nationalId . '</span>' : '' !!}
     </h1>
     <div class="stats-wrapper mb-4">
         <div class="row">

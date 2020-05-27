@@ -165,6 +165,26 @@ class Organization extends Model
         return "?";
     }
 
+    public function getNationalIdLabelAttribute() {
+        if ($this->gln != null) {
+            return "GLN";
+        }
+
+        if ($this->fn != null) {
+            return "Firmenbuchnr.";
+        }
+
+        if ($this->gkz != null) {
+            return "Gemeindekennzahl";
+        }
+
+        if ($this->ukn != null) {
+            return "?";
+        }
+
+        return "";
+    }
+
     public function getIdentifiersAttribute() {
         $identifiers = [];
 
