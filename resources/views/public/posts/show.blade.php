@@ -1,5 +1,9 @@
 @extends('public.layouts.page')
 
+@section('page:title',$post->title)
+@section('page:description',strip_tags($post->summary))
+@section('page:image',url($post->image))
+
 @section('body:class','posts show')
 
 @section('page:content')

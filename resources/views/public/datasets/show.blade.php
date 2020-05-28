@@ -1,6 +1,7 @@
 @extends('public.layouts.default')
 
 @section('page:title',$dataset->title)
+@section('page:description',$dataset->title != $dataset->description ? $dataset->description : '')
 
 @section('body:class','dataset')
 
