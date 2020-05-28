@@ -7,7 +7,7 @@
     <!-- Open Graph -->
     <meta property="og:title" content="@yield('page:title',config('app.name'))" />
     <meta property="og:description" content="@yield('page:description',__('global.meta.description'))" />
-    <meta property="og:image" content="@yield('page:image',link_to_image('logo/logo_400w.png'))" />
+    <meta property="og:image" content="@yield('page:image',link_to_image('logo/logo_1200x630.png'))" />
     @if(!App::environment('production'))
         <meta name="robots" content="noindex, nofollow" />
     @endif
