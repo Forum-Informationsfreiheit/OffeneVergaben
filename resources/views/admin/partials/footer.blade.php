@@ -2,7 +2,7 @@
 <footer class="sticky-footer bg-white">
     <div class="container my-auto">
         <div class="copyright text-center my-auto">
-            <span>Copyright &copy; Ives Lara v5.8 Admin 2019</span>
+            <span>Copyright &copy; Ives Lara v5.8 Admin {{ \Carbon\Carbon::now()->year }}</span>
         </div>
     </div>
 </footer>
