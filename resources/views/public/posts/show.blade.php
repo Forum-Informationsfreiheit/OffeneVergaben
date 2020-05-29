@@ -27,7 +27,9 @@
     </div>
     <div class="row">
         <div class="col">
-            {!! $post->body !!}
+            <div class="post-body">
+                {!! $post->body !!}
+            </div>
         </div>
     </div>
 @stop

@@ -26,4 +26,8 @@ body.posts.show {
     clear: both;
     content: '';
   }
+
+  .post-body img {
+    max-width: 100%;
+  }
 }
