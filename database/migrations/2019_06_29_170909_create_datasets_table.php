@@ -16,12 +16,9 @@ class CreateDatasetsTable extends Migration
         Schema::create('datasets', function (Blueprint $table) {
             $table->bigIncrements('id');
 
-            $table->unsignedInteger('datasource_id');
-            $table->foreign('datasource_id')->references('id')->on('datasources')->onDelete('cascade');
             $table->unsignedInteger('version');
             $table->boolean('is_current_version')->default(0);
-            $table->unsignedBigInteger('result_id')->nullable();
-            $table->foreign('result_id')->references('id')->on('scraper_results')->onDelete('set null');
+            $table->unsignedBigInteger('scraper_kerndaten_id')->nullable();
 
             $table->string('type_code')->length(15)->nullable();
             $table->foreign('type_code')->references('code')->on('dataset_types')->onDelete('set null');
@@ -30,7 +27,6 @@ class CreateDatasetsTable extends Migration
             $table->string('nuts_code')->length(10)->nullable();
             $table->foreign('nuts_code')->references('code')->on('nuts')->onDelete('set null');
 
-            // DETAILS ----- COULD BE MOVED INTO OWN TABLE LATER ON
             $table->string('url_document',500)->nullable();
             $table->boolean('url_is_restricted')->nullable();
             $table->string('url_participation',500)->nullable();
@@ -76,8 +72,6 @@ class CreateDatasetsTable extends Migration
             // awarded prize stuff
             $table->unsignedInteger('nb_participants')->nullable();
             $table->unsignedInteger('nb_participants_sme')->nullable();
-
-            $table->unique(['datasource_id','version']);
 
             $table->timestamps();
         });
