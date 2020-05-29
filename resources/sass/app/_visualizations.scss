@@ -1,0 +1,67 @@
+.treemap {
+
+  .node {
+
+    overflow: hidden;
+    position: absolute;
+    opacity: 1;
+    color: #fff;
+    background-color: $treemapBlue;
+
+    .node-title {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: normal;
+      line-height: 1.15rem;
+      margin-bottom: 4px;
+      word-break: break-all;
+    }
+    .node-value {
+      font-size: 1rem;
+      display: block;
+
+      &:before {
+        float: left;
+        content: '€';
+        margin-right: 4px;
+        color: rgba(0,0,0,0.5);
+      }
+    }
+
+    &.is-root {
+      background-color: $gray-500;
+    }
+
+    &.navable {
+      cursor: pointer;
+    }
+
+    &.with-label {
+      padding: 10px;
+    }
+
+    &.bg-darkish {
+      color: #fcfcfc;
+
+      .node-value:before {
+        color: rgba(255,255,255,0.5);
+      }
+    }
+
+    &.highlight {
+      background-color: $red;
+
+      .node-title {
+        text-decoration: underline;
+      }
+    }
+    &.highlight.is-root {
+      background-color: $gray-500;
+
+      .node-title {
+        text-decoration: none;
+      }
+    }
+  }
+
+}

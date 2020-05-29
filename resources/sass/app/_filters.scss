@@ -1,0 +1,67 @@
+.filter-wrapper {
+  margin-bottom: 20px;
+
+  .filter-head {
+    padding: 10px 15px;
+    background-color: #e4e2e0;
+
+    a,
+    a:hover
+    a:focus {
+      color: $black;
+      text-decoration: none;
+    }
+  }
+
+  .filter-body {
+    display: block;
+    background-color: #f6f6f5;
+    padding: 20px;
+  }
+
+  &.collapsed {
+    .filter-body {
+      display: none;
+    }
+  }
+
+  .filter-group {
+    margin-bottom: 1rem;
+
+    .filter-group-label {
+      display: block;
+      font-weight: bold;
+    }
+    .filter-group-inputs {
+
+    }
+
+    &.collapsed {
+      .filter-group-inputs {
+        display: none;
+      }
+    }
+
+    &.volume-range,
+    &.tenders-range {
+      input {
+        display: inline-block;
+        font-size: 0.85rem;
+        width: 110px;
+        padding: .375rem .375rem;
+        text-align: center;
+      }
+      .dash {
+        display: inline-block;
+        padding: 0 .25rem;
+      }
+    }
+
+    .block-input-label-sm {
+      line-height: 1.5;
+      padding: 0.25rem;
+      display: block;
+    }
+  }
+
+}

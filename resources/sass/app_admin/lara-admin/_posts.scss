@@ -1,0 +1,10 @@
+body.posts.create-post,
+body.posts.edit-post {
+  a.reset-image {
+    display: none;
+    color: $gray-500;
+  }
+  a.reset-image:hover {
+    color: $red;
+  }
+}

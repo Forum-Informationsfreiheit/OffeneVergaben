@@ -1,0 +1,70 @@
+body.offerors {
+  table {
+    td {
+      padding: 12px;
+    }
+
+    td.name {
+      //width: 40%;
+    }
+    td.count {
+      width: 12%;
+    }
+    td.value {
+      width: 13%;
+      text-align: right;
+    }
+    td.national-id {
+      width: 12%;
+    }
+  }
+}
+
+body.offeror {
+
+  table {
+    td {
+      padding: 12px;
+    }
+
+    td.name {
+      width: 23%;
+    }
+    td.nb {
+      width: 8%;
+    }
+    td.value {
+      text-align: right;
+    }
+    td.date {
+      width: 10%;
+    }
+  }
+
+  .stats-wrapper {
+
+    .stat-heading {
+      display: block;
+      line-height: 1;
+      font-size: 1rem;
+      color: $grey;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        padding: 0;
+        margin: 0;
+        line-height: 1.5;
+        font-size: 0.8rem;
+      }
+    }
+  }
+}

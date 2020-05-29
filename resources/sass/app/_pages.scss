@@ -1,0 +1,122 @@
+body.page {
+  section.header {
+    background-color: $lightblue;
+    text-align: center;
+    padding: 40px 0;
+
+    h1 {
+      font-size: 2.5em;
+      margin: 0;
+      padding: 0;
+    }
+
+    &.pale {
+      color: #fff;
+    }
+    &.xl {
+      padding: 120px 0;
+
+      h1 {
+        font-size: 4em;
+      }
+    }
+    &.lg {
+      padding: 80px 0;
+
+      h1 {
+        font-size: 3em;
+      }
+    }
+  }
+}
+
+body.cpvs {
+
+  .treemap-top-controls {
+
+    ul {
+      margin: 0 0 4px 0;
+      padding: 0;
+      list-style: none;
+
+      li {
+        float: left;
+        font-size: 0.9rem;
+        margin-right: 2rem;
+        color: $blue;
+
+        // these styles are used in other views / for other control links as well,
+        // so find a new place for this code?!
+        a {
+          color: $black;
+          text-decoration: underline;
+          text-decoration-color: $blue;
+        }
+        a:hover {
+          color: $blue;
+        }
+      }
+
+      &:after {
+        display: block;
+        content: '';
+        clear: both;
+      }
+    }
+
+    &:after {
+      display: block;
+      content: '';
+      clear: both;
+    }
+  }
+
+  .treemap-wrapper {
+    margin-bottom: 20px;
+  }
+
+  table {
+    td {
+      padding: 12px;
+    }
+
+    td.code {
+      width: 6%;
+    }
+    td.name {
+
+    }
+    td.value {
+      width: 13%;
+      text-align: right;
+    }
+  }
+
+  div.ov-tooltip {
+    display: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 190px;
+    min-height: 50px;
+    padding: 0.3rem 0.6rem;
+    background: rgba(255,255,255,0.7);
+    border: 2px solid #fff;
+    z-index: 9;
+    word-wrap: break-word;
+
+    .title, .value, .count {
+      display: block;
+      font-size: 0.9rem;
+      font-weight: bold;
+      line-height: 1.2rem;
+      margin-bottom: 3px;
+      color: $black;
+    }
+
+    .value:before {
+      content: '€';
+      padding-right: 3px;
+    }
+  }
+}

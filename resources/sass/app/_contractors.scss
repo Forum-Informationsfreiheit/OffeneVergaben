@@ -1,0 +1,78 @@
+body.contractors {
+  table {
+    td {
+      padding: 12px;
+    }
+
+    td.name {
+      //width: 40%;
+    }
+    td.count {
+      width: 12%;
+    }
+    td.value {
+      width: 13%;
+      text-align: right;
+    }
+    td.national-id {
+      width: 12%;
+    }
+  }
+}
+body.contractor {
+  .stats-wrapper {
+
+    .stat-heading {
+      display: block;
+      line-height: 1;
+      font-size: 1rem;
+      color: $grey;
+    }
+
+    .stat-value {
+      font-size: 2rem;
+    }
+
+    ul {
+      list-style: none;
+      padding: 0;
+      margin: 0;
+
+      li {
+        padding: 0;
+        margin: 0;
+        line-height: 1.5;
+        font-size: 0.8rem;
+      }
+    }
+  }
+
+  table {
+    td {
+      padding: 12px;
+    }
+
+    td.title {
+      width: auto;
+    }
+    td.offeror {
+      width: 17%;
+    }
+    td.contractors {
+      width: 17%;
+    }
+    td.cpv {
+      width: 12%;
+    }
+    td.nb {
+      width: 7%;
+    }
+    td.value {
+      width: 11%;
+      text-align: right;
+    }
+    td.date {
+      width: 10%;
+    }
+  }
+}
