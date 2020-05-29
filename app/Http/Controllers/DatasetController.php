@@ -70,7 +70,7 @@ class DatasetController extends Controller
 
         // in case user filtered by cpv we want to show cpv description on page load
         $cpvName = null;
-        if ($filters->has('cpv')) {
+        if ($filters->has('cpv') && isset($appliedFilters['cpv'])) {
             $cpv = CPV::where('trimmed_code',rtrim($appliedFilters['cpv'],'*'))->first();
             if ($cpv) {
                 $cpvName = $cpv->name;
