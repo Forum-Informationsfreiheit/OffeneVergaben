@@ -221,14 +221,27 @@ footer {
 table.ov-table {
   thead {
     th {
-      padding: 12px;
       background-color: $blue;
       color: #fff;
+    }
+    th:first-of-type {
+      border-left-color: transparent;
+    }
+    th:last-of-type {
+      border-right-color: transparent;
     }
   }
 
   th,td {
     font-size: 0.8rem;
+    padding: 12px;
+  }
+
+  td:first-of-type {
+    border-left-color: transparent;
+  }
+  td:last-of-type {
+    border-right-color: transparent;
   }
 
   &.ov-table-vertical {
@@ -247,6 +260,11 @@ table.ov-table {
     &.w-13 { width: 13%; }
     &.w-14 { width: 14%; }
     &.w-15 { width: 15%; }
+  }
+
+  a:not(.btn):hover {
+    text-decoration: underline;
+    text-decoration-color: $black;
   }
 }
 
@@ -273,7 +291,8 @@ table.ov-table {
         margin-right: 0;
       }
     }
-    li.page-item.active .page-link {
+    li.page-item.active .page-link,
+    li.page-item:hover .page-link {
       background-color: #fff;
       color: $blue;
     }
@@ -351,4 +370,9 @@ table.ov-table {
 .org-identifier-inline:before {
   content: ' | ';
   color: scale-color($grey, $lightness: 60%);
+}
+
+// necessary bootstrap override
+.badge.badge-light {
+  color: $black;
 }

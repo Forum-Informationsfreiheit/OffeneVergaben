@@ -11,14 +11,17 @@
 @stop
 
 @section('page:content')
-    <table class="table table-striped table-borderless">
-        <tr>
-            <td>Beschreibung</td>
-            <td>Dateityp</td>
-            <td>Größe</td>
-            <td>Zuletzt aktualisiert</td>
-            <td>Download</td>
-        </tr>
+    <table class="table ov-table table-sm table-bordered table-striped">
+        <thead>
+            <tr>
+                <th>Beschreibung</th>
+                <th>Dateityp</th>
+                <th>Größe</th>
+                <th>Zuletzt aktualisiert</th>
+                <th>Download</th>
+            </tr>
+        </thead>
+        <tbody>
         <tr>
             <td>
                 {{-- nachdem wir aktuell nur 1 file zu handlen haben ist die meiset info erstmal fix hier --}}
@@ -31,5 +34,6 @@
             <td>{{ $files['kerndaten_dailydump']->timestamp->format('d.m.Y') }} <small>{{ $files['kerndaten_dailydump']->timestamp->format('H:i') }}</small></td>
             <td><a href="{{ $files['kerndaten_dailydump']->url }}" class="btn btn-primary btn-sm">Download</a></td>
         </tr>
+        </tbody>
     </table>
 @stop

@@ -33,7 +33,7 @@
         <div class="col">
             <div class="float-left results-meta">
                 {{-- Auf hunderter runden --}}
-                <span class="count">{{ $totalItems > 100 ? 'ungefähr ' . round($totalItems,-2) : $totalItems }} Ergebnisse</span>
+                <span class="count">{{ $totalItems > 100 ? 'ungefähr ' . number_format(round($totalItems,-2),0,',','.') : number_format($totalItems,0,',','.') }} Ergebnisse</span>
             </div>
             <div title='Um eine tägliche Email-Benachrichtigung zu erstellen: schränken Sie die Ergebnisse gemäß Ihrem Interesse ein und klicken Sie auf "Filtern".' class="float-right">
                 @svg('/img/icons/benachrichtigung.svg','subscribe')&nbsp;&nbsp;
