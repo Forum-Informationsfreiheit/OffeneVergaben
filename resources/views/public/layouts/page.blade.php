@@ -48,7 +48,7 @@
             <!-- Begin Page Content -->
             <div class="container page-content">
                 <div class="row">
-                    <div class="offset-2 col-md-8">
+                    <div class="offset-md-2 offset-sm-0 col-md-8 col-sm-12">
                         @include('flash::message')
 
                         @yield('page:content')
