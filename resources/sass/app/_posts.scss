@@ -1,5 +1,21 @@
 body.posts.index {
 
+  line-height: 1.6;
+
+  h2.teaser-title {
+    font-size: 1.2rem;
+    margin: 0.3rem 0 .9rem 0;
+    font-weight: 600;
+
+    a {
+      color: $black;
+    }
+    a:hover {
+      text-decoration: underline;
+      text-decoration-color: $black;
+    }
+  }
+
   .teaser-meta {
     font-size: 90%;
     color: $grey;
@@ -10,11 +26,25 @@ body.posts.index {
     clear: both;
     content: '';
   }
+
+  .teaser-text {
+    p {
+      line-height: 1.65rem;
+    }
+  }
 }
 
 body.posts.show {
+
+  h1 {
+    font-size: 1.55rem;
+    margin: 0.58rem 0 1.75rem 0;
+    font-weight: 600;
+  }
+
   .post-image {
     width: 100%;
+    margin-bottom: 1.7rem;
   }
 
   .post-meta {
@@ -27,7 +57,47 @@ body.posts.show {
     content: '';
   }
 
-  .post-body img {
-    max-width: 100%;
+  // keep in sync with _pages.scss .page-body
+  .post-body {
+    h1 {
+      font-size: 1.55rem;
+      margin: 2.5rem 0;
+      font-weight: 600;
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin: 1.8rem 0 .9rem 0;
+      font-weight: 600;
+    }
+    h3 {
+      font-size: 0.9rem;
+      margin: 1.5rem 0 0.75rem 0;
+      font-weight: 600;
+    }
+    h4 {
+      font-size: 0.9rem;
+      margin: 1.5rem 0 0.75rem 0;
+      font-weight: 400;
+      color: $red;
+    }
+    p {
+      line-height: 1.7rem;
+    }
+    a {
+      color: $black;
+      text-decoration: underline;
+      text-decoration-color: $blue;
+    }
+    a:hover {
+      color: $red;
+    }
+    ul {
+      list-style-position: inside;
+      padding-left: 2px;
+    }
+
+    img {
+      max-width: 100%;
+    }
   }
 }

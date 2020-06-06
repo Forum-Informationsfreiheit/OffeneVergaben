@@ -14,7 +14,7 @@
                 <div class="teaser-meta">
                     <span class="float-left">{{ $post->published_at->format('d.m.Y') }}</span>
                 </div>
-                <h2><a href="{{ route('public::show-post',$post->slug) }}">{{ $post->title }}</a></h2>
+                <h2 class="teaser-title"><a href="{{ route('public::show-post',$post->slug) }}">{{ $post->title }}</a></h2>
                 <div class="teaser-text">
                     {!! $post->summary !!}
                 </div>

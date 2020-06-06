@@ -87,7 +87,7 @@
         path_absolute : "",
         selector: "#body",
         plugins: [
-            "link image table code"
+            "link image table code lists"
         ],
         image_caption: true,
         relative_urls: false,
@@ -115,7 +115,7 @@
     var summary_config = {
         path_absolute : "",
         selector: "#summary",
-        plugins: [ "link" ],
+        plugins: [ "link", "lists" ],
         menubar: false,
         relative_urls: false,
         height: 120,
