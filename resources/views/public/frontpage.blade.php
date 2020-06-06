@@ -140,7 +140,7 @@
                     </div>
                     @if($post->image)
                     <a href="{{ route('public::show-post',$post->slug) }}">
-                        <img class="teaser-image mb-2" src="{{ url($post->image) }}">
+                        <img class="teaser-image mb-3" src="{{ url($post->image) }}">
                     </a>
                     @endif
                     <h4>{{ $post->title }}</h4>
@@ -170,7 +170,7 @@
             <div class="col-md-4">
                 <div class="feature-wrapper">
                     <div class="icon justify-content-center">
-                    <span class="mx-auto icon-wrapper filter">
+                    <span class="mx-auto icon-wrapper filter mb-4">
                         @svg('img/icons/filter.svg','filter')
                     </span>
                     </div>
@@ -181,7 +181,7 @@
             <div class="col-md-4">
                 <div class="feature-wrapper">
                     <div class="icon justify-content-center">
-                    <span class="mx-auto icon-wrapper notification">
+                    <span class="mx-auto icon-wrapper notification mb-4">
                         @svg('img/icons/benachrichtigung_w.svg','notification')
                     </span>
                     </div>
@@ -192,7 +192,9 @@
             <div class="col-md-4">
                 <div class="feature-wrapper">
                     <div class="icon justify-content-center">
-                        <a href="{{ route('public::downloads') }}"><span class="mx-auto icon-wrapper export">@svg('img/icons/export_w.svg','export')</span></a>
+                        <a href="{{ route('public::downloads') }}">
+                            <span class="mx-auto icon-wrapper export mb-4">@svg('img/icons/export_w.svg','export')</span>
+                        </a>
                     </div>
                     <h4>Daten-Export</h4>
                     <p>für tiefergehende Analysen</p>

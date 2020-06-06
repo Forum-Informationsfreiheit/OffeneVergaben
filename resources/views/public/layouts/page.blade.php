@@ -24,7 +24,7 @@
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Archivo" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ link_to_stylesheet('app',true) }}">
