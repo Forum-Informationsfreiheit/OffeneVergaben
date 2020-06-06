@@ -20,10 +20,10 @@
                     <a class="nav-link {{ request()->route() && request()->segment(1) == 'aufträge' ? 'active' : '' }}" href="{{ route('public::auftraege') }}">{{ __('Aufträge') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->route() && request()->segment(1) == 'neuigkeiten' ? 'active' : '' }}" href="{{ route('public::posts') }}">{{ __('Neuigkeiten') }}</a>
+                    <a class="nav-link {{ request()->route() && request()->segment(1) == 'downloads' ? 'active' : '' }}" href="{{ route('public::downloads') }}">{{ __('Downloads') }}</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link {{ request()->route() && request()->segment(1) == 'downloads' ? 'active' : '' }}" href="{{ route('public::downloads') }}">{{ __('Downloads') }}</a>
+                    <a class="nav-link {{ request()->route() && request()->segment(1) == 'neuigkeiten' ? 'active' : '' }}" href="{{ route('public::posts') }}">{{ __('Neuigkeiten') }}</a>
                 </li>
             </ul>
         </div>

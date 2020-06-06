@@ -177,11 +177,21 @@ footer {
       padding-right: 20px;
     }
 
+    ul > li:last-of-type {
+      padding-right: 0;
+    }
+
     &:after {
       display: block;
       content: '';
       clear: left;
     }
+  }
+
+  p.text {
+    padding: 0 30px;
+    text-align: center;
+    line-height: 1.4
   }
 }
 

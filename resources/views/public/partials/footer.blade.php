@@ -5,9 +5,9 @@
                 @svg('img/icons/logo_offenevergaben_footer.svg','Offene Vergaben')
             </div>
         </div>
-        <div class="d-flex">
+        <div class="d-flex flex-column">
             <div class="mx-auto justify-content-center">
-                <p>Ermöglicht wird dieses Projekt des <a target="_blank" href="https://www.informationsfreiheit.at/">Forum Informationsfreiheit</a> durch eine Unterstützung der <a target="_blank" href="https://www.netidee.at/">Netidee</a> der Internet Privatstiftung Austria (IPA).</p>
+                <p class="text">Ermöglicht wird dieses Projekt des <a target="_blank" href="https://www.informationsfreiheit.at/">Forum Informationsfreiheit</a> durch eine Unterstützung der <a target="_blank" href="https://www.netidee.at/">Netidee</a> der Internet Privatstiftung Austria (IPA).</p>
             </div>
         </div>
         <div class="d-flex">
