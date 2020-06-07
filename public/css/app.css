@@ -11272,13 +11272,25 @@ body.frontpage section.news .teaser-wrapper .teaser-text p {
   line-height: 1.55rem;
 }
 
+@media (max-width: 767.98px) {
+  body.frontpage section.news .teaser-wrapper {
+    margin-bottom: 2rem;
+  }
+}
+
 body.frontpage section.news .teaser-wrapper:hover .teaser-image {
   opacity: 1;
   transition: all 0.4s;
 }
 
 body.frontpage section.features {
-  padding: 50px 0;
+  padding-bottom: 50px;
+}
+
+@media (min-width: 768px) {
+  body.frontpage section.features {
+    padding-top: 50px;
+  }
 }
 
 body.frontpage section.features h3 {
