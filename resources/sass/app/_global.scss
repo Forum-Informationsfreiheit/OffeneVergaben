@@ -63,7 +63,11 @@ body {
 
   form.search-form.right {
 
-    margin-left: 20px;
+    @include media-breakpoint-up(lg) { margin-left: 20px; }
+    @include media-breakpoint-down(lg) {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
 
     input {
       border: 2px solid #e4e2e0;
@@ -95,11 +99,18 @@ body {
 
   .navbar-nav {
 
+    @include media-breakpoint-down(lg) {
+      margin-top: 0.5rem;
+    }
+
     a.nav-link {
       position: relative;
       padding: 0;
-      margin-left: 0.5rem;
-      margin-right: 0.5rem;
+
+      @include media-breakpoint-up(lg) {
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+      }
 
       color: $black;
       //border-bottom: 1px solid $blue;
