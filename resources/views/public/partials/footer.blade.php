@@ -21,6 +21,9 @@
                 <li>
                     <a href="{{ url('/datenschutz') }}">Datenschutzerklärung</a>
                 </li>
+                <li>
+                    <a href="{{ url('/frequently-asked-questions') }}">FAQ</a>
+                </li>
             </ul>
         </div>
     </div>
