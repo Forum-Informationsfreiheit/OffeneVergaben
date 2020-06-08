@@ -49,7 +49,7 @@
         path_absolute : "",
         selector: "#body",
         plugins: [
-            "link image table code"
+            "link image table code anchor"
         ],
         image_caption: true,
         relative_urls: false,
