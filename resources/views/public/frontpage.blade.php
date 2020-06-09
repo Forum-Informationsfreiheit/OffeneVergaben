@@ -4,17 +4,13 @@
 
 @section('lead')
     <div class="container">
-        @if(false)
-            <!-- old text -->
+        @if(false) <!-- old beta text -->
         <p class="lead">
-            Das <a class="lead-link" href="https://www.informationsfreiheit.at">Forum Informationsfreiheit</a> engagiert sich für mehr Transparenz in der Verwaltung.
-            Auf offenevergaben.at machen wir Auftragsvergaben der öffentlichen Hand, die ab 2019
-            als Open Data veröffentlicht werden, für Journalist*innen, Bürgerinitiativen, NGOs und
-            interessierte Bürger*innen nachvollziehbar.
+            OffeneVergaben.at ist ein zivilgesellschaftliches Projekt des <a class="lead-link" href="https://www.informationsfreiheit.at">Forum Informationsfreiheit</a> und derzeit noch in einer Test-Phase. Wir machen Auftragsvergaben der öffentlichen Hand über 50.000 Euro nachvollziehbar. Dafür verwenden wir seit März 2019 verfügbare <a href="https://www.data.gv.at/suche/?searchterm=&tagFilter_sub%5B%5D=Ausschreibung">offene Daten</a> der Auftraggeber. Über Feedback an <a href="mailto:info@offenevergaben.at">info@offenevergaben.at</a> freuen wir uns.
         </p>
         @endif
         <p class="lead">
-            OffeneVergaben.at ist ein zivilgesellschaftliches Projekt des <a class="lead-link" href="https://www.informationsfreiheit.at">Forum Informationsfreiheit</a> und derzeit noch in einer Test-Phase. Wir machen Auftragsvergaben der öffentlichen Hand über 50.000 Euro nachvollziehbar. Dafür verwenden wir seit März 2019 verfügbare <a href="https://www.data.gv.at/suche/?searchterm=&tagFilter_sub%5B%5D=Ausschreibung">offene Daten</a> der Auftraggeber. Über Feedback an <a href="mailto:info@offenevergaben.at">info@offenevergaben.at</a> freuen wir uns.
+            OffeneVergaben.at ist ein zivilgesellschaftliches Projekt des <a class="lead-link" href="https://www.informationsfreiheit.at">Forum Informationsfreiheit</a>. Wir machen Auftragsvergaben der öffentlichen Hand über 50.000 Euro nachvollziehbar. Dafür verwenden wir seit März 2019 verfügbare <a href="https://www.data.gv.at/suche/ausschreibungen-laut-bvergg2018">offene Daten</a> der Auftraggeber. Über Feedback an <a href="mailto:info@offenevergaben.at">info@offenevergaben.at</a> freuen wir uns."
         </p>
         <form class="search-form-lg" action="{{ route('public::suchen') }}" method="GET">
             <div class="input-group">
@@ -158,11 +154,8 @@
     <div class="container">
         <div class="row">
             <div class="col">
-                @if(false)
-                <h3>Was bietet offenevergaben.at?</h3>
-                @endif
                 <h3>
-                    Diese Features wird OffeneVergaben.at im Endausbau bieten:
+                    OffeneVergaben.at bietet folgende Features
                 </h3>
             </div>
         </div>
@@ -170,20 +163,20 @@
             <div class="col-md-4">
                 <div class="feature-wrapper">
                     <div class="icon justify-content-center">
-                    <span class="mx-auto icon-wrapper filter mb-4">
-                        @svg('img/icons/filter.svg','filter')
-                    </span>
+                        <a href="{{ route('public::auftraege') }}">
+                           <span class="mx-auto icon-wrapper filter mb-4">@svg('img/icons/filter.svg','filter')</span>
+                        </a>
                     </div>
                     <h4>Filter & Visualisierungen</h4>
-                    <p>Daten einfach erkunden</p>
+                    <p>Such- und Filtermöglichkeiten</p>
                 </div>
             </div>
             <div class="col-md-4">
                 <div class="feature-wrapper">
                     <div class="icon justify-content-center">
-                    <span class="mx-auto icon-wrapper notification mb-4">
-                        @svg('img/icons/benachrichtigung_w.svg','notification')
-                    </span>
+                        <a href="{{ url('neuigkeiten/offenevergabenat-neue-filter-und-email-benachrichtigungen') }}">
+                            <span class="mx-auto icon-wrapper notification mb-4">@svg('img/icons/benachrichtigung_w.svg','notification')</span>
+                        </a>
                     </div>
                     <h4>Benachrichtigungen</h4>
                     <p>per Email individuelle Updates erhalten</p>
