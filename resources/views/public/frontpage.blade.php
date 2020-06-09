@@ -10,7 +10,7 @@
         </p>
         @endif
         <p class="lead">
-            OffeneVergaben.at ist ein zivilgesellschaftliches Projekt des <a class="lead-link" href="https://www.informationsfreiheit.at">Forum Informationsfreiheit</a>. Wir machen Auftragsvergaben der öffentlichen Hand über 50.000 Euro nachvollziehbar. Dafür verwenden wir seit März 2019 verfügbare <a href="https://www.data.gv.at/suche/ausschreibungen-laut-bvergg2018">offene Daten</a> der Auftraggeber. Über Feedback an <a href="mailto:info@offenevergaben.at">info@offenevergaben.at</a> freuen wir uns."
+            OffeneVergaben.at ist ein zivilgesellschaftliches Projekt des <a class="lead-link" href="https://www.informationsfreiheit.at">Forum Informationsfreiheit</a>. Wir machen Auftragsvergaben der öffentlichen Hand über 50.000 Euro nachvollziehbar. Dafür verwenden wir seit März 2019 verfügbare <a href="https://www.data.gv.at/suche/ausschreibungen-laut-bvergg2018">offene Daten</a> der Auftraggeber. Über Feedback an <a href="mailto:info@offenevergaben.at">info@offenevergaben.at</a> freuen wir uns.
         </p>
         <form class="search-form-lg" action="{{ route('public::suchen') }}" method="GET">
             <div class="input-group">
