@@ -21,8 +21,8 @@
                 <span class="float-left">{{ $post->published_at ? $post->published_at->format('d.m.Y') : 'Noch nicht veröffentlicht' }}</span>
                 <span class="float-right">{{ $post->author ? $post->author->name : '' }}</span>
             </div>
-            <img class="post-image mb-3" src="{{ url($post->image) }}">
             <h1>{{ $post->title }}</h1>
+            <img class="post-image" src="{{ url($post->image) }}">
         </div>
     </div>
     <div class="row">

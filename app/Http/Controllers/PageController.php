@@ -129,6 +129,7 @@ class PageController extends Controller
 
     /**
      * Handles request to pre-defined "reserved" routes, like about-us, impressum etc.
+     * Those are virtually the same as other page routes but without the preceding "page" segment in the url
      *
      * @param Request $request
      *

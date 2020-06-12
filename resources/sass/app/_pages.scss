@@ -28,6 +28,47 @@ body.page {
       }
     }
   }
+
+  // keep in sync with _posts.scss .post-body
+  .page-body {
+    h1 {
+      font-size: 1.55rem;
+      margin: 1.5rem 0;
+      font-weight: 600;
+    }
+    h2 {
+      font-size: 1.2rem;
+      margin: 1.8rem 0 .9rem 0;
+      font-weight: 600;
+    }
+    h3 {
+      font-size: 0.9rem;
+      margin: 1.5rem 0 0.75rem 0;
+      font-weight: 600;
+    }
+    h4 {
+      font-size: 0.9rem;
+      margin: 1.5rem 0 0.75rem 0;
+      font-weight: 400;
+      color: $red;
+    }
+    p {
+      line-height: 1.7rem;
+    }
+    a {
+      color: $black;
+      text-decoration: underline;
+      text-decoration-color: $blue;
+    }
+    a:hover {
+      color: $red;
+    }
+    ul {
+      list-style-position: inside;
+      padding-left: 2px;
+    }
+
+  }
 }
 
 body.cpvs {

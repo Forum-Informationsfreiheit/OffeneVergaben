@@ -38,6 +38,8 @@ Route::get('/neuigkeiten/{slug}', 'PostController@show')->name('public::show-pos
 Route::get('/impressum',   'PageController@reserved');
 Route::get('/datenschutz', 'PageController@reserved');
 Route::get('/überuns',     'PageController@reserved');
+Route::get('/frequently-asked-questions',  'PageController@reserved');
+Route::get('/faq',function() { return redirect('/frequently-asked-questions'); });
 Route::get('/page/{slug}', 'PageController@page')->name('public::show-page');
 
 // Auth routes, only /login is open, others (register,passwort reset and email verification are not)

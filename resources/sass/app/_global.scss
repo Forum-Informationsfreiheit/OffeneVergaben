@@ -3,8 +3,9 @@ body {
   h1 {
     color: $red;
     margin-bottom: 1rem;
-    font-weight: bold;
   }
+
+  h1,h2,h3,h4,h5,h6 { font-weight: 500; }
 
   h1 { font-size: 1.8rem }
   h2 { font-size: 1.575rem }
@@ -62,7 +63,11 @@ body {
 
   form.search-form.right {
 
-    margin-left: 20px;
+    @include media-breakpoint-up(lg) { margin-left: 20px; }
+    @include media-breakpoint-down(lg) {
+      width: 100%;
+      margin-top: 0.5rem;
+    }
 
     input {
       border: 2px solid #e4e2e0;
@@ -79,17 +84,36 @@ body {
       }
     }
 
+    button:hover {
+      background-color: $blue;
+      border-color: $blue;
+
+      svg {
+        line, circle {
+          stroke: #fff !important;
+        }
+      }
+    }
+
   }
 
   .navbar-nav {
 
+    @include media-breakpoint-down(lg) {
+      margin-top: 0.5rem;
+    }
+
     a.nav-link {
+      position: relative;
       padding: 0;
-      margin-left: 0.5rem;
-      margin-right: 0.5rem;
+
+      @include media-breakpoint-up(lg) {
+        margin-left: 0.5rem;
+        margin-right: 0.5rem;
+      }
 
       color: $black;
-      border-bottom: 1px solid $blue;
+      //border-bottom: 1px solid $blue;
       font-size: 1em;
     }
 
@@ -98,7 +122,17 @@ body {
     }
     a.nav-link.active {
       color: $blue;
-      border-bottom: 1px solid transparent;
+      //border-bottom: 1px solid transparent;
+    }
+
+    a.nav-link:after {
+      content: '';
+      position: absolute;
+      display: block;
+      width: 100%;
+      height: 1px;
+      background-color: $blue;
+      bottom: 5px;
     }
   }
 
@@ -177,25 +211,48 @@ footer {
       padding-right: 20px;
     }
 
+    ul > li:last-of-type {
+      padding-right: 0;
+    }
+
     &:after {
       display: block;
       content: '';
       clear: left;
     }
   }
+
+  p.text {
+    padding: 0 30px;
+    text-align: center;
+    line-height: 1.4
+  }
 }
 
 table.ov-table {
   thead {
     th {
-      padding: 12px;
       background-color: $blue;
       color: #fff;
+    }
+    th:first-of-type {
+      border-left-color: transparent;
+    }
+    th:last-of-type {
+      border-right-color: transparent;
     }
   }
 
   th,td {
     font-size: 0.8rem;
+    padding: 12px;
+  }
+
+  td:first-of-type {
+    border-left-color: transparent;
+  }
+  td:last-of-type {
+    border-right-color: transparent;
   }
 
   &.ov-table-vertical {
@@ -214,6 +271,11 @@ table.ov-table {
     &.w-13 { width: 13%; }
     &.w-14 { width: 14%; }
     &.w-15 { width: 15%; }
+  }
+
+  a:not(.btn):hover {
+    text-decoration: underline;
+    text-decoration-color: $black;
   }
 }
 
@@ -240,7 +302,8 @@ table.ov-table {
         margin-right: 0;
       }
     }
-    li.page-item.active .page-link {
+    li.page-item.active .page-link,
+    li.page-item:hover .page-link {
       background-color: #fff;
       color: $blue;
     }
@@ -318,4 +381,9 @@ table.ov-table {
 .org-identifier-inline:before {
   content: ' | ';
   color: scale-color($grey, $lightness: 60%);
+}
+
+// necessary bootstrap override
+.badge.badge-light {
+  color: $black;
 }

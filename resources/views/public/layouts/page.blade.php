@@ -24,7 +24,7 @@
 
     <!-- Fonts -->
     <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css?family=Archivo" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Styles -->
     <link rel="stylesheet" href="{{ link_to_stylesheet('app',true) }}">
@@ -48,7 +48,7 @@
             <!-- Begin Page Content -->
             <div class="container page-content">
                 <div class="row">
-                    <div class="offset-2 col-md-8">
+                    <div class="offset-md-2 offset-sm-0 col-md-8 col-sm-12">
                         @include('flash::message')
 
                         @yield('page:content')

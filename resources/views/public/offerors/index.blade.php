@@ -11,7 +11,7 @@
     <div class="row">
         <div class="col">
             <div class="results-meta">
-                <span class="count">ungefähr {{ $totalItems }} Ergebnisse</span>
+                <span class="count">ungefähr {{ number_format($totalItems,0,',','.') }} Ergebnisse</span>
             </div>
         </div>
     </div>

@@ -1,5 +1,7 @@
 @extends('public.layouts.page')
 
+@section('body:class','page')
+
 @section('page:content')
     @if(!$page->isPublic)
         <div class="alert alert-warning alert-dismissible fade show" role="alert">
@@ -16,7 +18,9 @@
     </div>
     <div class="row">
         <div class="col">
-            {!! $page->body !!}
+            <div class="page-body">
+                {!! $page->body !!}
+            </div>
         </div>
     </div>
 @stop

@@ -15,7 +15,7 @@
 
   .filter-body {
     display: block;
-    background-color: #f6f6f5;
+    background-color: #f3f2f1;
     padding: 20px;
   }
 
@@ -30,7 +30,7 @@
 
     .filter-group-label {
       display: block;
-      font-weight: bold;
+      font-weight: 600;
     }
     .filter-group-inputs {
 
@@ -46,7 +46,6 @@
     &.tenders-range {
       input {
         display: inline-block;
-        font-size: 0.85rem;
         width: 110px;
         padding: .375rem .375rem;
         text-align: center;
