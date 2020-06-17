@@ -4,22 +4,17 @@
 
 @section('body:class','page downloads')
 
-@section('page:header')
-    <section class="header lg">
-        <h1>Downloads</h1>
-    </section>
-@stop
-
 @section('page:content')
+    <h1>Downloads</h1>
     <table class="table ov-table table-sm table-bordered table-striped">
         <thead>
-            <tr>
-                <th>Beschreibung</th>
-                <th>Dateityp</th>
-                <th>Größe</th>
-                <th>Zuletzt aktualisiert</th>
-                <th>Download</th>
-            </tr>
+        <tr>
+            <th>Beschreibung</th>
+            <th>Dateityp</th>
+            <th>Größe</th>
+            <th>Zuletzt aktualisiert</th>
+            <th>Download</th>
+        </tr>
         </thead>
         <tbody>
         <tr>

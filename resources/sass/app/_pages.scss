@@ -1,4 +1,9 @@
 body.page {
+
+  #content-wrapper {
+    min-height: 403px;
+  }
+
   section.header {
     background-color: $lightblue;
     text-align: center;
