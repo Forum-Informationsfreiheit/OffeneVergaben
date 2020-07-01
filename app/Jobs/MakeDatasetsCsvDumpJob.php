@@ -41,6 +41,8 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
      */
     const CACHE_CURRENT_FILE_TIMESTAMP = "kerndaten_dump_current_file_timestamp";
 
+    const CSV_DELIMITER = ',';
+
     protected $parameters = [
         'ids' => null,
     ];
@@ -232,7 +234,7 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
             'gründe notwendigkeit',
             'beschreibung der maßgeblichen gründe',
             'forschung und entwicklung',
-        ], ';');
+        ], self::CSV_DELIMITER);
     }
 
     protected function writeDatasetToCsv($file, $dataset) {
@@ -285,7 +287,7 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
             $dataset->justification,
             $dataset->rd_notification ? 'ja' : null,
 
-        ], ',');
+        ], self::CSV_DELIMITER);
     }
 
     /**
