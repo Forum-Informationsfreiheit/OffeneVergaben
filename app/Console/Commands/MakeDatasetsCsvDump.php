@@ -21,7 +21,7 @@ class MakeDatasetsCsvDump extends Command
      *
      * @var string
      */
-    protected $description = 'For Testing purposes only. Trigger the Job that creates the zipped CSV Datasets (daily) dump.';
+    protected $description = 'Trigger the Job that creates the zipped CSV Datasets (daily) dump manually.';
 
     /**
      * Create a new command instance.
