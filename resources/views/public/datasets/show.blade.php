@@ -50,7 +50,7 @@
                             <ul>
                                 @foreach($dataset->offerors as $offeror)
                                     <li>
-                                        <a href="{{ route('public::show-auftraggeber',$offeror->organization_id) }}">{{ $offeror->organization->name }}</a>&nbsp;<small>{{ $offeror->organization->nationalId }}</small>
+                                        <a href="{{ route('public::show-auftraggeber',$offeror->organization_id) }}">{{ $offeror->name }}</a>&nbsp;<small>{{ $offeror->nationalId }}</small>
                                         @if($offeror->phone)
                                             <br>{{ $offeror->phone }}
                                         @endif

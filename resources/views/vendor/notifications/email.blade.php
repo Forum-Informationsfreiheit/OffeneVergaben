@@ -66,7 +66,7 @@ Mit einer [Spende an das Forum Informationsfreiheit](https://www.informationsfre
 
 {{-- Footer --}}
 @slot('footer')
-[{{ config('app.name') }}]({{ url('/') }}) ist ein zivilgesellschaftliches Projekt des Forum Informationsfreiheit, ZVR 796723786, Kirchberggasse 7/4A, 1070 Wien. Email: [office@informationsfreiheit.at](mailto:office@informationsfreiheit.at)<br><br>
+[{{ config('app.name') }}]({{ url('/') }}) ist ein zivilgesellschaftliches Projekt des Forum Informationsfreiheit, ZVR 796723786, Schuhmeierplatz 9/25, 1160 Wien. Email: [office@informationsfreiheit.at](mailto:office@informationsfreiheit.at)<br><br>
 Ermöglicht wurde die Umsetzung durch die [Netidee.at](https://netidee.at), eine Förderung der Internet Privatstiftung Austria (IPA).
 @endslot
 @endcomponent
