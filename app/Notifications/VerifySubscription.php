@@ -2,6 +2,7 @@
 
 namespace App\Notifications;
 
+use App\Subscription;
 use App\User;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
@@ -75,7 +76,7 @@ class VerifySubscription extends Notification
     protected function verificationUrl($notifiable) {
         return URL::temporarySignedRoute(
             'public::verify-subscription',
-            Carbon::now()->addMinutes(60),
+            Carbon::now()->addMinutes(Subscription::VERIFY_SUBSCRIPTION_IN_MINUTES),
             [ 'id' => $this->subscription->id, 'email' => $notifiable->email ]
         );
     }

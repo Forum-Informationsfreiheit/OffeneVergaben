@@ -10,6 +10,10 @@ class Subscription extends Model
     const TYPE_DATASET      = 'dataset';
     const TYPE_ORGANIZATION = 'organization';
 
+    // Subscription that are not verified within time window
+    // will be removed from the database
+    const VERIFY_SUBSCRIPTION_IN_MINUTES = 60;
+
     protected $dates = [
         'verified_at'
     ];
