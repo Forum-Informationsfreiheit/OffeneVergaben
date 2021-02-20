@@ -54,7 +54,7 @@ class Kernel extends ConsoleKernel
         }
 
         // SUBSCRIPTIONS & SUBSCRIBER clean up ---------------------------
-        $schedule->command('fif:clean-up-tmp-links')->hourly();
+        $schedule->command('fif:clean-up-subscriptions')->hourly();
 
         // TMP files clean up ---------------------------------------------
         $schedule->command('fif:clean-up-tmp-links')->everyThirtyMinutes();
