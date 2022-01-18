@@ -2,6 +2,7 @@
 
 namespace App;
 
+use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
@@ -27,7 +28,8 @@ class Dataset extends Model
         'deadline_standstill',
         'datetime_receipt_tenders',
         'datetime_last_change',
-        'item_lastmod',
+        // 2021-12-15 item_lastmod is timestamp with microseconds and not a date - use accessor/mutator
+        //'item_lastmod',
         'disabled_at'
     ];
 
@@ -208,6 +210,14 @@ class Dataset extends Model
 
         return nl_to_br($this->procedure_description);
     }
+
+    // 2021-12-15 item_lastmod is timestamp with microseconds and not a date - use accessor/mutator
+    public function getItemLastmodAttribute($value) {
+        return $value ? Carbon::createFromFormat('Y-m-d H:i:s.u', $value) : null;
+    }
+    public function setItemLastmodAttribute($value) {
+        $this->attributes['item_lastmod'] = $value ? $value->format('Y-m-d H:i:s.u') : null;
+    }    
 
     /**
      * Some attributes of a dataset have different meaning/translations

@@ -68,9 +68,18 @@ class Process
             $this->log->debug("Process block info: index:".($index+1).", length:".(count($records)));
 
             foreach($records as $record) {
-                $dom = new DOMKerndaten($record->xml,null,[ 'record_id' => $record->id ]);
+                dump("Processing Record ID {$record->id}");
+		$this->log->debug("Processing Record ID {$record->id}");    
+		$success = 0;
 
-                $success = $this->process($record,$dom->getData());
+		try {
+			$dom = new DOMKerndaten($record->xml,null,[ 'record_id' => $record->id ]);
+
+			$success = $this->process($record,$dom->getData());
+		} catch(\Exception $ex) {
+			$this->log->debug("Failed Parsing Record ID {$record->id}");
+			$this->log->debug($ex);
+		}
 
                 $processedCount += $success ? 1 : 0;
             }
@@ -132,7 +141,11 @@ class Process
             // Handle root dataset
             $dataset = new Dataset();
             $dataset->metaset_id = $metaset->id;
-            $dataset->item_lastmod = $record->item_lastmod;
+            // 2021-12-15 item_lastmod is timestamp with microseconds and not a date - use accessor/mutator
+            //$dataset->item_lastmod = $record->item_lastmod;
+            if ($record->item_lastmod) {
+                $dataset->item_lastmod = Carbon::createFromFormat('Y-m-d H:i:s.u', $record->item_lastmod);
+            }
             $dataset->scraper_kerndaten_id = $record->id;
             $dataset->version = $record->version;
             $dataset->is_current_version = 1;          // confidently set the newest dataset as the current version
@@ -540,6 +553,12 @@ class Process
         if ($data->additionalCoreData && $data->additionalCoreData->nbSmeContractor
             && $data->awardContract && $data->awardContract->nbSmeContractor) {
             $this->dumpAndLogValidationError($record, 'Both NB_SME_CONTRACTOR attributes are set (additional core data & award contract)!!');
+            $validationError = true;
+        }
+	
+	if ($data->modificationsContract && $data->modificationsContract->valTotalAfter
+	    && $data->modificationsContract->valTotalAfter<0) {
+            $this->dumpAndLogValidationError($record, 'ModificationisContract->valTotalAfter < 0');
             $validationError = true;
         }
 
