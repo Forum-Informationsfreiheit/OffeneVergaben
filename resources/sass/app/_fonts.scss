@@ -1,0 +1,19 @@
+// 2023-04-06 Serve fonts locally, instead of importing via google fonts. Removed direct embeds in layout files like
+// <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
+// 2022-12-19 Fonts are now served locally (not via google fonts)
+// Font files are downloaded from fonts.google.com
+// How to implement variable font file
+// @see https://developer.mozilla.org/en-US/docs/Web/CSS/CSS_Fonts/Variable_Fonts_Guide
+// How this works with laravel/mix: on npm run dev/production public/fonts will be automatically created/updated
+@font-face {
+    font-family: 'Archivo';
+    font-style: normal;
+    font-weight: 100 1000;
+    src: url('../../fonts/Archivo/Archivo-VariableFont_wdth,wght.ttf');
+}
+@font-face {
+    font-family: 'Archivo';
+    font-style: italic;
+    font-weight: 100 1000;
+    src: url('../../fonts/Archivo/Archivo-Italic-VariableFont_wdth,wght.ttf');
+}

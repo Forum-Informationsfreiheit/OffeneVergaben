@@ -22,10 +22,6 @@
     <link rel="icon" type="image/png" sizes="32x32" href="{{ url('/img/favicons/favicon-32x32.png') }}">
     <link rel='shortcut icon' type='image/x-icon' href='{{ url('/img/favicons/favicon.ico') }}'>
 
-    <!-- Fonts -->
-    <link rel="dns-prefetch" href="//fonts.gstatic.com">
-    <link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&display=swap" rel="stylesheet">
-
     <!-- Styles -->
     <link rel="stylesheet" href="{{ link_to_stylesheet('app',true) }}">
     <link rel="stylesheet" href="{{ link_to_stylesheet('vendor/fontawesome/all.min') }}">
