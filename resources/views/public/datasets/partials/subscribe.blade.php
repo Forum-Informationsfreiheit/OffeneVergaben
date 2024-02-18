@@ -19,6 +19,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 <label for="subscribeTitle" style="display: none;">Bezeichnung</label>
+                <input name="pm_title" type="text" class="form-control" value="" placeholder='z.B. "Aufträge ab 1 Mio"'> {{-- Honeypot --}}
                 <input name="title" type="text" class="form-control {{ $errors->subscription->has('title') ? 'is-invalid' : '' }}" id="subscribeTitle" aria-describedby="subscribeTitleHelp" placeholder='z.B. "Aufträge ab 1 Mio. €"' value="{{ old('title') }}">
                 <small id="subscribeTitleHelp" class="form-text text-muted">Aussagekräfitge Bezeichnung</small>
             </div>

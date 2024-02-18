@@ -2,6 +2,10 @@
 
 @section('page:title','Aufträge')
 
+@section('head:append')
+    <style>.form-group .ftob { display: none; visibility: hidden; }</style>
+@stop
+
 @section('body:class','datasets')
 
 @section('page:content')
@@ -186,6 +190,8 @@
                 },
                 preventSubmit: true,
             });
+
+            $('input[name="pm_title"]').addClass('ftob');
         })(__ives);
     </script>
 @stop

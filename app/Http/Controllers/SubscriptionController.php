@@ -30,6 +30,14 @@ class SubscriptionController extends Controller
             'confirm.required' => 'Die Bedingungen zum Datenschutz müssen gelesen und akzeptiert werden.'
         ]);
 
+        // "Protective Measure" Honeypot: if the honeypot field is included ignore the request
+        // The input field is hidden with a combination of JS and CSS:
+        // On pageload a (static) css class is added to the input that hides (display:nones) the field
+        if ($request->input('pm_title')) {
+            usleep(rand(1,250000)); // add a tiny bit of fake execution time on top (max 0.25s)
+            return back();
+        }
+
         // Check the query string for sanity
         if (!$this->validateSubscriptionQuery($request->input('query'))) {
             Flash::error('Fehler bei Filterabfrage.');
