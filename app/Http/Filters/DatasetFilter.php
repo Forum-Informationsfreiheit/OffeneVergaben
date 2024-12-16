@@ -11,6 +11,16 @@ use Kblais\QueryFilter\QueryFilter;
 
 class DatasetFilter extends QueryFilter
 {
+    public static $sortable = [
+        'title',
+        'offeror',
+        'contractor',
+        'cpv',
+        'nb_tenders_received',
+        'val_total',
+        'item_lastmod'
+    ];
+
     /**
      * @var array $appliedFilters
      *
@@ -45,9 +55,23 @@ class DatasetFilter extends QueryFilter
         'AT31','AT32','AT33','AT34'
     ];
 
+    /**
+     * By implementing the sort(...) method it can automagically be called by the QueryFilter-Logic
+     * on $query->filter(...) calls. Note that sort logic is entirely custom and not provided by the QueryFilter code.
+     *
+     * @param $field - the attribute the current query should be ordered by (single attribute only)
+     *                 If prefixed by minus/dash ("-") character sorting will be executed in descending order
+     *
+     * @return \Illuminate\Database\Eloquent\Builder
+     */
     public function sort($field) {
+        // unknown sort attribute? return early
+        if ((substr($field, 0, 1) !== '-' && !in_array($field,self::$sortable)) ||
+            (substr($field, 0, 1) === '-' && !in_array(substr($field,1),self::$sortable))) { // check prefix (desc sorting)
 
-        // TODO there needs to be a white list of sortable parameters!
+            // return default sort
+            return $this->builder->orderBy('item_lastmod','desc');
+        }
 
         $this->sortDirection = substr($field, 0, 1) == '-' ? 'desc' : 'asc';
         $this->sortedBy = substr($field, 0, 1) == '-' ? substr($field,1) : $field;

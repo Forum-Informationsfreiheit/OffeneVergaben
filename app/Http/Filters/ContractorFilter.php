@@ -8,6 +8,12 @@ use Kblais\QueryFilter\QueryFilter;
 
 class ContractorFilter extends QueryFilter
 {
+    public static $sortable = [
+        'name',
+        'count',
+        'sum'
+    ];
+
     protected $filters = [];
 
     // only single attribute sort implemented atm
@@ -15,6 +21,11 @@ class ContractorFilter extends QueryFilter
     protected $sortDirection = null;
 
     public function sort($field) {
+        // unknown sort attribute? return early
+        if ((substr($field, 0, 1) !== '-' && !in_array($field,self::$sortable)) ||
+            (substr($field, 0, 1) === '-' && !in_array(substr($field,1),self::$sortable))) { // check prefix (desc sorting)
+            return $this->builder;
+        }
 
         $this->sortDirection = substr($field, 0, 1) == '-' ? 'desc' : 'asc';
         $this->sortedBy = substr($field, 0, 1) == '-' ? substr($field,1) : $field;
