@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\DB;
 class OfferorController extends Controller
 {
     public function index(OfferorFilter $filters) {
+        if_debug_mode_enable_query_log();
         $totalItems = Organization::whereHas('offerors')->count();
 
         $query = Offeror::indexQuery()->filter($filters);
@@ -32,6 +33,7 @@ class OfferorController extends Controller
     }
 
     public function show(DatasetFilter $filters, $id) {
+        if_debug_mode_enable_query_log();
         $org = Organization::findOrFail($id);
 
         $query = Dataset::indexQuery(['allOfferors' => true])

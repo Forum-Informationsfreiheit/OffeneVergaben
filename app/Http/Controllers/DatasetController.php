@@ -42,6 +42,7 @@ class DatasetController extends Controller
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function index(DatasetFilter $filters) {
+        if_debug_mode_enable_query_log();
         $query = Dataset::indexQuery()->filter($filters);
 
         if (!$filters->has('sort')) {

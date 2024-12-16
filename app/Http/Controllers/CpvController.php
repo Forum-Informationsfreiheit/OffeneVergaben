@@ -32,7 +32,7 @@ class CpvController extends Controller
     }
 
     public function index() {
-
+        if_debug_mode_enable_query_log();
         $params = $this->buildViewParams();
 
         $result = $this->query($params);

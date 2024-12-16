@@ -1,5 +1,8 @@
 <?php
 
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
+
 if (! function_exists('link_to_stylesheet')) {
     /**
      * Returns a url to a <filename>.css stylesheet. If versioned is true
@@ -241,5 +244,28 @@ if (!function_exists('procedure_label')) {
 
         // nothing ? should never happen
         return join(', ',$p);
+    }
+
+    if (! function_exists('if_debug_mode_enable_query_log')) {
+        function if_debug_mode_enable_query_log() {
+            if (request()->has('qdebug') && Auth::user() && Auth::user()->isAdmin()) {
+                DB::enableQueryLog();
+            }
+        }
+    }
+
+    if (! function_exists('if_debug_mode_print_query_log')) {
+        function if_debug_mode_print_query_log() {
+            if (request()->has('qdebug') && Auth::user() && Auth::user()->isAdmin()) {
+                $queryLog = DB::getQueryLog();
+                $totalTime = 0;
+                foreach($queryLog as $query) {
+                    $totalTime += $query['time'];
+                }
+
+                dump($queryLog);
+                dump("total time: ".$totalTime);
+            }
+        }
     }
 }

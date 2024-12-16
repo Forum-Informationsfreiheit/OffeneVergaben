@@ -58,6 +58,7 @@
 @stop
 
 @section('body:append')
+    @php if_debug_mode_print_query_log(); @endphp
     <script>
         var $filterRoot   = $('#filterWrapper');
         var $filterToggle = $('#filterToggle');

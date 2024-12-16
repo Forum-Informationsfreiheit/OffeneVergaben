@@ -100,6 +100,7 @@
     <div class="ov-tooltip tooltip-treemap" id="tooltip">
         <div class="inner"></div>
     </div>
+    @php if_debug_mode_print_query_log(); @endphp
     <script src="{{ url('/vendor/d3/d3_v5.12.js') }}"></script>
     <script>
         (function(app){

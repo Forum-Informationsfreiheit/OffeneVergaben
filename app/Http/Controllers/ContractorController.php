@@ -14,6 +14,7 @@ use Illuminate\Support\Facades\DB;
 class ContractorController extends Controller
 {
     public function index(ContractorFilter $filters) {
+        if_debug_mode_enable_query_log();
         $totalItems = Organization::whereHas('contractors')->count();
 
         $query = Contractor::indexQuery()->filter($filters);
@@ -33,6 +34,7 @@ class ContractorController extends Controller
     }
 
     public function show(DatasetFilter $filters, $id) {
+        if_debug_mode_enable_query_log();
         $org = Organization::findOrFail($id);
 
         // re-use the main index query for datasets, but restricted to the

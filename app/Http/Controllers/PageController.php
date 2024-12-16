@@ -16,7 +16,7 @@ use Laracasts\Utilities\JavaScript\JavaScriptFacade;
 class PageController extends Controller
 {
     public function frontpage() {
-
+        if_debug_mode_enable_query_log();
         $topOfferorsByCount = $this->fetchTopOfferors('count',10);
         $topOfferorsBySum = $this->fetchTopOfferors('sum',10);
 
