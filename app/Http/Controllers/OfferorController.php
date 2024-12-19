@@ -48,10 +48,15 @@ class OfferorController extends Controller
         $totalItems = $query->count();
         $data       = $query->paginate(20);
 
-        // now load the appropriate models for the view
-        $items = Dataset::loadInOrder($data->pluck('id')->toArray())
-            ->withCount('contractors')
-            ->get();
+        // 2024-12-19 fix no data handling
+        if (count($data)) {
+            // now load the appropriate models for the view
+            $items = Dataset::loadInOrder($data->pluck('id')->toArray())
+                ->withCount('contractors')
+                ->get();
+        } else {
+            $items = [];
+        }
 
         $stats = $this->getOfferorStats($id);
 
