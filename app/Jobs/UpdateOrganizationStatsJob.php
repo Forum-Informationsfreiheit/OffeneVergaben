@@ -2,11 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Offeror;
 use App\Organization;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\DB;
@@ -34,6 +30,8 @@ class UpdateOrganizationStatsJob implements ShouldQueue
      * Execute the job.
      *
      * Updates these attributes on each (or only a single) organization:
+     * - count_offeror
+     * - count_contractor
      * - count_ausschreibung_offeror
      * - count_ausschreibung_contractor
      * - count_auftrag_offeror
@@ -94,6 +92,8 @@ class UpdateOrganizationStatsJob implements ShouldQueue
                     $val = $valuesOfferors1->get($org->id)->sum_val_total;
                     $org->val_total_auftrag_offeror = $val !== null ? $val : 0;
                 }
+                // also keep total of ausschreibung und auftrag
+                $org->count_offeror = $org->count_ausschreibung_offeror + $org->count_auftrag_offeror;
 
                 // organization as contractor
                 if ($valuesContractors0->has($org->id)) {
@@ -105,6 +105,7 @@ class UpdateOrganizationStatsJob implements ShouldQueue
                     $val = $valuesContractors1->get($org->id)->sum_val_total;
                     $org->val_total_auftrag_contractor = $val !== null ? $val : 0;
                 }
+                $org->count_contractor = $org->count_ausschreibung_contractor + $org->count_auftrag_contractor;
 
                 $org->save();
             }

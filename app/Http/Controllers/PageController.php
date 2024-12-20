@@ -55,22 +55,42 @@ class PageController extends Controller
     }
 
     protected function fetchTopOfferors($type, $limit) {
-        $res = Offeror::bigFishQuery($type)->limit($limit)->get();
-        $ids = $res->pluck('organization_id')->toArray();      // has order
-        $idsStr = join(',',$ids);
-        $values = $res->keyBy('organization_id');  // key count value by org id
+// 2024-12-19 old code replaced
+//        $res = Offeror::bigFishQuery($type)->limit($limit)->get();
+//        $ids = $res->pluck('organization_id')->toArray();      // has order
+//        $idsStr = join(',',$ids);
+//        $values = $res->keyBy('organization_id');  // key count value by org id
+//
+//        // now load the appropriate models for the view
+//        $orgs = Organization::whereIn('id',$ids)
+//            ->orderByRaw(DB::raw("FIELD(id, $idsStr)"))->get();
+//
+//        foreach($orgs as &$org) {
+//            if ($type == 'count') {
+//                $org->datasets_count = $values[$org->id]->datasets_count;
+//            }
+//            if ($type == 'sum') {
+//                $org->sum_total_val = $values[$org->id]->sum_total_val;
+//            }
+//        }
+//
+//        return $orgs;
 
-        // now load the appropriate models for the view
-        $orgs = Organization::whereIn('id',$ids)
-            ->orderByRaw(DB::raw("FIELD(id, $idsStr)"))->get();
-
-        foreach($orgs as &$org) {
-            if ($type == 'count') {
-                $org->datasets_count = $values[$org->id]->datasets_count;
-            }
-            if ($type == 'sum') {
-                $org->sum_total_val = $values[$org->id]->sum_total_val;
-            }
+        // new queries based on pre-calculated count/volume stats
+        if ($type === 'count') {
+            $orgs = Organization::query()
+                ->select()
+                ->addSelect(DB::raw('count_auftrag_offeror as datasets_count'))
+                ->orderBy('datasets_count','desc')
+                ->limit($limit)
+                ->get();
+        } else if ($type === 'sum') {
+            $orgs = Organization::query()
+                ->select()
+                ->addSelect(DB::raw('val_total_auftrag_offeror as sum_total_val'))
+                ->orderBy('sum_total_val','desc')
+                ->limit($limit)
+                ->get();
         }
 
         return $orgs;
@@ -84,24 +104,43 @@ class PageController extends Controller
      */
     protected function fetchTopContractors($type, $limit = 10) {
 
-        $res = Contractor::bigFishQuery($type)->limit($limit)->get();
-        $ids = $res->pluck('organization_id')->toArray();      // has order
-        $idsStr = join(',',$ids);
-        $values = $res->keyBy('organization_id');  // key count value by org id
-        // now load the appropriate models for the view
-        $orgs = Organization::whereIn('id',$ids)
-            ->orderByRaw(DB::raw("FIELD(id, $idsStr)"))->get();
+//        $res = Contractor::bigFishQuery($type)->limit($limit)->get();
+//        $ids = $res->pluck('organization_id')->toArray();      // has order
+//        $idsStr = join(',',$ids);
+//        $values = $res->keyBy('organization_id');  // key count value by org id
+//        // now load the appropriate models for the view
+//        $orgs = Organization::whereIn('id',$ids)
+//            ->orderByRaw(DB::raw("FIELD(id, $idsStr)"))->get();
+//
+//        foreach($orgs as &$org) {
+//            // write the datasets count value into the orgs entities as a 'dynamic' attribute
+//
+//            if ($type == 'count') {
+//                $org->datasets_count = $values[$org->id]->datasets_count;
+//            }
+//            if ($type == 'sum') {
+//                $org->sum_total_val = $values[$org->id]->sum_total_val;
+//            }
+//        }
+//        return $orgs;
 
-        foreach($orgs as &$org) {
-            // write the datasets count value into the orgs entities as a 'dynamic' attribute
-
-            if ($type == 'count') {
-                $org->datasets_count = $values[$org->id]->datasets_count;
-            }
-            if ($type == 'sum') {
-                $org->sum_total_val = $values[$org->id]->sum_total_val;
-            }
+        // new queries based on pre-calculated count/volume stats
+        if ($type === 'count') {
+            $orgs = Organization::query()
+                ->select()
+                ->addSelect(DB::raw('count_auftrag_contractor as datasets_count'))
+                ->orderBy('datasets_count','desc')
+                ->limit($limit)
+                ->get();
+        } else if ($type === 'sum') {
+            $orgs = Organization::query()
+                ->select()
+                ->addSelect(DB::raw('val_total_auftrag_contractor as sum_total_val'))
+                ->orderBy('sum_total_val','desc')
+                ->limit($limit)
+                ->get();
         }
+
         return $orgs;
     }
 

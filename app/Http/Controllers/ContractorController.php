@@ -7,28 +7,42 @@ use App\CPV;
 use App\Dataset;
 use App\Http\Filters\ContractorFilter;
 use App\Http\Filters\DatasetFilter;
+use App\Http\Filters\OrganizationAsContractorFilter;
 use App\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ContractorController extends Controller
 {
-    public function index(ContractorFilter $filters) {
+    public function index(OrganizationAsContractorFilter $filters) {
         if_debug_mode_enable_query_log();
-        $totalItems = Organization::whereHas('contractors')->count();
+//        $totalItems = Organization::whereHas('contractors')->count();
+//
+//        $query = Contractor::indexQuery()->filter($filters);
+//        $data  = $query->paginate(20);
+//
+//        $values = $data->keyBy('organization_id');
+//
+//        // now load the appropriate models for the view
+//        $items = Organization::loadInOrder($data->pluck('organization_id')->toArray());
+//
+//        foreach($items as &$item) {
+//            $item->datasets_count = $values[$item->id]->datasets_count;
+//            $item->sum_val_total  = $values[$item->id]->sum_val_total;
+//        }
 
-        $query = Contractor::indexQuery()->filter($filters);
+        $query = Organization::query()
+            ->filter($filters)
+            ->select([
+                'organizations.*',
+                DB::raw('count_contractor as datasets_count'),
+                DB::raw('val_total_auftrag_contractor as sum_val_total')
+            ])
+            ->where('count_contractor','>',0);
+
         $data  = $query->paginate(20);
-
-        $values = $data->keyBy('organization_id');
-
-        // now load the appropriate models for the view
-        $items = Organization::loadInOrder($data->pluck('organization_id')->toArray());
-
-        foreach($items as &$item) {
-            $item->datasets_count = $values[$item->id]->datasets_count;
-            $item->sum_val_total  = $values[$item->id]->sum_val_total;
-        }
+        $items = $data->items();
+        $totalItems = $data->total();
 
         return view('public.contractors.index',compact('items','totalItems','data','filters'));
     }

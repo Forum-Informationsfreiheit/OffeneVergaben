@@ -4,9 +4,12 @@ namespace App;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
+use Kblais\QueryFilter\FilterableTrait;
 
 class Organization extends Model
 {
+    use FilterableTrait;
+
     protected $casts = [
         'is_identified' => 'boolean',
     ];

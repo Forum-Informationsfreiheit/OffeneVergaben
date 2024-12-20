@@ -14,7 +14,9 @@ class AddStatColumnsToOrganizationsTable extends Migration
     public function up()
     {
         Schema::table('organizations', function (Blueprint $table) {
-            $table->unsignedInteger('count_ausschreibung_offeror')->default(0)->after('is_identified');
+            $table->unsignedInteger('count_offeror')->default(0)->after('is_identified');
+            $table->unsignedInteger('count_contractor')->default(0)->after('count_offeror');
+            $table->unsignedInteger('count_ausschreibung_offeror')->default(0)->after('count_contractor');
             $table->unsignedInteger('count_ausschreibung_contractor')->default(0)->after('count_ausschreibung_offeror');
             $table->unsignedInteger('count_auftrag_offeror')->default(0)->after('count_ausschreibung_contractor');
             $table->unsignedInteger('count_auftrag_contractor')->default(0)->after('count_auftrag_offeror');
@@ -41,6 +43,8 @@ class AddStatColumnsToOrganizationsTable extends Migration
             $table->dropColumn('count_auftrag_offeror');
             $table->dropColumn('count_ausschreibung_contractor');
             $table->dropColumn('count_ausschreibung_offeror');
+            $table->dropColumn('count_contractor');
+            $table->dropColumn('count_offeror');
         });
     }
 }
