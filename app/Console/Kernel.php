@@ -38,7 +38,11 @@ class Kernel extends ConsoleKernel
         // XML processing ----------------------------------------
         $processAt = env('APP_SCHEDULE_PROCESS_AT_TIMESTRING');
         if ($processAt && $this->validateTimeString($processAt)) {
-            $schedule->command('fif:process')->dailyAt($processAt);
+            $schedule->command('fif:process')->dailyAt($processAt)
+                // 2024-12-20 add organization stats calculation start right after processing has finished
+                ->after(function() {
+                        $this->artisan->call('fif:update-organization-stats');
+                });
         }
 
         // Make CSV Dump
