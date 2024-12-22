@@ -41,21 +41,35 @@ class DatasetController extends Controller
      * @param DatasetFilter $filters
      * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
-    public function index(DatasetFilter $filters) {
+    public function index(DatasetFilter $filters, Request $request) {
         if_debug_mode_enable_query_log();
-        $query = Dataset::indexQuery()->filter($filters);
+
+        // complex query necessary if user uses text search or sorts by offeror or contractor names
+        $needsExtensiveQuery = $request->has('search') && $request->input('search') ||
+            ($request->has('sort') && in_array($request->input('sort'),['offeror','-offeror','contractor','-contractor']));
+        if ($needsExtensiveQuery) {
+            $query = Dataset::indexQuery();
+        } else {
+            $query = Dataset::indexQuery(['joinOfferors' => false, 'joinContractors' => false]);
+        }
+
+        $query->filter($filters);
 
         if (!$filters->has('sort')) {
             // apply default sorting, item aktualisierungsdatum
             $query->orderBy('item_lastmod','desc');
         }
 
-        $totalItems = $query->count();
         $data       = $query->paginate(20);
+        $totalItems = $data->total();
 
         if (count($data) > 0) {
             // now load the appropriate models for the view
             $items = Dataset::loadInOrder($data->pluck('id')->toArray())
+                ->with('offeror')    // pre loads the main offeror "is_extra === 0"
+                ->with('offerors')
+                ->with('contractor') // pre loads the main contractor "is_extra === 0"
+                ->with('contractors')
                 ->withCount('contractors')
                 ->withCount('offerors')
                 ->get();

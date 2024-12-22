@@ -51,23 +51,40 @@ class ContractorController extends Controller
         if_debug_mode_enable_query_log();
         $org = Organization::findOrFail($id);
 
-        // re-use the main index query for datasets, but restricted to the
-        // organization id of the contractor
-        $query = Dataset::indexQuery(['allContractors' => true])
-            ->filter($filters)
-            ->where('contractors.organization_id',$org->id);
+//        // re-use the main index query for datasets, but restricted to the
+//        // organization id of the contractor
+//        $query = Dataset::indexQuery(['allContractors' => true])
+//            ->filter($filters)
+//            ->where('contractors.organization_id',$org->id);
+
+        $request = request();
+
+        // for the base query join on contractors table is mandatory
+        // join on offerors table is optional (only needed if user wants to sort by offerors)
+        if (($request->has('sort') && in_array($request->input('sort'),['offeror','-offeror']))) {
+            $query = Dataset::indexQuery(['allContractors' => true]);
+        } else {
+            $query = Dataset::indexQuery(['joinOfferors' => false, 'allContractors' => true]);
+        }
+
+        $query->filter($filters)->where('contractors.organization_id',$org->id);
 
         if (!$filters->has('sort')) {
             // apply default sorting, item aktualisierungsdatum
             $query->orderBy('item_lastmod','desc');
         }
 
-        $totalItems = $query->count();
         $data       = $query->paginate(20);     // data holds the pagination-aware builder
+        $totalItems = $data->total();
 
         if (count($data)) {
             $items = Dataset::loadInOrder($data->pluck('id')->toArray())
                 ->withCount('offerors')
+                ->with('offeror')    // pre loads the main offeror "is_extra === 0"
+                ->with('offerors')
+                ->with('contractor') // pre loads the main contractor "is_extra === 0"
+                ->with('contractors')
+                ->with('cpv')
                 ->get();
         } else {
             $items = [];

@@ -51,22 +51,35 @@ class OfferorController extends Controller
         if_debug_mode_enable_query_log();
         $org = Organization::findOrFail($id);
 
-        $query = Dataset::indexQuery(['allOfferors' => true])
-            ->filter($filters)
-            ->where('offerors.organization_id',$org->id);
+        $request = request();
+
+        // for the base query join on offerors table is mandatory
+        // join on contractors table is optional (only needed if user wants to sort by contractors)
+        if (($request->has('sort') && in_array($request->input('sort'),['contractor','-contractor']))) {
+            $query = Dataset::indexQuery(['allOfferors' => true]);
+        } else {
+            $query = Dataset::indexQuery(['joinContractors' => false, 'allOfferors' => true]);
+        }
+
+        $query->filter($filters)->where('offerors.organization_id',$org->id);
 
         if (!$filters->has('sort')) {
             // apply default sorting, item aktualisierungsdatum
             $query->orderBy('item_lastmod','desc');
         }
 
-        $totalItems = $query->count();
         $data       = $query->paginate(20);
+        $totalItems = $data->total();
 
         // 2024-12-19 fix no data handling
         if (count($data)) {
             // now load the appropriate models for the view
             $items = Dataset::loadInOrder($data->pluck('id')->toArray())
+                ->with('offeror')    // pre loads the main offeror "is_extra === 0"
+                ->with('offerors')
+                ->with('contractor') // pre loads the main contractor "is_extra === 0"
+                ->with('contractors')
+                ->with('cpv')
                 ->withCount('contractors')
                 ->get();
         } else {
