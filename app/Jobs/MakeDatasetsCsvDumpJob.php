@@ -3,6 +3,7 @@
 namespace App\Jobs;
 
 use App\Dataset;
+use App\Http\Controllers\DownloadController;
 use Carbon\Carbon;
 use Illuminate\Bus\Queueable;
 use Illuminate\Queue\SerializesModels;
@@ -40,6 +41,8 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
      * or having to parse the file name.
      */
     const CACHE_CURRENT_FILE_TIMESTAMP = "kerndaten_dump_current_file_timestamp";
+
+    const CSV_FILE_PREFIX = "kerndaten_csv_dump";
 
     const CSV_DELIMITER = ',';
 
@@ -123,6 +126,9 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
         }
 
         $this->make();
+
+        // 2024-12-13: added new clean up function
+        $this->cleanUp();
     }
 
     /**
@@ -140,14 +146,14 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
         $tempDir = $rootDir . DIRECTORY_SEPARATOR . 'temp_' . Carbon::now()->format('Ymd_Hiu');
         mkdir($tempDir);
 
-        $csvPath = $tempDir . DIRECTORY_SEPARATOR . 'kerndaten_csv_dump_' . Carbon::now()->format('Ymd_Hi') . '.csv';
+        $csvPath = $tempDir . DIRECTORY_SEPARATOR . self::CSV_FILE_PREFIX .'_' . Carbon::now()->format('Ymd_Hi') . '.csv';
         $csvName = basename($csvPath);
 
         $fHandle = fopen($csvPath, 'w');
 
         $this->writeHeaderToCsv($fHandle);
         while($datasets = $this->datasetsStream($idx)) {
-            dump('index '.$idx);
+            //dump('index '.$idx);
 
             foreach($datasets as $dataset) {
                 $this->writeDatasetToCsv($fHandle, $dataset);
@@ -350,5 +356,76 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
         }
 
         return join("\n",$result);
+    }
+
+    /**
+     * keep one file per month, but only remove files older than 30 days (to avoid edge cases)
+     */
+    protected function cleanUp() {
+
+        $dateMap = collect([]);
+        $threshold = Carbon::now()->subDays(30);
+
+        // 1. read all files in output directory
+        $dir = storage_path('app' . DIRECTORY_SEPARATOR .self::STORAGE_OUTPUT_DIRECTORY);
+
+        if (!file_exists($dir)) {
+            return;
+        }
+
+        // NOTE: the sorted order is alphabetical in ascending order
+        $files = scandir($dir);
+
+        // 2. iterate, check date in filename
+        foreach($files as $file) {
+            if ($file == '.' || $file == '..') {
+                continue;
+            }
+
+            // $file contains the filename inside the given directory and not a path!
+            $filePathAbs = $dir . '/' . $file;
+            $fileName = basename($filePathAbs);
+
+            // sanity checks...
+            // only operate on files that match the expected file prefix
+            if (strpos($fileName,self::CSV_FILE_PREFIX) !== 0) {
+                continue;
+            }
+            // only operate on .zip files
+            if (count(explode(".",$fileName)) !== 2 || explode(".",$fileName)[1] !== "zip") {
+                continue;
+            }
+            // parse date from filename (expecting Ymd format)
+            $parsedDate = substr($fileName,
+                strlen(self::CSV_FILE_PREFIX) + 1, // +1 for following _
+                8 // e.g. 20200115
+            );
+            // last sanity check
+            if (!is_numeric($parsedDate)) {
+                continue;
+            }
+
+            $dateOfFile = Carbon::createFromFormat("Ymd",$parsedDate);
+
+            // age check (always keep the most recent files)
+            if (!$dateOfFile->isBefore($threshold)) {
+                continue;
+            }
+
+            // keep first file of month, remove the rest
+            // how? iterating over list of files in asc order so file x_20200101 will always come before x_20200102 will come before x_20200103 etc.
+            //      so file x_20200101 will claim 202001 and not be removed but every other file with the same key will
+            $dateKey = $dateOfFile->format("Ym"); // monthly key
+
+            if (!$dateMap->has($dateKey)) {
+                $dateMap->put($dateKey,$fileName);
+                continue; // KEEP the file that claims the datekey
+            }
+
+            // REMOVE the rest
+            // at this point the key of the file is already claimed and the file is older than 30 days --> remove!
+            Log::info('Clean up old kerndaten_dump: remove '. $fileName);
+            unlink($filePathAbs);
+        }
     }
 }

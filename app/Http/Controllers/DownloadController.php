@@ -62,6 +62,10 @@ class DownloadController extends Controller
         $tmpName = 'kerndaten_dailydump_' . $timestamp->format('YmdHi') . '_' . $rand . '.zip';
         $linkPath = public_path('tmp/'.$tmpName);
 
+        if (!file_exists(public_path('tmp'))) {
+            mkdir(public_path('tmp'));
+        }
+
         $res = symlink($filePath,$linkPath);
 
         if (!$res) {
