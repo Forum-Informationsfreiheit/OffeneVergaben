@@ -51,15 +51,9 @@ class ContractorController extends Controller
         if_debug_mode_enable_query_log();
         $org = Organization::findOrFail($id);
 
-//        // re-use the main index query for datasets, but restricted to the
-//        // organization id of the contractor
-//        $query = Dataset::indexQuery(['allContractors' => true])
-//            ->filter($filters)
-//            ->where('contractors.organization_id',$org->id);
-
         $request = request();
 
-        // for the base query join on contractors table is mandatory
+        // for the base query join on contractors table is mandatory (fixed to this organization $id)
         // join on offerors table is optional (only needed if user wants to sort by offerors)
         if (($request->has('sort') && in_array($request->input('sort'),['offeror','-offeror']))) {
             $query = Dataset::indexQuery(['allContractors' => true]);
@@ -90,32 +84,42 @@ class ContractorController extends Controller
             $items = [];
         }
 
-        $stats      = $this->getContractorStats($org->id);
+        $stats      = $this->getContractorStats($org);
 
         return view('public.contractors.show',compact('items','totalItems','org','filters','data','stats'));
     }
 
-    protected function getContractorStats($orgId) {
+    protected function getContractorStats($organization) {
 
         $stats = new \stdClass();
 
-        // 1. Anzahl gewonnene Aufträge
+        // Query in parts calculates values that are pre-calculated now:
+        // datasets_count (== organization->count_auftrag_contractor) and
+        // but nb_tenders_received is not so query is required anyway. can be easily modified though
         $query = DB::table('datasets')
+            ->select([
+                DB::raw('count(*) as datasets_count'),
+                DB::raw('sum(datasets.nb_tenders_received) as sum_nb_tenders_received'),
+            ])
             ->join('contractors','contractors.dataset_id','=','datasets.id')
-            ->where('contractors.organization_id',$orgId)
+            ->where('contractors.organization_id',$organization->id)
             ->where('datasets.disabled_at',null)
             ->where('datasets.is_current_version',1);
-        $stats->totalCount = $query->count();
+
+        $statsRecord = $query->first();
+
+        // 1. Anzahl gewonnene Aufträge
+        $stats->totalCount = $statsRecord->datasets_count;
 
         // 2. Die durchschnittliche Anzahl der Bieter bei gewonnenn Aufträgen
-        $stats->totalTenders = intval($query->sum('datasets.nb_tenders_received'));
+        $stats->totalTenders = intval($statsRecord->sum_nb_tenders_received);
 
         // 3. Die 5 häufigsten Kategorien
         $query = DB::table('datasets')
             ->select(['datasets.cpv_code',DB::raw('COUNT(*) as "cpv_count"')])
             ->join('contractors','contractors.dataset_id','=','datasets.id')
             ->where('datasets.cpv_code','<>',null)
-            ->where('contractors.organization_id',$orgId)
+            ->where('contractors.organization_id',$organization->id)
             ->where('datasets.is_current_version',1)
             ->where('datasets.disabled_at',null)
             ->groupBy('datasets.cpv_code')
@@ -134,7 +138,7 @@ class ContractorController extends Controller
             ->select(['offerors.organization_id',DB::raw('COUNT(*) as "offeror_count"')])
             ->join('offerors','offerors.dataset_id','=','datasets.id')
             ->join('contractors','contractors.dataset_id','=','datasets.id')
-            ->where('contractors.organization_id',$orgId)
+            ->where('contractors.organization_id',$organization->id)
             ->where('datasets.is_current_version',1)
             ->where('datasets.disabled_at',null)
             ->groupBy('offerors.organization_id')
