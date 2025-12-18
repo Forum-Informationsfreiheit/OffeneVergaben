@@ -153,7 +153,10 @@ if (! function_exists('ui_highlight_tokens')) {
     function ui_highlight_tokens($text, $tokens, $highlightTag = 'b') {
 
         foreach($tokens as $token) {
-            $text = preg_replace('/(' . $token . ')/i', "<$highlightTag>$1</$highlightTag>", $text);
+            // escape user input for safe regex use
+            $escaped = preg_quote($token, '/'); // "/" is the delimiter in your regex
+
+            $text = preg_replace('/(' . $escaped . ')/i', "<$highlightTag>$1</$highlightTag>", $text);
         }
 
         return $text;
