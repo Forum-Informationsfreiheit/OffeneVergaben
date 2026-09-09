@@ -50,6 +50,8 @@ class VerifySubscription extends Notification
 
         $verificationUrl = $this->verificationUrl($notifiable);
 
+info("MW Mail From Debug", [ 'fromArg1' => $this->mailFromAddress(), 'fromArg2' => config('app.name') ]);
+
         return (new MailMessage)
                     ->from($this->mailFromAddress(),config('app.name'))
                     ->subject(config('app.name').' - Abo bestätigen')
@@ -82,6 +84,7 @@ class VerifySubscription extends Notification
     }
 
     protected function mailFromAddress() {
-        return env('APP_MAIL_ALERTS_FROM_ADDRESS',env('MAIL_FROM_ADDRESS'));
+	    //return "ov@offenevergaben.at";
+	    return env('APP_MAIL_ALERTS_FROM_ADDRESS',env('MAIL_FROM_ADDRESS'));
     }
 }

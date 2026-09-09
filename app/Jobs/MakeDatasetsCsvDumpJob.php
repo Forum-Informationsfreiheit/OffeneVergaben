@@ -116,6 +116,7 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
      */
     public function handle()
     {
+        Log::info('MakeDatasetsCsvDumpJob start');
         if ($this->parameters['ids']) {
             dump('MakeDatasetsCsvDumpJob called with predefined ids. Count='.count($this->parameters['ids']));
             Log::info('MakeDatasetsCsvDumpJob called with predefined ids. Count='.count($this->parameters['ids']));
@@ -129,6 +130,7 @@ class MakeDatasetsCsvDumpJob implements ShouldQueue
 
         // 2024-12-13: added new clean up function
         $this->cleanUp();
+        Log::info('MakeDatasetsCsvDumpJob stop');
     }
 
     /**
