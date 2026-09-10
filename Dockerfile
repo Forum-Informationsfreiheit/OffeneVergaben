@@ -9,27 +9,27 @@
 # ------------------------------------------------------------------------------------------------
 FROM php:7.4-apache-bullseye AS base
 
-# Debian bullseye is past its LTS window: the bullseye-security Release file is expired and
-# the mirrors are being moved to archive.debian.org. Accept expired Release files, and fall
-# back to the archive mirror once deb.debian.org has dropped bullseye.
+# Debian bullseye is past its LTS window (ended 2026-08-31) and is being moved to
+# archive.debian.org, so accept expired Release files. The deb.debian.org CDN has already
+# dropped the bullseye-security packages while still serving their index (404 on download), so
+# security updates come from security.debian.org directly. If installing fails anyway — bullseye
+# gone from there too — retry everything against archive.debian.org.
 #
 # Only the build dependencies of the extensions below: libpng/libjpeg for gd, libzip for zip.
 RUN set -eux; \
     echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until; \
-    if ! apt-get update -qq; then \
+    sed -i 's|deb.debian.org/debian-security|security.debian.org/debian-security|g' /etc/apt/sources.list; \
+    install_packages() { \
+        apt-get update -qq \
+        && apt-get install -y --no-install-recommends libjpeg62-turbo-dev libpng-dev libzip-dev; \
+    }; \
+    if ! install_packages; then \
         sed -i \
-            -e 's|deb.debian.org/debian-security|archive.debian.org/debian-security|g' \
             -e 's|security.debian.org/debian-security|archive.debian.org/debian-security|g' \
             -e 's|deb.debian.org|archive.debian.org|g' \
-            -e '/bullseye-updates/d' \
             /etc/apt/sources.list; \
-        apt-get update -qq; \
+        install_packages; \
     fi; \
-    apt-get install -y --no-install-recommends \
-        libjpeg62-turbo-dev \
-        libpng-dev \
-        libzip-dev \
-    ; \
     rm -rf /var/lib/apt/lists/*
 
 # Everything else Laravel needs (mbstring, dom, curl, openssl, fileinfo, pdo, ...) is already
