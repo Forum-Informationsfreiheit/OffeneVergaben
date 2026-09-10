@@ -11,7 +11,9 @@
 /.DS_Store
 .env
 .phpunit.result.cache
+/coverage
 Homestead.json
 Homestead.yaml
 npm-debug.log
 yarn-error.log
+/.vscode
