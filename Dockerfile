@@ -9,27 +9,27 @@
 # ------------------------------------------------------------------------------------------------
 FROM php:7.4-apache-bullseye AS base
 
-# Debian bullseye is past its LTS window (ended 2026-08-31) and is being moved to
-# archive.debian.org, so accept expired Release files. The deb.debian.org CDN has already
-# dropped the bullseye-security packages while still serving their index (404 on download), so
-# security updates come from security.debian.org directly. If installing fails anyway — bullseye
-# gone from there too — retry everything against archive.debian.org.
+# Debian bullseye reached end of life on 2026-08-31 and its packages are being removed from the
+# regular mirrors: the origin already returns 404 for bullseye-security, and the deb.debian.org /
+# security.debian.org CDN only still serves copies some locations happen to have cached (so a
+# build can pass locally and fail on GitHub). Install from snapshot.debian.org instead — a
+# permanent copy of the archive right after the last bullseye security update. Its Release
+# files are expired by design, hence Check-Valid-Until=false.
 #
 # Only the build dependencies of the extensions below: libpng/libjpeg for gd, libzip for zip.
 RUN set -eux; \
-    echo 'Acquire::Check-Valid-Until "false";' > /etc/apt/apt.conf.d/99no-check-valid-until; \
-    sed -i 's|deb.debian.org/debian-security|security.debian.org/debian-security|g' /etc/apt/sources.list; \
-    install_packages() { \
-        apt-get update -qq \
-        && apt-get install -y --no-install-recommends libjpeg62-turbo-dev libpng-dev libzip-dev; \
-    }; \
-    if ! install_packages; then \
-        sed -i \
-            -e 's|security.debian.org/debian-security|archive.debian.org/debian-security|g' \
-            -e 's|deb.debian.org|archive.debian.org|g' \
-            /etc/apt/sources.list; \
-        install_packages; \
-    fi; \
+    snapshot=http://snapshot.debian.org/archive; \
+    printf '%s\n' \
+        "deb $snapshot/debian/20260901T000000Z bullseye main" \
+        "deb $snapshot/debian/20260901T000000Z bullseye-updates main" \
+        "deb $snapshot/debian-security/20260901T000000Z bullseye-security main" \
+        > /etc/apt/sources.list; \
+    apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Retries=3 update -qq; \
+    apt-get -o Acquire::Retries=3 install -y --no-install-recommends \
+        libjpeg62-turbo-dev \
+        libpng-dev \
+        libzip-dev \
+    ; \
     rm -rf /var/lib/apt/lists/*
 
 # Everything else Laravel needs (mbstring, dom, curl, openssl, fileinfo, pdo, ...) is already
