@@ -250,6 +250,7 @@ if (!function_exists('procedure_label')) {
         }
 
         // nothing ? should never happen
+        // TODO: I think this should log an error
         return join(', ',$p);
     }
 

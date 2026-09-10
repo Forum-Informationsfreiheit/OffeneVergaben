@@ -95,10 +95,10 @@ class HelpersTest extends TestCase
         ];
     }
 
-public function testUiHighlightTokensUsesBTagByDefault()
-{
-    $this->assertSame('Stadt <b>Wien</b>', ui_highlight_tokens('Stadt Wien', ['wien']));
-}
+    public function testUiHighlightTokensUsesBTagByDefault()
+    {
+        $this->assertSame('Stadt <b>Wien</b>', ui_highlight_tokens('Stadt Wien', ['wien']));
+    }
 
 
     /**
@@ -118,5 +118,77 @@ public function testUiHighlightTokensUsesBTagByDefault()
         ];
     }
 
+    /**
+     * @dataProvider producerLabelProvider
+     */
+    public function testProducerLabel($procedures, $expected) {
+        $this->assertSame($expected, procedure_label($procedures));
+    }
 
+    public function producerLabelProvider() {
+        return [
+            "nothing matches"            => ["test", "test"],
+            "nothing matches 2"          => [["test", "hello"], "test, hello"],
+            "is no array"                => ["PT_OPEN", "offenes Verfahren"],
+            "PT_OPEN"                    => [["PT_OPEN"], "offenes Verfahren"],
+            "PT_COMPETITIVE_DIALOG"      => [["PT_COMPETITIVE_DIALOG"], "wettbewerblicher Dialog"],
+            "PT_COMPETITIVE_NEGOTIATION" => [["PT_COMPETITIVE_NEGOTIATION"], "Verhandlungsverfahren"],
+            "PT_INNOVATION_PARTNERSHIP"  => [["PT_INNOVATION_PARTNERSHIP"], "Innovationspartnerschaft"],
+            "PT_SPECIAL_SERVICE"         => [["PT_SPECIAL_SERVICE"], "Besonderer Dienstleistungsauftrag"],
+            "DPS"                        => [["DPS"], "dynamisches Beschaffungssystem"],
+            "PT_DIRECT"                  => [["PT_DIRECT"], "Direktvergabe"],
+            "PT_RESTRICTED + PT_WITH_PRIOR_NOTICE" => [
+                ["PT_RESTRICTED","PT_WITH_PRIOR_NOTICE"], 
+                "nicht offenes Verfahren mit vorheriger Bekanntmachung"
+            ],
+            "PT_RESTRICTED + PT_WITHOUT_PRIOR_NOTICE" => [
+                ["PT_RESTRICTED","PT_WITHOUT_PRIOR_NOTICE"], 
+                "nicht offenes Verfahren ohne vorheriger Bekanntmachung"
+            ],
+            "PT_COMPETITIVE_NEGOTIATION + PT_WITH_PRIOR_NOTICE" => [
+                ["PT_COMPETITIVE_NEGOTIATION","PT_WITH_PRIOR_NOTICE"], 
+                "Verhandlungsverfahren mit vorheriger Bekanntmachung"
+            ],
+            "PT_COMPETITIVE_NEGOTIATION + PT_WITHOUT_PRIOR_NOTICE" => [
+                ["PT_COMPETITIVE_NEGOTIATION","PT_WITHOUT_PRIOR_NOTICE"], 
+                "Verhandlungsverfahren ohne vorheriger Bekanntmachung"
+            ],
+            "PT_SPECIAL_SERVICE + PT_WITH_PRIOR_NOTICE" => [
+                ["PT_SPECIAL_SERVICE","PT_WITH_PRIOR_NOTICE"], 
+                "besonderer Dienstleistungsauftrag mit vorheriger Bekanntmachung"
+            ],
+            "PT_SPECIAL_SERVICE + PT_WITHOUT_PRIOR_NOTICE" => [
+                ["PT_SPECIAL_SERVICE","PT_WITHOUT_PRIOR_NOTICE"], 
+                "besonderer Dienstleistungsauftrag ohne vorheriger Bekanntmachung"
+            ],
+            "PT_DIRECT + PT_WITH_PRIOR_NOTICE" => [
+                ["PT_DIRECT","PT_WITH_PRIOR_NOTICE"], 
+                "Direktvergabe mit vorheriger Bekanntmachung"
+            ],
+            "PT_OPEN + PT_IDEA" => [
+                ["PT_OPEN","PT_IDEA"], 
+                "offener Ideenwettbewerb"
+            ],
+            "PT_OPEN + PT_IMPLEMENTATION" => [
+                ["PT_OPEN","PT_IMPLEMENTATION"], 
+                "offener Realisierungswettbewerb"
+            ],
+            "PT_RESTRICTED + PT_IDEA" => [
+                ["PT_RESTRICTED","PT_IDEA"], 
+                "nicht offener Ideenwettbewerb"
+            ],
+            "PT_RESTRICTED + PT_IMPLEMENTATION" => [
+                ["PT_RESTRICTED","PT_IMPLEMENTATION"], 
+                "nicht offener Realisierungswettbewerb"
+            ],
+            "PT_INVITED + PT_IDEA" => [
+                ["PT_INVITED","PT_IDEA"], 
+                "geladener Ideenwettbewerb"
+            ],
+            "PT_INVITED + PT_IMPLEMENTATION" => [
+                ["PT_INVITED","PT_IMPLEMENTATION"], 
+                "geladener Realisierungswettbewerb"
+            ],
+        ];
+    }
 }
