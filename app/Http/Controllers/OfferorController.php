@@ -5,31 +5,14 @@ namespace App\Http\Controllers;
 use App\CPV;
 use App\Dataset;
 use App\Http\Filters\DatasetFilter;
-use App\Http\Filters\OfferorFilter;
 use App\Http\Filters\OrganizationAsOfferorFilter;
-use App\Offeror;
 use App\Organization;
-use Illuminate\Pagination\LengthAwarePaginator;
 use Illuminate\Support\Facades\DB;
 
 class OfferorController extends Controller
 {
     public function index(OrganizationAsOfferorFilter $filters) {
         if_debug_mode_enable_query_log();
-//        $totalItems = Organization::whereHas('offerors')->count();
-//
-//        $query = Offeror::indexQuery()->filter($filters);
-//        $data  = $query->paginate(20);
-//
-//        $values = $data->keyBy('organization_id');
-//
-//        // now load the appropriate models for the view
-//        $items = Organization::loadInOrder($data->pluck('organization_id')->toArray());
-//
-//        foreach($items as &$item) {
-//            $item->datasets_count = $values[$item->id]->datasets_count;
-//            $item->sum_val_total  = $values[$item->id]->sum_val_total;
-//        }
 
         $query = Organization::query()
             ->filter($filters)
