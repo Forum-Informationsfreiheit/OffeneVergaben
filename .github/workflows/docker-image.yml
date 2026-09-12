@@ -2,19 +2,27 @@ name: Docker image
 
 # Builds the production image (Dockerfile target "prod") and pushes it to the GitHub Container
 # Registry as ghcr.io/forum-informationsfreiheit/offenevergaben.
+#
+# A build of master is additionally tagged :release if its commit is a merged pull request whose
+# tests (tests.yml) passed. Production runs :release; direct pushes to master never move it.
 on:
   push:
+    # Everything the build copies into the image, so :release always has master's code.
     paths:
       - Dockerfile
       - .dockerignore
       - docker/**
       - .github/workflows/docker-image.yml
       - app/**
+      - bootstrap/**
       - resources/**
       - routes/**
       - config/**
       - database/**
       - public/**
+      - artisan
+      - server.php
+      - composer.json
       - composer.lock
   workflow_dispatch:
 
@@ -22,9 +30,16 @@ permissions:
   contents: read
   packages: write
 
+# One run per branch at a time, so an older push that finishes last cannot move :latest or
+# :release back to its commit. A newer push replaces a run that is still queued.
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+
 jobs:
   build:
     runs-on: ubuntu-latest
+    outputs:
+      digest: ${{ steps.push.outputs.digest }}
     steps:
       - uses: actions/checkout@v7
 
@@ -45,7 +60,8 @@ jobs:
             type=sha
             type=raw,value=latest,enable={{is_default_branch}}
 
-      - uses: docker/build-push-action@v7
+      - id: push
+        uses: docker/build-push-action@v7
         with:
           context: .
           target: prod
@@ -54,3 +70,51 @@ jobs:
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
+
+  release:
+    needs: build
+    if: github.ref == 'refs/heads/master'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      pull-requests: read
+      checks: read
+    steps:
+      - name: Check for a merged and tested pull request
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          # merge_commit_sha is the commit master was updated to, for merge, squash and rebase alike.
+          pr=$(gh api "repos/$GITHUB_REPOSITORY/commits/$GITHUB_SHA/pulls" --jq '
+            [.[] | select(.merged_at != null and .base.ref == "master" and .merge_commit_sha == env.GITHUB_SHA)]
+            | .[0] // empty')
+          if [ -z "$pr" ]; then
+            echo "::error::${GITHUB_SHA::7} did not come from a pull request merged into master; not releasing"
+            exit 1
+          fi
+          number=$(jq -r .number <<<"$pr")
+          head=$(jq -r .head.sha <<<"$pr")
+
+          # tests.yml reports its phpunit job on the head commit of the pull request.
+          conclusion=$(gh api "repos/$GITHUB_REPOSITORY/commits/$head/check-runs?check_name=phpunit" \
+            --jq '.check_runs[0].conclusion // empty')
+          if [ "$conclusion" != success ]; then
+            echo "::error::Tests of #$number (${head::7}) did not pass (${conclusion:-no run found}); not releasing"
+            exit 1
+          fi
+          echo "Releasing #$number"
+
+      - uses: docker/login-action@v4
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      # Tag the digest built above instead of rebuilding, so :release is exactly that image.
+      - name: Tag image as release
+        env:
+          DIGEST: ${{ needs.build.outputs.digest }}
+        run: |
+          image="ghcr.io/${GITHUB_REPOSITORY,,}"
+          docker buildx imagetools create --tag "$image:release" "$image@$DIGEST"
