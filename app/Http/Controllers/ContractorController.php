@@ -4,11 +4,9 @@ namespace App\Http\Controllers;
 
 use App\CPV;
 use App\Dataset;
-use App\Http\Filters\ContractorFilter;
 use App\Http\Filters\DatasetFilter;
 use App\Http\Filters\OrganizationAsContractorFilter;
 use App\Organization;
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 
 class ContractorController extends Controller

@@ -5,7 +5,6 @@ namespace App\Http\Controllers;
 use App\CPV;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 use Laracasts\Utilities\JavaScript\JavaScriptFacade;
 
 class CpvController extends Controller
