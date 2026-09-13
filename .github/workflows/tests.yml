@@ -1,0 +1,101 @@
+name: Tests
+
+# Runs PHPUnit with code coverage on pull requests from dev into master and posts the coverage
+# summary as a PR comment. The comment is updated in place on every new push to the PR.
+on:
+  pull_request:
+    branches: [master]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  phpunit:
+    # Only dev -> master. This also skips Dependabot PRs, whose token may not write comments.
+    if: github.head_ref == 'dev'
+    # Pinned so a newer ubuntu-latest cannot break the PHP 7.4 / Xdebug 2 setup.
+    runs-on: ubuntu-24.04
+
+    env:
+      DB_HOST: 127.0.0.1
+      DB_DATABASE: offenevergaben
+      DB_USERNAME: offenevergaben
+      DB_PASSWORD: secret
+      DB_SCRAPER_HOST: 127.0.0.1
+      DB_SCRAPER_DATABASE: fif_scraper
+      DB_SCRAPER_USERNAME: fif_scraper
+      DB_SCRAPER_PASSWORD: fif_scraper
+
+    steps:
+      - uses: actions/checkout@v7
+
+      # Same database as compose.yaml. Started with `docker run` instead of a service container:
+      # services can neither take mysqld flags nor mount docker/mysql-init from the checkout.
+      - name: Start MySQL
+        run: |
+          docker run -d --name mysql -p 3306:3306 \
+            -e MYSQL_ROOT_PASSWORD=root \
+            -e MYSQL_DATABASE=offenevergaben \
+            -e MYSQL_USER=offenevergaben \
+            -e MYSQL_PASSWORD=secret \
+            -v "$PWD/docker/mysql-init:/docker-entrypoint-initdb.d:ro" \
+            --health-cmd "mysqladmin ping -h 127.0.0.1 -uroot -proot" \
+            --health-interval 5s \
+            --health-retries 30 \
+            mysql:8.0 \
+            --default-authentication-plugin=mysql_native_password \
+            --character-set-server=utf8mb4 \
+            --collation-server=utf8mb4_unicode_ci
+
+      # PHPUnit 7.5 only understands Xdebug 2 for coverage (see Dockerfile).
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '7.4'
+          extensions: exif, gd, pdo_mysql, zip
+          coverage: xdebug2
+
+      - uses: ramsey/composer-install@v4
+
+      - name: Prepare Laravel
+        run: |
+          cp .env.example .env
+          php artisan key:generate
+
+      - name: Wait for MySQL
+        run: |
+          for i in $(seq 60); do
+            [ "$(docker inspect -f '{{.State.Health.Status}}' mysql)" = healthy ] && exit 0
+            sleep 2
+          done
+          docker logs mysql
+          exit 1
+
+      - name: Migrate
+        run: php artisan migrate --force
+
+      - name: Run tests
+        run: vendor/bin/phpunit --coverage-text=coverage.txt
+
+      - name: Build coverage comment
+        env:
+          HEAD_SHA: ${{ github.event.pull_request.head.sha }}
+        run: |
+          # the first match is the summary block at the top of the report
+          metric() { awk -v name="$1:" '$1 == name { print $2, $3; exit }' coverage.txt; }
+          cat > coverage-comment.md <<EOF
+          ### Code coverage
+
+          | | Coverage |
+          |---|---|
+          | Lines | $(metric Lines) |
+          | Methods | $(metric Methods) |
+          | Classes | $(metric Classes) |
+
+          <sub>Commit ${HEAD_SHA::7}</sub>
+          EOF
+
+      - uses: marocchino/sticky-pull-request-comment@v3
+        with:
+          header: coverage
+          path: coverage-comment.md

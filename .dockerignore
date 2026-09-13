@@ -1,0 +1,36 @@
+# Build context. The build/prod stages copy the application into the image, so keep out VCS
+# data, local config and secrets, dependencies installed during the build, dev tooling, and
+# everything the app writes at runtime.
+.git
+.github
+.idea
+.vscode
+.env
+.env.*
+.phpunit.result.cache
+*.md
+compose.yaml
+Dockerfile
+.dockerignore
+coverage
+node_modules
+package.json
+package-lock.json
+phpunit.xml
+tests
+vendor
+webpack.mix.js
+
+bootstrap/cache/*.php
+storage/app/*
+storage/framework/cache/data/*
+storage/framework/sessions/*
+storage/framework/testing/*
+storage/framework/views/*
+storage/logs/*
+public/hot
+public/storage
+public/sitemap.xml
+public/sitemaps
+public/tmp
+public/uploads

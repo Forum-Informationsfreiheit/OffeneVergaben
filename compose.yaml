@@ -1,0 +1,153 @@
+name: offenevergaben
+
+# Local development stack for OffeneVergaben.at (Laravel 5.8 / PHP 7.4).
+#
+#   docker compose up --build          # or: podman-compose up --build
+#   open http://localhost:8000
+#
+# Fedora notes
+#   * SELinux: the bind mounts below carry the :z label so the containers may
+#     read/write the repository. Without it you get "Permission denied" even as root.
+#   * Rootless podman (the default on Fedora): the app image remaps www-data to
+#     UID/GID 1000 and the services use `userns_mode: keep-id` so the container user
+#     and your host user are the same. If your host user is not 1000, build with
+#     `UID=$(id -u) GID=$(id -g) docker compose build`. Drop the two `userns_mode`
+#     lines when running with rootful Docker instead.
+#   * Firewalld does not block published ports on localhost; nothing to open.
+
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: offenevergaben/app:local
+    # keep-id maps your host UID into the container so the bind mount stays writable.
+    # Remove this line when running with rootful Docker instead of rootless podman.
+    userns_mode: keep-id
+    ports:
+      - "${APP_HOST_PORT:-8000}:8080"
+    volumes:
+      - .:/var/www/html:z
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: "http://localhost:${APP_HOST_PORT:-8000}"
+      APP_HOST_PORT: "${APP_HOST_PORT:-8000}"
+
+      LOG_CHANNEL: stack
+      CACHE_DRIVER: file
+      SESSION_DRIVER: file
+      QUEUE_CONNECTION: sync
+      BROADCAST_DRIVER: log
+
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: offenevergaben
+      DB_USERNAME: offenevergaben
+      DB_PASSWORD: secret
+
+      DB_SCRAPER_CONNECTION: mysql_scraper
+      DB_SCRAPER_HOST: db
+      DB_SCRAPER_PORT: "3306"
+      DB_SCRAPER_DATABASE: fif_scraper
+      DB_SCRAPER_USERNAME: fif_scraper
+      DB_SCRAPER_PASSWORD: fif_scraper
+
+      # Mail: point at a local catcher or leave unset. MAIL_DRIVER=log keeps mails
+      # in storage/logs/laravel.log instead of trying to reach an SMTP server.
+      MAIL_DRIVER: log
+      APP_MAIL_ALERTS_FROM_ADDRESS: alerts@localhost
+      APP_MAIL_DEFAULT_FROM_ADDRESS: noreply@localhost
+
+      # Entrypoint behaviour
+      APP_INIT: "true"
+      RUN_MIGRATIONS: "true"
+    depends_on:
+      db:
+        condition: service_healthy
+    restart: unless-stopped
+
+  db:
+    image: mysql:8.0
+    command:
+      # TODO: we should migrate this
+      - --default-authentication-plugin=mysql_native_password
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --innodb-buffer-pool-size=512M
+    environment:
+      MYSQL_ROOT_PASSWORD: root
+      MYSQL_DATABASE: offenevergaben
+      MYSQL_USER: offenevergaben
+      MYSQL_PASSWORD: secret
+    ports:
+      # Exposed on 3307 so it cannot collide with a MySQL/MariaDB on the Fedora host.
+      - "${DB_HOST_PORT:-3307}:3306"
+    volumes:
+      - db-data:/var/lib/mysql
+      - ./docker/mysql-init:/docker-entrypoint-initdb.d:z
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "127.0.0.1", "-uroot", "-proot"]
+      interval: 5s
+      timeout: 5s
+      retries: 30
+      start_period: 30s
+    restart: unless-stopped
+
+  # Laravel task scheduler (App\Console\Kernel: fif:process, CSV dumps, sitemap,
+  # subscription cleanup). Opt in with:  docker compose --profile scheduler up
+  scheduler:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: dev
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+    image: offenevergaben/app:local
+    # keep-id maps your host UID into the container so the bind mount stays writable.
+    # Remove this line when running with rootful Docker instead of rootless podman.
+    userns_mode: keep-id
+    profiles: ["scheduler"]
+    volumes:
+      - .:/var/www/html:z
+    environment:
+      APP_ENV: local
+      APP_DEBUG: "true"
+      APP_URL: "http://localhost:${APP_HOST_PORT:-8000}"
+
+      DB_CONNECTION: mysql
+      DB_HOST: db
+      DB_PORT: "3306"
+      DB_DATABASE: offenevergaben
+      DB_USERNAME: offenevergaben
+      DB_PASSWORD: secret
+
+      DB_SCRAPER_CONNECTION: mysql_scraper
+      DB_SCRAPER_HOST: db
+      DB_SCRAPER_PORT: "3306"
+      DB_SCRAPER_DATABASE: fif_scraper
+      DB_SCRAPER_USERNAME: fif_scraper
+      DB_SCRAPER_PASSWORD: fif_scraper
+
+      MAIL_DRIVER: log
+
+      # The app container owns .env, composer install and the migrations.
+      APP_INIT: "false"
+      RUN_MIGRATIONS: "false"
+    command: >
+      sh -c 'while true; do as-app php artisan schedule:run --no-ansi; sleep 60; done'
+    depends_on:
+      db:
+        condition: service_healthy
+      app:
+        condition: service_started
+    restart: unless-stopped
+
+volumes:
+  db-data:
