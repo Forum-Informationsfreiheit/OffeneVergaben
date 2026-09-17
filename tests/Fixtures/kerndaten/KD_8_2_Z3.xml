@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KD_8_2_Z3>
+    <CONTRACTING_BODY>
+        <ADDRESS_CONTRACTING_BODY>
+            <OFFICIALNAME>Testgemeinde Musterdorf</OFFICIALNAME>
+            <NATIONALID>99999</NATIONALID>
+        </ADDRESS_CONTRACTING_BODY>
+    </CONTRACTING_BODY>
+    <OBJECT_CONTRACT>
+        <TITLE>
+            <P>Sanierung der Ortsdurchfahrt Musterdorf, Zusatzleistung</P>
+        </TITLE>
+        <CPV_MAIN>
+            <CPV_CODE CODE="99100000"/>
+        </CPV_MAIN>
+    </OBJECT_CONTRACT>
+    <MODIFICATIONS_CONTRACT>
+        <DESCRIPTION_PROCUREMENT>
+            <!-- on one line, so tests can replace it without touching CPV_MAIN of OBJECT_CONTRACT -->
+            <CPV_MAIN><CPV_CODE CODE="99100000"/></CPV_MAIN>
+            <CPV_ADDITIONAL>
+                <CPV_CODE CODE="99120000"/>
+            </CPV_ADDITIONAL>
+            <SHORT_DESCR>
+                <P>Zusätzliche Lärmschutzwand</P>
+            </SHORT_DESCR>
+            <CONTRACTOR>
+                <ADDRESS_CONTRACTOR>
+                    <OFFICIALNAME>Muster Bau GmbH</OFFICIALNAME>
+                    <NATIONALID>999997y</NATIONALID>
+                </ADDRESS_CONTRACTOR>
+            </CONTRACTOR>
+        </DESCRIPTION_PROCUREMENT>
+        <INFO_MODIFICATIONS>
+            <ADDITIONAL_NEED>
+                <P>Auflage der Behörde</P>
+            </ADDITIONAL_NEED>
+            <VAL_TOTAL_BEFORE CURRENCY="EUR">1234567.89</VAL_TOTAL_BEFORE>
+            <VAL_TOTAL_AFTER CURRENCY="EUR">150000</VAL_TOTAL_AFTER>
+        </INFO_MODIFICATIONS>
+    </MODIFICATIONS_CONTRACT>
+</KD_8_2_Z3>
