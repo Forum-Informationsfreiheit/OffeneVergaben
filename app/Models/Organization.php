@@ -1,7 +1,8 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
+use App\NationalIdParser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Kblais\QueryFilter\FilterableTrait;
@@ -15,11 +16,11 @@ class Organization extends Model
     ];
 
     public function offerors() {
-        return $this->hasMany('App\Offeror');
+        return $this->hasMany('App\Models\Offeror');
     }
 
     public function contractors() {
-        return $this->hasMany('App\Contractor');
+        return $this->hasMany('App\Models\Contractor');
     }
 
     /**
@@ -42,7 +43,7 @@ class Organization extends Model
      * @param $type string
      * @param $name string
      *
-     * @return null|\App\Organization
+     * @return null|\App\Models\Organization
      */
     public static function createFromType($id, $type, $name) {
         $type = is_string($type) ? strtoupper($type) : null;
@@ -106,7 +107,7 @@ class Organization extends Model
     /**
      * @param $name
      *
-     * @return null|\App\Organization
+     * @return null|\App\Models\Organization
      */
     public static function createFromUnknownType($id, $name) {
         if (!$id) {
@@ -126,7 +127,7 @@ class Organization extends Model
     /**
      * @param $name
      *
-     * @return null|\App\Organization
+     * @return null|\App\Models\Organization
      */
     public static function createGeneric($name) {
         if (!$name) {

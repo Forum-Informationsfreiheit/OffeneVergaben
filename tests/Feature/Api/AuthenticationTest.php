@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Api;
 
-use App\Role;
-use App\User;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -147,6 +147,6 @@ class AuthenticationTest extends TestCase
 
     protected function createUser(array $attributes = [])
     {
-        return factory(User::class)->create($attributes);
+        return User::factory()->create($attributes);
     }
 }

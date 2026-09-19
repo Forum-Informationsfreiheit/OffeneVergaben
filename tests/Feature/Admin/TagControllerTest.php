@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Tag;
+use App\Models\Tag;
 use Illuminate\Support\Str;
 
 class TagControllerTest extends AdminTestCase

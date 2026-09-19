@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -18,7 +18,7 @@ class ScraperQuelle extends Model
     // RELATIONS -------------------------------------------------------------------------------------------------------
     /*
     public function author() {
-        return $this->belongsTo('App\User','author_id');
+        return $this->belongsTo('App\Models\User','author_id');
     }
     */
 

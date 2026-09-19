@@ -2,12 +2,10 @@
 
 namespace App\Notifications;
 
-use App\Subscription;
-use App\User;
+use App\Models\Subscription;
+use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Bus\Queueable;
 use Illuminate\Notifications\Notification;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Support\Facades\URL;
 
@@ -18,7 +16,7 @@ class VerifySubscription extends Notification
     /**
      * Create a new notification instance.
      *
-     * @param \App\Subscription $subscription
+     * @param \App\Models\Subscription $subscription
      */
     public function __construct($subscription)
     {

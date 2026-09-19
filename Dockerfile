@@ -1,4 +1,4 @@
-# OffeneVergaben.at — Laravel 5.8 / PHP 7.4 on Apache
+# OffeneVergaben.at — Laravel 8 / PHP 7.4 on Apache
 #
 # Stages:
 #   base   PHP extensions, Apache and php.ini, shared by dev and prod
@@ -60,11 +60,11 @@ RUN set -eux; \
 # ------------------------------------------------------------------------------------------------
 FROM base AS dev
 
-# Xdebug for PHPUnit code coverage. PHPUnit 7.5 (php-code-coverage 6) only understands
-# Xdebug 2 — Xdebug 3 fails its `xdebug.coverage_enable` check. Installed but NOT enabled,
-# so Apache runs without the overhead; load it per run with `php -d zend_extension=xdebug`.
+# Xdebug for PHPUnit code coverage. 3.1.6 is the last release that supports PHP 7.4.
+# Installed but NOT enabled, so Apache runs without the overhead; load it per run with
+# `php -d zend_extension=xdebug -d xdebug.mode=coverage`.
 RUN set -eux; \
-    pecl install xdebug-2.9.8; \
+    pecl install xdebug-3.1.6; \
     rm -rf /tmp/pear
 
 # Fully qualified so podman does not have to guess the registry for the build stage.

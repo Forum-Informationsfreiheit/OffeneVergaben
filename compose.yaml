@@ -1,6 +1,6 @@
 name: offenevergaben
 
-# Local development stack for OffeneVergaben.at (Laravel 5.8 / PHP 7.4).
+# Local development stack for OffeneVergaben.at (Laravel 8 / PHP 7.4).
 #
 #   docker compose up --build          # or: podman-compose up --build
 #   open http://localhost:8000
@@ -58,9 +58,9 @@ services:
       DB_SCRAPER_USERNAME: fif_scraper
       DB_SCRAPER_PASSWORD: fif_scraper
 
-      # Mail: point at a local catcher or leave unset. MAIL_DRIVER=log keeps mails
+      # Mail: point at a local catcher or leave unset. MAIL_MAILER=log keeps mails
       # in storage/logs/laravel.log instead of trying to reach an SMTP server.
-      MAIL_DRIVER: log
+      MAIL_MAILER: log
       APP_MAIL_ALERTS_FROM_ADDRESS: alerts@localhost
       APP_MAIL_DEFAULT_FROM_ADDRESS: noreply@localhost
 
@@ -135,7 +135,7 @@ services:
       DB_SCRAPER_USERNAME: fif_scraper
       DB_SCRAPER_PASSWORD: fif_scraper
 
-      MAIL_DRIVER: log
+      MAIL_MAILER: log
 
       # The app container owns .env, composer install and the migrations.
       APP_INIT: "false"

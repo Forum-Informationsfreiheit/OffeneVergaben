@@ -2,7 +2,7 @@
 
 namespace App\Http\Controllers;
 
-use App\CPV;
+use App\Models\CPV;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Laracasts\Utilities\JavaScript\JavaScriptFacade;

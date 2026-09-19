@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers;
 
-use App\CPV;
-use App\Dataset;
+use App\Models\CPV;
+use App\Models\Dataset;
 use App\Http\Filters\DatasetFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Gate;

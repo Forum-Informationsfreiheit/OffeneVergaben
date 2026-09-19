@@ -2,10 +2,10 @@
 
 namespace App\Providers;
 
+use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Support\ServiceProvider;
-use Illuminate\Support\Facades\DB;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -30,6 +30,9 @@ class AppServiceProvider extends ServiceProvider
         // utf8_mb4 problems with older mysql versions
         // @see https://laravel-news.com/laravel-5-4-key-too-long-error
         Schema::defaultStringLength(191);
+
+        // Laravel 8 renders pagination links with Tailwind by default; the views use Bootstrap 4
+        Paginator::useBootstrap();
 
         // add @svg directive to blade templates
         // @see https://stackoverflow.com/a/43117258/718980

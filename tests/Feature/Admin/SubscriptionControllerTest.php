@@ -3,7 +3,7 @@
 namespace Tests\Feature\Admin;
 
 use App\Notifications\VerifySubscription;
-use App\Role;
+use App\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Notification;
 

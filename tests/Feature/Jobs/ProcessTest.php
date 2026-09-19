@@ -3,9 +3,9 @@
 namespace Tests\Feature\Jobs;
 
 use App\Jobs\Process;
-use App\Organization;
-use App\ScraperKerndaten;
-use App\ScraperQuelle;
+use App\Models\Organization;
+use App\Models\ScraperKerndaten;
+use App\Models\ScraperQuelle;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Tests\Fixtures\Kerndaten;

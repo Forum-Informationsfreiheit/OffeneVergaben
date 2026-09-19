@@ -1,16 +1,16 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use App\Http\Controllers\SubscriptionController;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Notifications\Notifiable;
-use Illuminate\Contracts\Auth\MustVerifyEmail;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Support\Facades\URL;
 
 class User extends Authenticatable
 {
-    use Notifiable;
+    use HasFactory, Notifiable;
 
     /**
      * The attributes that are mass assignable.
@@ -44,14 +44,14 @@ class User extends Authenticatable
      * @return \Illuminate\Database\Eloquent\Relations\BelongsTo
      */
     public function role() {
-        return $this->belongsTo('App\Role');
+        return $this->belongsTo('App\Models\Role');
     }
 
     /**
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
     public function subscriptions() {
-        return $this->hasMany('App\Subscription');
+        return $this->hasMany('App\Models\Subscription');
     }
 
     // SCOPES ----------------------------------------------------------------------------------------------------------
@@ -130,10 +130,10 @@ class User extends Authenticatable
     }
 
     /**
-     * @param \App\Subscription $subscription
+     * @param \App\Models\Subscription $subscription
      */
     public function sendSubscriptionVerificationNotification($subscription) {
-        $this->notify(new Notifications\VerifySubscription($subscription));
+        $this->notify(new \App\Notifications\VerifySubscription($subscription));
     }
 
     /**
@@ -146,6 +146,6 @@ class User extends Authenticatable
             return $this->id === $subscription->user_id && $subscription->verified_at != null;
         });
 
-        $this->notify(new Notifications\SubscriptionUpdateSummary($subscriptions, $updateInfo));
+        $this->notify(new \App\Notifications\SubscriptionUpdateSummary($subscriptions, $updateInfo));
     }
 }

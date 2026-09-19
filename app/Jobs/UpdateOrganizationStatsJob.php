@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Organization;
+use App\Models\Organization;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\DB;

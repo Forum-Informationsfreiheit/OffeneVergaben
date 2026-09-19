@@ -2,9 +2,9 @@
 
 namespace App\Jobs;
 
-use App\Dataset;
+use App\Models\Dataset;
 use App\Http\Filters\DatasetFilter;
-use App\User;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\Request;
@@ -42,7 +42,7 @@ class SendSubscriptionUpdateNotificationsJob
     }
 
     /**
-     * @param \App\User $subscriber
+     * @param \App\Models\User $subscriber
      */
     protected function handleSubscriber($subscriber) {
 
@@ -100,7 +100,7 @@ class SendSubscriptionUpdateNotificationsJob
 
     /**
      * @param array $timeFrame
-     * @param \App\Subscription $subscription
+     * @param \App\Models\Subscription $subscription
      * @return mixed
      */
     protected function getNumberOfSubscriptionUpdatesInTimeFrame($timeFrame, $subscription) {

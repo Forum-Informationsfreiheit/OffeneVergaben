@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Post;
-use App\Role;
+use App\Models\Post;
+use App\Models\Role;
 use Illuminate\Support\Str;
 
 class PostControllerTest extends PublicTestCase
@@ -32,7 +32,7 @@ class PostControllerTest extends PublicTestCase
         $response->assertStatus(200);
         $response->assertViewIs('public.posts.show');
         $response->assertSee($post->title);
-        $response->assertSee('<p>Inhalt des Beitrags</p>');
+        $response->assertSee('<p>Inhalt des Beitrags</p>', false);
         $response->assertDontSee('Nicht veröffentlicht!');
     }
 

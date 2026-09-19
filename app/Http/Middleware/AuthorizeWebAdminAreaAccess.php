@@ -2,7 +2,7 @@
 
 namespace App\Http\Middleware;
 
-use App\Role;
+use App\Models\Role;
 use Closure;
 use Illuminate\Auth\Access\AuthorizationException;
 use Illuminate\Support\Facades\Auth;

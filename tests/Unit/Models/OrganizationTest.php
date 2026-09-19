@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Models;
 
-use App\Organization;
+use App\Models\Organization;
 use Tests\TestCase;
 
 class OrganizationTest extends TestCase

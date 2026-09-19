@@ -1,28 +1,35 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 
-class Page extends Model
+class Post extends Model
 {
-    protected $fillable = [
-        'title',
-        'body',
-        'slug'
-    ];
+    protected $dates = ['published_at'];
 
     // RELATIONS -------------------------------------------------------------------------------------------------------
     public function author() {
-        return $this->belongsTo('App\User','author_id');
+        return $this->belongsTo('App\Models\User','author_id');
+    }
+    public function tags() {
+        return $this->belongsToMany('App\Models\Tag');
     }
 
     // SCOPES ----------------------------------------------------------------------------------------------------------
     public static function scopePublished($query) {
         return $query->whereNotNull('published_at');
     }
+
+    /*
+    public static function publishedPostsWithTag($tagId) {
+        return self::publishedPosts()->whereHas('tags', function($query) use ($tagId){
+            $query->where('tags.id', '=', $tagId);
+        });
+    }
+    */
 
     public static function findBySlugOrFail($slug) {
         $post = self::where('slug',$slug)->first();
@@ -38,8 +45,6 @@ class Page extends Model
      * Check if given slug is unique within Posts table.
      * If input is not unique, a random string of 4 chars will be appended.
      *
-     * Duplicate of Post::uniqueSlug
-     *
      * @param $slug
      * @return string
      */
@@ -47,14 +52,36 @@ class Page extends Model
         $suffix = '';
 
         while (self::where('slug',$slug.$suffix)->first()) {
-            $suffix = '-' . strtolower(Str::random(3));
+            $suffix = '-' . strtolower(Str::random(4));
         }
 
         return $slug.$suffix;
     }
 
+    public static function newestPost() {
+        return self::orderBy('created_at','desc')->first();
+    }
+
+    // ATTRIBUTES ------------------------------------------------------------------------------------------------------
+
+    public function getImageAttribute() {
+        if ($this->image_filepath && $this->image_filename) {
+            return $this->image_filepath . '/' . $this->image_filename;
+        }
+
+        return null;
+    }
+
+    public function getThumbAttribute() {
+        if ($this->image_filepath && $this->image_filename) {
+            return $this->image_filepath . '/' . config('lfm.thumb_folder_name') . '/' . $this->image_filename;
+        }
+
+        return null;
+    }
+
     /**
-     * On publish set the slug according to the title of the page.
+     * On publish set the slug according to the title of the post.
      *
      * On un-publish clear the slug (set null).
      *

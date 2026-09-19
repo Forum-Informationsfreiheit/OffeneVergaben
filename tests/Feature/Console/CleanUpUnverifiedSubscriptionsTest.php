@@ -2,9 +2,9 @@
 
 namespace Tests\Feature\Console;
 
-use App\Role;
-use App\Subscription;
-use App\User;
+use App\Models\Role;
+use App\Models\Subscription;
+use App\Models\User;
 use Tests\Feature\Jobs\JobTestCase;
 
 /**

@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
@@ -59,59 +59,59 @@ class Dataset extends Model
 
     // RELATIONS -------------------------------------------------------------------------------------------------------
     public function type() {
-        return $this->belongsTo('App\DatasetType','type_code');
+        return $this->belongsTo('App\Models\DatasetType','type_code');
     }
 
     public function metaset() {
-        return $this->belongsTo('App\Metaset');
+        return $this->belongsTo('App\Models\Metaset');
     }
 
     public function scraperKerndaten() {
-        return $this->belongsTo('App\ScraperKerndaten','scraper_kerndaten_id','id');
+        return $this->belongsTo('App\Models\ScraperKerndaten','scraper_kerndaten_id','id');
     }
 
     public function offeror() {
-        return $this->hasOne('App\Offeror')->where('is_extra',0);
+        return $this->hasOne('App\Models\Offeror')->where('is_extra',0);
     }
 
     public function offerors() {
-        return $this->hasMany('App\Offeror');
+        return $this->hasMany('App\Models\Offeror');
     }
 
     public function offerorsAdditional(){
-        return $this->hasMany('App\Offeror')->where('is_extra',1);
+        return $this->hasMany('App\Models\Offeror')->where('is_extra',1);
     }
 
     public function contractor() {
-        return $this->hasOne('App\Contractor')->where('is_extra',0);
+        return $this->hasOne('App\Models\Contractor')->where('is_extra',0);
     }
 
     public function contractors() {
-        return $this->hasMany('App\Contractor');
+        return $this->hasMany('App\Models\Contractor');
     }
 
     public function contractorsAdditional() {
-        return $this->hasMany('App\Contractor')->where('is_extra',1);
+        return $this->hasMany('App\Models\Contractor')->where('is_extra',1);
     }
 
     public function nuts() {
-        return $this->belongsTo('App\NUTS','nuts_code');
+        return $this->belongsTo('App\Models\NUTS','nuts_code');
     }
 
     public function cpv() {
-        return $this->belongsTo('App\CPV','cpv_code');
+        return $this->belongsTo('App\Models\CPV','cpv_code');
     }
 
     public function cpvs() {
-        return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code');
+        return $this->belongsToMany('App\Models\CPV','cpv_dataset','dataset_id','cpv_code');
     }
 
     public function cpvsAdditional() {
-        return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code')->where('main',0);
+        return $this->belongsToMany('App\Models\CPV','cpv_dataset','dataset_id','cpv_code')->where('main',0);
     }
 
     public function procedures() {
-        return $this->belongsToMany('App\Procedure','dataset_procedure','dataset_id','procedure_code');
+        return $this->belongsToMany('App\Models\Procedure','dataset_procedure','dataset_id','procedure_code');
     }
 
     // ACCESSORS -------------------------------------------------------------------------------------------------------

@@ -2,9 +2,9 @@
 
 namespace App\Console\Commands;
 
-use App\Role;
-use App\Subscription;
-use App\User;
+use App\Models\Role;
+use App\Models\Subscription;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;

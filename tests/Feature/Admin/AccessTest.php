@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Role;
+use App\Models\Role;
 
 class AccessTest extends AdminTestCase
 {

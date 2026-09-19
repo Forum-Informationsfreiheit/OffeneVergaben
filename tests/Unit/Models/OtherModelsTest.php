@@ -2,10 +2,10 @@
 
 namespace Tests\Unit\Models;
 
-use App\Contractor;
-use App\Offeror;
-use App\Post;
-use App\ScraperKerndaten;
+use App\Models\Contractor;
+use App\Models\Offeror;
+use App\Models\Post;
+use App\Models\ScraperKerndaten;
 use Tests\TestCase;
 
 class OtherModelsTest extends TestCase

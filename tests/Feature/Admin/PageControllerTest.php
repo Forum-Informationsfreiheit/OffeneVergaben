@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Page;
+use App\Models\Page;
 use Illuminate\Support\Str;
 
 class PageControllerTest extends AdminTestCase

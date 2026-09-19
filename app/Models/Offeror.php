@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Kblais\QueryFilter\FilterableTrait;
@@ -18,11 +18,11 @@ class Offeror extends Model
     }
 
     public function organization() {
-        return $this->belongsTo('App\Organization');
+        return $this->belongsTo('App\Models\Organization');
     }
 
     public function dataset() {
-        return $this->belongsTo('App\Dataset');
+        return $this->belongsTo('App\Models\Dataset');
     }
 
     public function toString() {

@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Role;
+use App\Models\Role;
 use Illuminate\Contracts\Debug\ExceptionHandler;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Facade;

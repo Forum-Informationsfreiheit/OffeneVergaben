@@ -2,11 +2,11 @@
 
 namespace App\Http\Controllers;
 
-use App\CPV;
-use App\Dataset;
+use App\Models\CPV;
+use App\Models\Dataset;
 use App\Http\Filters\DatasetFilter;
 use App\Http\Filters\OrganizationAsContractorFilter;
-use App\Organization;
+use App\Models\Organization;
 use Illuminate\Support\Facades\DB;
 
 class ContractorController extends Controller

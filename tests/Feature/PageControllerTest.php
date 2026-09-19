@@ -2,8 +2,8 @@
 
 namespace Tests\Feature;
 
-use App\Page;
-use App\Role;
+use App\Models\Page;
+use App\Models\Role;
 use Illuminate\Support\Str;
 
 class PageControllerTest extends PublicTestCase
@@ -88,7 +88,7 @@ class PageControllerTest extends PublicTestCase
         $response->assertStatus(200);
         $response->assertViewIs('public.page');
         $response->assertSee($page->title);
-        $response->assertSee('<p>Inhalt der Seite</p>');
+        $response->assertSee('<p>Inhalt der Seite</p>', false);
         $response->assertDontSee('Nicht veröffentlicht!');
     }
 

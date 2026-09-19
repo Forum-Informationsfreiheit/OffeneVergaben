@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Kblais\QueryFilter\FilterableTrait;
@@ -14,7 +14,7 @@ class Contractor extends Model
     ];
 
     public function organization() {
-        return $this->belongsTo('App\Organization');
+        return $this->belongsTo('App\Models\Organization');
     }
 
     public function toString() {

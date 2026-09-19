@@ -2,9 +2,8 @@
 
 namespace App\Http\Filters;
 
-use App\CPV;
-use App\DatasetType;
-use Illuminate\Database\Query\Builder;
+use App\Models\CPV;
+use App\Models\DatasetType;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 use Kblais\QueryFilter\QueryFilter;

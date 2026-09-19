@@ -2,18 +2,17 @@
 
 namespace App\Jobs;
 
-use App\Contractor;
-use App\CPV;
-use App\Dataset;
+use App\Models\Contractor;
+use App\Models\CPV;
+use App\Models\Dataset;
 use App\DOMKerndaten;
-use App\Metaset;
+use App\Models\Metaset;
 use App\NationalIdParser;
-use App\NUTS;
-use App\Offeror;
-use App\Organization;
-use App\ScraperKerndaten;
+use App\Models\NUTS;
+use App\Models\Offeror;
+use App\Models\Organization;
+use App\Models\ScraperKerndaten;
 use Carbon\Carbon;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -58,7 +57,7 @@ class Process
         $blockSize = 50;
         $index = 0;
 
-        // Collection of App\ScraperKerndaten
+        // Collection of App\Models\ScraperKerndaten
         $records = $this->getRawKerndatenRecords(0, $blockSize);
 
         $processedCount = 0;
@@ -421,7 +420,7 @@ class Process
      * @param $id
      * @param $name
      *
-     * @return null|\App\Organization
+     * @return null|\App\Models\Organization
      */
     protected function matchOrCreateOrganization($id, $name) {
         $parser = null;

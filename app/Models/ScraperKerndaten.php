@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -24,7 +24,7 @@ class ScraperKerndaten extends Model
     // RELATIONS -------------------------------------------------------------------------------------------------------
     // Sonderfall weil attribut ebenfalls quelle heisst, daher methode umbenannt auf rel_quelle (anstatt quelle)
     public function rel_quelle() {
-        return $this->belongsTo('App\ScraperQuelle','quelle','alias');
+        return $this->belongsTo('App\Models\ScraperQuelle','quelle','alias');
     }
 
     // SCOPES ----------------------------------------------------------------------------------------------------------

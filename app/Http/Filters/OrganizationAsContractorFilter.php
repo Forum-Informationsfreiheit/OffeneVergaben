@@ -2,8 +2,6 @@
 
 namespace App\Http\Filters;
 
-use App\DatasetType;
-use Illuminate\Database\Query\Builder;
 use Kblais\QueryFilter\QueryFilter;
 
 class OrganizationAsContractorFilter extends QueryFilter

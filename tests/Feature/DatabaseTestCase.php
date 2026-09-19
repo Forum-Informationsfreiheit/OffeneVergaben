@@ -2,10 +2,10 @@
 
 namespace Tests\Feature;
 
-use App\CPV;
-use App\Organization;
-use App\Role;
-use App\User;
+use App\Models\CPV;
+use App\Models\Organization;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -62,7 +62,7 @@ abstract class DatabaseTestCase extends TestCase
 
     protected function createUser($roleId, array $attributes = [])
     {
-        return factory(User::class)->create(array_merge(['role_id' => $roleId], $attributes));
+        return User::factory()->create(array_merge(['role_id' => $roleId], $attributes));
     }
 
     protected function createOrganization(array $attributes = [])

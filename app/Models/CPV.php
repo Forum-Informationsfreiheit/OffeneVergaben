@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
@@ -31,7 +31,7 @@ class CPV extends Model
     }
 
     public function datasets() {
-        return $this->belongsToMany('App\Dataset','cpv_dataset','cpv_code','dataset_id');
+        return $this->belongsToMany('App\Models\Dataset','cpv_dataset','cpv_code','dataset_id');
     }
 
     public function getLevelAttribute() {

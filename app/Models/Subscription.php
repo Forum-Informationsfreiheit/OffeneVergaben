@@ -1,6 +1,6 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
@@ -20,7 +20,7 @@ class Subscription extends Model
 
     // RELATIONS -------------------------------------------------------------------------------------------------------
     public function subscriber() {
-        return $this->belongsTo('App\User','user_id');
+        return $this->belongsTo('App\Models\User','user_id');
     }
 
     // SCOPES ----------------------------------------------------------------------------------------------------------
