@@ -7,6 +7,56 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Kblais\QueryFilter\FilterableTrait;
 
+/**
+ * App\Models\Organization
+ *
+ * @property int $id
+ * @property string $name
+ * @property string|null $fn
+ * @property string|null $gln
+ * @property string|null $gkz
+ * @property string|null $ukn
+ * @property bool $is_identified
+ * @property int $count_offeror
+ * @property int $count_contractor
+ * @property int $count_ausschreibung_offeror
+ * @property int $count_ausschreibung_contractor
+ * @property int $count_auftrag_offeror
+ * @property int $count_auftrag_contractor
+ * @property int $val_total_auftrag_offeror
+ * @property int $val_total_auftrag_contractor
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Contractor> $contractors
+ * @property-read int|null $contractors_count
+ * @property-read mixed $identifiers
+ * @property-read mixed $national_id
+ * @property-read mixed $national_id_label
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Offeror> $offerors
+ * @property-read int|null $offerors_count
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization filter(\Kblais\QueryFilter\QueryFilter $filters)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereCountAuftragContractor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereCountAuftragOfferor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereCountAusschreibungContractor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereCountAusschreibungOfferor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereCountContractor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereCountOfferor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereFn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereGkz($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereGln($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereIsIdentified($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereUkn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereValTotalAuftragContractor($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Organization whereValTotalAuftragOfferor($value)
+ * @mixin \Eloquent
+ */
 class Organization extends Model
 {
     use FilterableTrait;

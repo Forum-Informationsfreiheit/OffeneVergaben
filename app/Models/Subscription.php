@@ -5,6 +5,36 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\URL;
 
+/**
+ * App\Models\Subscription
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string $type
+ * @property string $title
+ * @property string $query
+ * @property \Illuminate\Support\Carbon|null $verified_at
+ * @property string|null $last_notified_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read String $cancel_url
+ * @property-read String $unsubscribe_url
+ * @property-read \App\Models\User $subscriber
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription verified()
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereLastNotifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereQuery($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereVerifiedAt($value)
+ * @mixin \Eloquent
+ */
 class Subscription extends Model
 {
     const TYPE_DATASET      = 'dataset';

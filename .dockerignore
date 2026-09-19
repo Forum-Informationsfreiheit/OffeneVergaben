@@ -16,8 +16,13 @@ coverage
 node_modules
 package.json
 package-lock.json
+phpstan.neon
+phpstan.neon.dist
 phpunit.xml
 tests
+_ide_helper.php
+_ide_helper_models.php
+.phpstorm.meta.php
 vendor
 webpack.mix.js
 

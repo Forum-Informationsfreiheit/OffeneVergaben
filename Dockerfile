@@ -1,4 +1,4 @@
-# OffeneVergaben.at — Laravel 8 / PHP 7.4 on Apache
+# OffeneVergaben.at — Laravel 8 / PHP 8.1 on Apache
 #
 # Stages:
 #   base   PHP extensions, Apache and php.ini, shared by dev and prod
@@ -7,24 +7,15 @@
 #   prod   code + vendor/ baked in, runs as www-data (default target, built by CI)
 
 # ------------------------------------------------------------------------------------------------
-FROM php:7.4-apache-bullseye AS base
+FROM php:8.1-apache-bookworm AS base
 
-# Debian bullseye reached end of life on 2026-08-31 and its packages are being removed from the
-# regular mirrors: the origin already returns 404 for bullseye-security, and the deb.debian.org /
-# security.debian.org CDN only still serves copies some locations happen to have cached (so a
-# build can pass locally and fail on GitHub). Install from snapshot.debian.org instead — a
-# permanent copy of the archive right after the last bullseye security update. Its Release
-# files are expired by design, hence Check-Valid-Until=false.
+# Bookworm instead of bullseye: bullseye reached end of life on 2026-08-31 and there is no
+# php:8.1-apache-bullseye image past 8.1.33, so the snapshot.debian.org sources.list pinning the
+# 7.4 image needed is gone with it — bookworm is still served by the regular mirrors.
 #
 # Only the build dependencies of the extensions below: libpng/libjpeg for gd, libzip for zip.
 RUN set -eux; \
-    snapshot=http://snapshot.debian.org/archive; \
-    printf '%s\n' \
-        "deb $snapshot/debian/20260901T000000Z bullseye main" \
-        "deb $snapshot/debian/20260901T000000Z bullseye-updates main" \
-        "deb $snapshot/debian-security/20260901T000000Z bullseye-security main" \
-        > /etc/apt/sources.list; \
-    apt-get -o Acquire::Check-Valid-Until=false -o Acquire::Retries=3 update -qq; \
+    apt-get -o Acquire::Retries=3 update -qq; \
     apt-get -o Acquire::Retries=3 install -y --no-install-recommends \
         libjpeg62-turbo-dev \
         libpng-dev \
@@ -60,11 +51,11 @@ RUN set -eux; \
 # ------------------------------------------------------------------------------------------------
 FROM base AS dev
 
-# Xdebug for PHPUnit code coverage. 3.1.6 is the last release that supports PHP 7.4.
+# Xdebug for PHPUnit code coverage. 3.2.2 covers PHP 8.0–8.2 (3.1.x was the 7.4 line).
 # Installed but NOT enabled, so Apache runs without the overhead; load it per run with
 # `php -d zend_extension=xdebug -d xdebug.mode=coverage`.
 RUN set -eux; \
-    pecl install xdebug-3.1.6; \
+    pecl install xdebug-3.2.2; \
     rm -rf /tmp/pear
 
 # Fully qualified so podman does not have to guess the registry for the build stage.

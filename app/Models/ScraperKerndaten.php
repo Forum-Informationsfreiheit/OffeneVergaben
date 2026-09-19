@@ -4,6 +4,33 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\ScraperKerndaten
+ *
+ * @property int $id
+ * @property string $quelle
+ * @property string $item_id
+ * @property string|null $item_lastmod
+ * @property int|null $version
+ * @property string|null $xml
+ * @property \Illuminate\Support\Carbon|null $app_processed_at
+ * @property int|null $app_dataset_id
+ * @property-read string $xml_formatted_html
+ * @property-read \App\Models\ScraperQuelle|null $rel_quelle
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten query()
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten unprocessed()
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten whereAppDatasetId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten whereAppProcessedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten whereItemId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten whereItemLastmod($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten whereQuelle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten whereVersion($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|ScraperKerndaten whereXml($value)
+ * @mixin \Eloquent
+ */
 class ScraperKerndaten extends Model
 {
     /**

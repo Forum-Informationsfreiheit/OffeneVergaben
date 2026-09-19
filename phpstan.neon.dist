@@ -1,0 +1,43 @@
+# Static analysis. Added for the PHP 7.4 -> 8.1 deprecation sweep (ROADMAP Phase 2, step 2.0);
+# ROADMAP Phase 2 wants this at level 5 by its exit.
+#
+#   composer analyse                                  # full report
+#   composer analyse -- --error-format=table          # grouped by file
+#
+# Why level 5 for the sweep: it is the level that checks the types of arguments passed to
+# functions, so it reports the PHP 8.1 "passing null to a non-nullable internal parameter"
+# class as
+#
+#   Parameter #1 $haystack of function strpos expects string, string|null given.
+#
+# without a null ever having to occur at runtime — which is the whole problem with catching
+# these from the test suite, where the fixtures decide whether the null appears.
+#
+# Two blind spots, so this does NOT replace clicking through the running app once:
+#   * Blade is never analysed. `ui_highlight_tokens()` / `contains_decimal()` are called from
+#     .blade.php, and those call sites are invisible here.
+#   * Eloquent attributes are `mixed` unless the model carries `@property` docblocks, so
+#     `$dataset->cpv` reads as mixed rather than string|null and passes silently. Only
+#     `Organization` has them today — see the `@property docblocks on all models` item in
+#     ROADMAP §"Code quality", which generates them with barryvdh/laravel-ide-helper. Doing
+#     that first is what makes this config find the model-driven nulls.
+# `nunomaduro/larastan` is marked abandoned in favour of `larastan/larastan`, and composer will
+# say so on every install. It is the correct package anyway while this app is on Laravel 8: the
+# renamed package starts at 2.0, which requires Laravel 9. Swap it — and lift the phpstan cap
+# below — with the 8 -> 9 step in ROADMAP Phase 2.
+includes:
+    - ./vendor/nunomaduro/larastan/extension.neon
+    - ./vendor/phpstan/phpstan-deprecation-rules/rules.neon
+
+parameters:
+    level: 5
+
+    paths:
+        - app
+        - database
+        - routes
+
+    # The legacy helpers and filters take untyped $value / $text / array parameters. Without
+    # this every one of them raises "no value type specified in iterable type array", which
+    # buries the findings the sweep is actually looking for.
+    checkMissingIterableValueType: false

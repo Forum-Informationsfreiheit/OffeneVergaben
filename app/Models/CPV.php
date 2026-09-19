@@ -4,6 +4,27 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
 
+/**
+ * App\Models\CPV
+ *
+ * @property string $code
+ * @property string|null $trimmed_code
+ * @property int $control_digit
+ * @property string $name
+ * @property string|null $name_en
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Dataset> $datasets
+ * @property-read int|null $datasets_count
+ * @property-read mixed $level
+ * @method static \Illuminate\Database\Eloquent\Builder|CPV newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CPV newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|CPV query()
+ * @method static \Illuminate\Database\Eloquent\Builder|CPV whereCode($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CPV whereControlDigit($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CPV whereName($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CPV whereNameEn($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|CPV whereTrimmedCode($value)
+ * @mixin \Eloquent
+ */
 class CPV extends Model
 {
     const STR_CODE_LENGTH = 8;   // all cpv codes are length 8

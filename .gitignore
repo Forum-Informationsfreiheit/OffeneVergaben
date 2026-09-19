@@ -11,6 +11,10 @@
 /.DS_Store
 .env
 .phpunit.result.cache
+/phpstan.neon
+/_ide_helper.php
+/_ide_helper_models.php
+/.phpstorm.meta.php
 /coverage
 Homestead.json
 Homestead.yaml
