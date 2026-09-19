@@ -3,7 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Kblais\QueryFilter\FilterableTrait;
+use Kblais\QueryFilter\Filterable;
 
 /**
  * App\Models\Offeror
@@ -45,7 +45,7 @@ use Kblais\QueryFilter\FilterableTrait;
  */
 class Offeror extends Model
 {
-    use FilterableTrait;
+    use Filterable;
 
     protected $casts = [
         'is_extra' => 'boolean',

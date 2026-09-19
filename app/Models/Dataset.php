@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
-use Kblais\QueryFilter\FilterableTrait;
+use Kblais\QueryFilter\Filterable;
 
 /**
  * App\Models\Dataset
@@ -144,7 +144,7 @@ use Kblais\QueryFilter\FilterableTrait;
  */
 class Dataset extends Model
 {
-    use FilterableTrait;
+    use Filterable;
 
     protected $xml;
 

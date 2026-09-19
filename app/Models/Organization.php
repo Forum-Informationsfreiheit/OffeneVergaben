@@ -5,7 +5,7 @@ namespace App\Models;
 use App\NationalIdParser;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
-use Kblais\QueryFilter\FilterableTrait;
+use Kblais\QueryFilter\Filterable;
 
 /**
  * App\Models\Organization
@@ -59,7 +59,7 @@ use Kblais\QueryFilter\FilterableTrait;
  */
 class Organization extends Model
 {
-    use FilterableTrait;
+    use Filterable;
 
     protected $casts = [
         'is_identified' => 'boolean',

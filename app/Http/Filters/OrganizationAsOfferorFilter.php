@@ -2,8 +2,6 @@
 
 namespace App\Http\Filters;
 
-use Kblais\QueryFilter\QueryFilter;
-
 class OrganizationAsOfferorFilter extends QueryFilter
 {
     public static $sortable = [
@@ -12,7 +10,13 @@ class OrganizationAsOfferorFilter extends QueryFilter
         'sum'
     ];
 
-    protected $filters = [];
+    /**
+     * @var array $appliedFilters
+     *
+     * Kept for the same reason as in DatasetFilter, but nothing writes to it here — this
+     * filter only sorts. hasAny() has therefore always been false; see the ROADMAP item.
+     */
+    protected $appliedFilters = [];
 
     // only single attribute sort implemented atm
     protected $sortedBy = null;
@@ -49,11 +53,11 @@ class OrganizationAsOfferorFilter extends QueryFilter
      * @return bool
      */
     public function has($keyOne, $keyTwo = null) {
-        return $this->request->has($keyOne);
+        return $this->request()->has($keyOne);
     }
 
     public function hasAny() {
-        return count($this->filters) > 0;
+        return count($this->appliedFilters) > 0;
     }
 
     public function isSortedBy($field) {
@@ -63,7 +67,7 @@ class OrganizationAsOfferorFilter extends QueryFilter
     public function makeSortUrl($field,$direction) {
 
         $url = url()->current();
-        $params = $this->request->except('sort');
+        $params = $this->request()->except('sort');
         $params['sort'] = ($direction == 'desc' ? '-' : '') . $field;
 
         return $url . '?' . http_build_query($params);
