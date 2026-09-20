@@ -72,10 +72,16 @@ ARG GID=1000
 
 # Remap www-data to the host user and hand it the Apache runtime directories — with rootless
 # podman + keep-id the whole container runs as this user.
+#
+# UID 0 is rejected: Apache refuses to serve pages as root, and `User www-data` would resolve
+# to root once www-data carries UID 0. A root host user means rootful Docker, where the
+# container starts as root and as-app drops to www-data, so no remapping is needed at all.
 RUN set -eux; \
     chmod +x /usr/local/bin/entrypoint.sh /usr/local/bin/as-app; \
-    groupmod -o -g "${GID}" www-data; \
-    usermod -o -u "${UID}" -g "${GID}" www-data; \
+    if [ "${UID}" != "0" ] && [ "${GID}" != "0" ]; then \
+        groupmod -o -g "${GID}" www-data; \
+        usermod -o -u "${UID}" -g "${GID}" www-data; \
+    fi; \
     chown -R www-data:www-data /var/run/apache2 /var/lock/apache2 /var/log/apache2 /var/www
 
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]
