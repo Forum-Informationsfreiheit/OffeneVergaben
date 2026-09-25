@@ -162,16 +162,20 @@ class CpvController extends Controller
 
         $query = DB::table('datasets')
             ->select([DB::raw('sum(val_total) as sum'), DB::raw('count(*) as count')])
-            ->where('datasets.is_current_version',1)->where('datasets.disabled_at',null)
-            ->where('datasets.cpv_code','<>',null);
+            ->where('datasets.is_current_version',1)
+            ->where('datasets.disabled_at',null);
         //->where('datasets.val_total','<>',null);
 
         if ($params->root == null) {
             // oberste Ebene: gruppiert ueber die generierte Spalte, damit MySQL den Index
             // ix_cur_dis_cpvdiv_val nutzen kann statt alles zu sortieren
             $query->addSelect('datasets.cpv_div as cpv');
+            // NULL-Pruefung auf cpv_div statt cpv_code (gleichwertig, LEFT(NULL,2) ist NULL):
+            // cpv_code steht nicht im Index, sonst wird jede Zeile in der Tabelle nachgeschlagen
+            $query->whereNotNull('datasets.cpv_div');
             $query->groupBy('datasets.cpv_div');
         } else {
+            // cpv_code IS NOT NULL ist hier nicht noetig, LIKE schliesst NULL schon aus
             $query->addSelect(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level + 1).') as cpv'));
             $query->groupBy(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level + 1).')'));
             // als LIKE statt LEFT(...) = ..., damit der Index auf cpv_code greift
