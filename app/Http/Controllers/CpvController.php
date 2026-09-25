@@ -78,7 +78,12 @@ class CpvController extends Controller
         //             mit dem gleichen Schema funktionieren wie die untergeordneten Nodes
         //             Sprich Gesamtanzahl anzeigen und Gesamtvolumen von RootNode*
         //             Braucht es ein extra query
-        $rootNodeTotals = $params->root ? $this->rootNodeQuery($params) : null;
+        // 2026-09-26: Kein extra Query mehr: $result deckt per LIKE schon den ganzen Teilbaum
+        //             des Root Nodes ab, die Summe ueber alle Kinder ist die Gesamtsumme
+        $rootNodeTotals = $params->root ? (object) [
+            'sum'   => $result->sum('sum'),
+            'count' => $result->sum('count'),
+        ] : null;
 
         JavaScriptFacade::put([
             'parameters' => $params,
@@ -166,15 +171,20 @@ class CpvController extends Controller
             ->where('datasets.disabled_at',null);
         //->where('datasets.val_total','<>',null);
 
+        // Beide Zweige geben den abdeckenden Index fest vor. Ohne Hint waehlt MySQL einen Index
+        // auf (is_current_version, disabled_at) und schlaegt jede der ~240k Zeilen in der Tabelle
+        // nach (~1s), weil es diese Lookups zu billig rechnet; abdeckend sind es ~150ms.
         if ($params->root == null) {
             // oberste Ebene: gruppiert ueber die generierte Spalte, damit MySQL den Index
             // ix_cur_dis_cpvdiv_val nutzen kann statt alles zu sortieren
+            $query->forceIndex('ix_cur_dis_cpvdiv_val');
             $query->addSelect('datasets.cpv_div as cpv');
             // NULL-Pruefung auf cpv_div statt cpv_code (gleichwertig, LEFT(NULL,2) ist NULL):
             // cpv_code steht nicht im Index, sonst wird jede Zeile in der Tabelle nachgeschlagen
             $query->whereNotNull('datasets.cpv_div');
             $query->groupBy('datasets.cpv_div');
         } else {
+            $query->forceIndex('ix_cur_dis_cpv_val');
             // cpv_code IS NOT NULL ist hier nicht noetig, LIKE schliesst NULL schon aus
             $query->addSelect(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level + 1).') as cpv'));
             $query->groupBy(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level + 1).')'));
@@ -183,18 +193,6 @@ class CpvController extends Controller
         }
 
         $result = $query->get();
-
-        return $result;
-    }
-
-    protected function rootNodeQuery($params) {
-        $query = DB::table('datasets')
-            ->select([DB::raw('sum(val_total) as sum'), DB::raw('count(*) as count')])
-            ->where('datasets.is_current_version',1)->where('datasets.disabled_at',null)
-            ->where('datasets.cpv_code','like',$params->root->trimmed_code.'%')
-            ->groupBy(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level).')'));
-
-        $result = $query->first();
 
         return $result;
     }
