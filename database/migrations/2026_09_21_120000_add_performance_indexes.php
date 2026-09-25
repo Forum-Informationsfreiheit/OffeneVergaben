@@ -26,23 +26,19 @@ class AddPerformanceIndexes extends Migration
         Schema::table('datasets', function (Blueprint $table) {
             $table->index(['is_current_version','disabled_at','item_lastmod'],'ix_cur_dis_lastmod');
             $table->index(['is_current_version','disabled_at','val_total'],'ix_cur_dis_val');
-
-            // exaktes Duplikat von is_current_version
-            $table->dropIndex('is_current_version_2');
         });
+
+        // exaktes Duplikat von is_current_version
+        $this->dropIndexIfExists('datasets','is_current_version_2');
 
         // name ist TEXT und laenger als 255 (max 398 bei offerors, 2056 bei contractors),
         // laesst sich also weder auf varchar verkuerzen noch direkt indizieren
-        Schema::table('offerors', function (Blueprint $table) {
-            $table->dropIndex('name');
-        });
+        $this->dropIndexIfExists('offerors','name');
         DB::statement('ALTER TABLE offerors
             ADD COLUMN name_sort varchar(191) GENERATED ALWAYS AS (LEFT(`name`,191)) STORED,
             ADD INDEX ix_extra_namesort_ds (is_extra, name_sort, dataset_id)');
 
-        Schema::table('contractors', function (Blueprint $table) {
-            $table->dropIndex('name');
-        });
+        $this->dropIndexIfExists('contractors','name');
         DB::statement('ALTER TABLE contractors
             ADD COLUMN name_sort varchar(191) GENERATED ALWAYS AS (LEFT(`name`,191)) STORED,
             ADD INDEX ix_extra_namesort_ds (is_extra, name_sort, dataset_id)');
@@ -52,8 +48,17 @@ class AddPerformanceIndexes extends Migration
         // FK-Index und muss danach die Zeile fuer is_extra nachladen; mit nur dem
         // zusammengesetzten Index bleibt der Lookup covering (710ms -> 484ms gemessen).
         // Der Foreign Key bleibt gedeckt, weil dataset_id dessen erste Spalte ist.
-        DB::statement('ALTER TABLE offerors DROP INDEX offerors_dataset_id_foreign');
-        DB::statement('ALTER TABLE contractors DROP INDEX contractors_dataset_id_foreign');
+        //
+        // Der zusammengesetzte Index heisst im Produktivschema `dataset_id` und wurde dort von
+        // Hand angelegt, eine frisch migrierte Datenbank hat ihn nicht. Ohne ihn verweigert
+        // MySQL das Loeschen des FK-Index (Fehler 1553), daher wird er bei Bedarf unter
+        // demselben Namen angelegt.
+        foreach (['offerors','contractors'] as $table) {
+            if (!$this->indexExists($table,'dataset_id')) {
+                DB::statement("ALTER TABLE `$table` ADD INDEX `dataset_id` (dataset_id, is_extra)");
+            }
+            DB::statement("ALTER TABLE `$table` DROP INDEX `{$table}_dataset_id_foreign`");
+        }
     }
 
     /**
@@ -81,5 +86,25 @@ class AddPerformanceIndexes extends Migration
             $table->dropIndex('ix_cur_dis_val');
             $table->dropIndex('ix_cur_dis_lastmod');
         });
+    }
+
+    /**
+     * Index nur loeschen, wenn es ihn gibt.
+     *
+     * is_current_version_2 und die Prefix-Indexe `name` wurden im Produktivschema von Hand
+     * angelegt und stammen aus keiner Migration. Auf einer frisch migrierten Datenbank (CI,
+     * Demo, Integrationstests) fehlen sie, ein unbedingtes DROP INDEX bricht dort ab.
+     */
+    private function dropIndexIfExists($table, $index)
+    {
+        if ($this->indexExists($table,$index)) {
+            DB::statement("ALTER TABLE `$table` DROP INDEX `$index`");
+        }
+    }
+
+    private function indexExists($table, $index)
+    {
+        return count(DB::select('SELECT 1 FROM information_schema.statistics
+            WHERE table_schema = DATABASE() AND table_name = ? AND index_name = ?',[$table,$index])) > 0;
     }
 }
