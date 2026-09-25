@@ -74,6 +74,30 @@ class OfferorController extends Controller
         return view('public.offerors.show',compact('items','totalItems','org','filters','data','stats'));
     }
 
+    /**
+     * Die Datensatz-Ids dieser Organisation als Subquery fuer die Statistik-Queries.
+     *
+     * Als direkter Join laesst MySQL die Tabelle offerors zuletzt laufen und liest vorher
+     * alle Datensaetze der passenden Typen (159k Zeilen, ~700ms). Als Subquery wird sie
+     * zuerst materialisiert (24k Zeilen) und datasets nur noch per Primaerschluessel
+     * getroffen (~120ms).
+     *
+     * Das limit ist notwendig und kein Ueberbleibsel: ohne eine Klausel, die das Mergen
+     * verhindert, zieht MySQL die Subquery wieder in die aeussere Query hinein und der
+     * Plan ist derselbe wie vorher. distinct wuerde das auch tun, wuerde aber die Zahlen
+     * aendern -- 154 Organisationen haengen an Datensaetzen, in denen sie mehrfach als
+     * Bieter stehen, und werden bisher entsprechend mehrfach gezaehlt.
+     *
+     * @param \App\Models\Organization $organization
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function datasetIdsOfOfferor($organization) {
+        return DB::table('offerors')
+            ->select('dataset_id')
+            ->where('organization_id',$organization->id)
+            ->limit(PHP_INT_MAX);
+    }
+
     protected function getOfferorStats($organization) {
 
         $stats = new \stdClass();
@@ -88,10 +112,9 @@ class OfferorController extends Controller
                 DB::raw('sum(datasets.nb_tenders_received) as sum_nb_tenders_received'),
                 DB::raw('sum(datasets.val_total) as sum_val_total'),
             ])
-            ->join('offerors','offerors.dataset_id','=','datasets.id')
+            ->joinSub($this->datasetIdsOfOfferor($organization),'o','o.dataset_id','=','datasets.id')
             ->join('dataset_types','datasets.type_code','=','dataset_types.code')
             ->where('dataset_types.end',1)
-            ->where('offerors.organization_id',$organization->id)
             ->where('datasets.is_current_version',1)
             ->where('datasets.disabled_at',null);
 
@@ -109,8 +132,7 @@ class OfferorController extends Controller
         // 3. Die 5 häufigsten Kategorien
         $query = DB::table('datasets')
             ->select(['datasets.cpv_code',DB::raw('COUNT(*) as "cpv_count"')])
-            ->join('offerors','offerors.dataset_id','=','datasets.id')
-            ->where('offerors.organization_id',$organization->id)
+            ->joinSub($this->datasetIdsOfOfferor($organization),'o','o.dataset_id','=','datasets.id')
             ->where('datasets.is_current_version',1)
             ->where('datasets.cpv_code','<>',null)
             ->groupBy('datasets.cpv_code')
@@ -127,9 +149,8 @@ class OfferorController extends Controller
         // 4. Die 5 Top Lieferanten (nach Anzahl konkreter Aufträge)
         $query = DB::table('datasets')
             ->select(['contractors.organization_id',DB::raw('COUNT(*) as "contractor_count"')])
+            ->joinSub($this->datasetIdsOfOfferor($organization),'o','o.dataset_id','=','datasets.id')
             ->join('contractors','contractors.dataset_id','=','datasets.id')
-            ->join('offerors','offerors.dataset_id','=','datasets.id')
-            ->where('offerors.organization_id',$organization->id)
             ->where('datasets.is_current_version',1)
             ->groupBy('contractors.organization_id')
             ->orderBy('contractor_count','desc')

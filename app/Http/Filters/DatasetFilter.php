@@ -74,12 +74,14 @@ class DatasetFilter extends QueryFilter
         $this->sortDirection = substr($field, 0, 1) == '-' ? 'desc' : 'asc';
         $this->sortedBy = substr($field, 0, 1) == '-' ? substr($field,1) : $field;
 
+        // name_sort haelt die ersten 191 Zeichen von name und ist im Gegensatz zum
+        // TEXT-Feld indiziert, sortiert wird daher ueber den Index statt per filesort
         if ($this->sortedBy == 'offeror') {
-            return $this->builder->orderBy('offerors.name',$this->sortDirection);
+            return $this->builder->orderBy('offerors.name_sort',$this->sortDirection);
         }
 
         if ($this->sortedBy == 'contractor') {
-            return $this->builder->orderBy('contractors.name',$this->sortDirection);
+            return $this->builder->orderBy('contractors.name_sort',$this->sortDirection);
         }
 
         if ($this->sortedBy == 'cpv') {
@@ -330,17 +332,53 @@ class DatasetFilter extends QueryFilter
 
         $this->appliedFilters['search'] = $value;
 
-        $where = $this->builder->where(function($query) use ($value) {
-            return $query->where('title','like','%'.$value.'%')
-                ->orWhere('description','like','%'.$value.'%')
-                ->orWhere('offerors.name','like','%'.$value.'%')
-                ->orWhere('offerors.national_id',$value)
-                ->orWhere('offerors.reference_number',$value)
-                ->orWhere('contractors.name','like','%'.$value.'%')
-                ->orWhere('contractors.national_id',$value);
-        });
+        $term = $this->fulltextTerm($value);
 
-        return $where;
+        if ($term === '') {
+            // nur Sonderzeichen eingegeben, nichts wonach sich suchen liesse
+            return $this->builder;
+        }
+
+        // Frueher hing die Suche als OR ueber drei Tabellen im WHERE des Joins: MySQL musste
+        // dafuer erst den kompletten Join bilden und dann jede Zeile einzeln pruefen, die
+        // LIKE-Wildcards liessen ausserdem keinen Index zu (~1.8s allein fuer count(*)).
+        // Stattdessen wird die Treffermenge vorab als UNION zusammengesetzt, jeder Zweig fuer
+        // sich ueber einen Index, und erst dann auf datasets gejoint (~0.4s).
+        $matches = DB::table('datasets')
+            ->select('id as dataset_id')
+            ->whereRaw('MATCH(title, description) AGAINST (? IN BOOLEAN MODE)',[$term])
+            ->union(DB::table('offerors')->select('dataset_id')->where('is_extra',0)
+                ->whereRaw('MATCH(name) AGAINST (? IN BOOLEAN MODE)',[$term]))
+            ->union(DB::table('offerors')->select('dataset_id')->where('is_extra',0)
+                ->where('national_id',$value))
+            ->union(DB::table('offerors')->select('dataset_id')->where('is_extra',0)
+                ->where('reference_number',$value))
+            ->union(DB::table('contractors')->select('dataset_id')->where('is_extra',0)
+                ->whereRaw('MATCH(name) AGAINST (? IN BOOLEAN MODE)',[$term]))
+            ->union(DB::table('contractors')->select('dataset_id')->where('is_extra',0)
+                ->where('national_id',$value));
+
+        // UNION entfernt Duplikate, der Join vervielfacht die datasets-Zeilen also nicht
+        return $this->builder->joinSub($matches,'search_match','search_match.dataset_id','=','datasets.id');
+    }
+
+    /**
+     * Sucheingabe in einen Boolean-Mode-Ausdruck uebersetzen.
+     *
+     * Die Operatoren des Boolean Mode werden entfernt, sonst laesst sich mit einer Eingabe
+     * wie "a -b" ein Syntaxfehler ausloesen. Jedes Wort wird als Pflichtwort mit
+     * Prefix-Suche angehaengt ("wiener linien" -> "+wiener* +linien*").
+     *
+     * @param string $value
+     * @return string
+     */
+    protected function fulltextTerm($value) {
+        $cleaned = preg_replace('/[+\-*~<>()"@]+/u',' ',$value);
+        $words   = preg_split('/\s+/u',trim($cleaned),-1,PREG_SPLIT_NO_EMPTY);
+
+        return implode(' ',array_map(function($word) {
+            return '+'.$word.'*';
+        },$words));
     }
 
     // HELPERS ---------------------------------------------------------------------------------------------------------

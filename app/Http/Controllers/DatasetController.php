@@ -40,14 +40,14 @@ class DatasetController extends Controller
     public function index(DatasetFilter $filters, Request $request) {
         if_debug_mode_enable_query_log();
 
-        // complex query necessary if user uses text search or sorts by offeror or contractor names
-        $needsExtensiveQuery = $request->has('search') && $request->input('search') ||
-            ($request->has('sort') && in_array($request->input('sort'),['offeror','-offeror','contractor','-contractor']));
-        if ($needsExtensiveQuery) {
-            $query = Dataset::indexQuery();
-        } else {
-            $query = Dataset::indexQuery(['joinOfferors' => false, 'joinContractors' => false]);
-        }
+        // Joins werden nur noch zum Sortieren nach Bieter-/Lieferantennamen gebraucht:
+        // die Textsuche macht das ueber Subqueries, siehe DatasetFilter::search()
+        $sort = $request->input('sort');
+
+        $query = Dataset::indexQuery([
+            'joinOfferors'    => in_array($sort,['offeror','-offeror']),
+            'joinContractors' => in_array($sort,['contractor','-contractor']),
+        ]);
 
         $query->filter($filters);
 

@@ -72,6 +72,20 @@ class ContractorController extends Controller
         return view('public.contractors.show',compact('items','totalItems','org','filters','data','stats'));
     }
 
+    /**
+     * Die Datensatz-Ids dieser Organisation als Subquery fuer die Statistik-Queries,
+     * siehe OfferorController::datasetIdsOfOfferor() fuer den Grund.
+     *
+     * @param \App\Models\Organization $organization
+     * @return \Illuminate\Database\Query\Builder
+     */
+    protected function datasetIdsOfContractor($organization) {
+        return DB::table('contractors')
+            ->select('dataset_id')
+            ->where('organization_id',$organization->id)
+            ->limit(PHP_INT_MAX);
+    }
+
     protected function getContractorStats($organization) {
 
         $stats = new \stdClass();
@@ -84,8 +98,7 @@ class ContractorController extends Controller
                 DB::raw('count(*) as datasets_count'),
                 DB::raw('sum(datasets.nb_tenders_received) as sum_nb_tenders_received'),
             ])
-            ->join('contractors','contractors.dataset_id','=','datasets.id')
-            ->where('contractors.organization_id',$organization->id)
+            ->joinSub($this->datasetIdsOfContractor($organization),'c','c.dataset_id','=','datasets.id')
             ->where('datasets.disabled_at',null)
             ->where('datasets.is_current_version',1);
 
@@ -100,9 +113,8 @@ class ContractorController extends Controller
         // 3. Die 5 häufigsten Kategorien
         $query = DB::table('datasets')
             ->select(['datasets.cpv_code',DB::raw('COUNT(*) as "cpv_count"')])
-            ->join('contractors','contractors.dataset_id','=','datasets.id')
+            ->joinSub($this->datasetIdsOfContractor($organization),'c','c.dataset_id','=','datasets.id')
             ->where('datasets.cpv_code','<>',null)
-            ->where('contractors.organization_id',$organization->id)
             ->where('datasets.is_current_version',1)
             ->where('datasets.disabled_at',null)
             ->groupBy('datasets.cpv_code')
@@ -119,9 +131,8 @@ class ContractorController extends Controller
         // 4. Die 5 Top Auftraggeber (nach Anzahl konkreter Aufträge)
         $query = DB::table('datasets')
             ->select(['offerors.organization_id',DB::raw('COUNT(*) as "offeror_count"')])
+            ->joinSub($this->datasetIdsOfContractor($organization),'c','c.dataset_id','=','datasets.id')
             ->join('offerors','offerors.dataset_id','=','datasets.id')
-            ->join('contractors','contractors.dataset_id','=','datasets.id')
-            ->where('contractors.organization_id',$organization->id)
             ->where('datasets.is_current_version',1)
             ->where('datasets.disabled_at',null)
             ->groupBy('offerors.organization_id')

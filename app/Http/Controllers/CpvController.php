@@ -167,12 +167,15 @@ class CpvController extends Controller
         //->where('datasets.val_total','<>',null);
 
         if ($params->root == null) {
-            $query->addSelect(DB::raw('LEFT(datasets.cpv_code,2) as cpv'));
-            $query->groupBy(DB::raw('LEFT(datasets.cpv_code,2)'));
+            // oberste Ebene: gruppiert ueber die generierte Spalte, damit MySQL den Index
+            // ix_cur_dis_cpvdiv_val nutzen kann statt alles zu sortieren
+            $query->addSelect('datasets.cpv_div as cpv');
+            $query->groupBy('datasets.cpv_div');
         } else {
             $query->addSelect(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level + 1).') as cpv'));
             $query->groupBy(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level + 1).')'));
-            $query->where(DB::raw('LEFT(datasets.cpv_code,'.$params->root->level.')'),$params->root->trimmed_code);
+            // als LIKE statt LEFT(...) = ..., damit der Index auf cpv_code greift
+            $query->where('datasets.cpv_code','like',$params->root->trimmed_code.'%');
         }
 
         $result = $query->get();
@@ -184,7 +187,7 @@ class CpvController extends Controller
         $query = DB::table('datasets')
             ->select([DB::raw('sum(val_total) as sum'), DB::raw('count(*) as count')])
             ->where('datasets.is_current_version',1)->where('datasets.disabled_at',null)
-            ->where(DB::raw('LEFT(datasets.cpv_code,'.$params->root->level.')'),$params->root->trimmed_code)
+            ->where('datasets.cpv_code','like',$params->root->trimmed_code.'%')
             ->groupBy(DB::raw('LEFT(datasets.cpv_code,'.($params->root->level).')'));
 
         $result = $query->first();
