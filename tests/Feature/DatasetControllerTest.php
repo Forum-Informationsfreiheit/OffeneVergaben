@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Role;
+use App\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
@@ -107,7 +107,7 @@ class DatasetControllerTest extends PublicTestCase
         $response = $this->get(route('public::auftrag', $version2));
 
         $response->assertStatus(200);
-        $response->assertSee('<a href="'.route('public::auftrag', $version1).'">1</a>');
+        $response->assertSee('<a href="'.route('public::auftrag', $version1).'">1</a>', false);
     }
 
     /**
@@ -155,7 +155,7 @@ class DatasetControllerTest extends PublicTestCase
         $response = $this->actingAsRole(Role::EDITOR)->get(route('public::auftrag', $id));
 
         $response->assertStatus(200);
-        $response->assertSee('<strong>deaktiviert</strong>');
+        $response->assertSee('<strong>deaktiviert</strong>', false);
     }
 
     /**

@@ -2,7 +2,7 @@
 
 namespace Tests\Unit\Models;
 
-use App\Dataset;
+use App\Models\Dataset;
 use Carbon\Carbon;
 use Tests\TestCase;
 

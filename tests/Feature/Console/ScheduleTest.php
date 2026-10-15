@@ -13,13 +13,20 @@ use Tests\TestCase;
 class ScheduleTest extends TestCase
 {
     /**
-     * @var array values of $_ENV before the test, null for variables that were not set
+     * @var array ['_SERVER' => [...], '_ENV' => [...]] values before the test, null for variables that were not set
      */
-    private $originalEnvironment = [];
+    private $originalEnvironment = ['_SERVER' => [], '_ENV' => []];
 
     protected function tearDown(): void
     {
-        foreach ($this->originalEnvironment as $key => $value) {
+        foreach ($this->originalEnvironment['_SERVER'] as $key => $value) {
+            if ($value === null) {
+                unset($_SERVER[$key]);
+            } else {
+                $_SERVER[$key] = $value;
+            }
+        }
+        foreach ($this->originalEnvironment['_ENV'] as $key => $value) {
             if ($value === null) {
                 unset($_ENV[$key]);
             } else {
@@ -79,10 +86,12 @@ class ScheduleTest extends TestCase
     private function scheduledCommands(array $environment)
     {
         foreach ($environment as $key => $value) {
-            if (!array_key_exists($key, $this->originalEnvironment)) {
-                $this->originalEnvironment[$key] = $_ENV[$key] ?? null;
+            if (!array_key_exists($key, $this->originalEnvironment['_ENV'])) {
+                $this->originalEnvironment['_SERVER'][$key] = $_SERVER[$key] ?? null;
+                $this->originalEnvironment['_ENV'][$key] = $_ENV[$key] ?? null;
             }
-            // env() reads $_ENV first
+            // env() reads $_SERVER first, then $_ENV (phpdotenv 5); .env fills both
+            $_SERVER[$key] = $value;
             $_ENV[$key] = $value;
         }
 

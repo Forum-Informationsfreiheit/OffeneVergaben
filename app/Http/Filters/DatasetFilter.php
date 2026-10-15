@@ -2,12 +2,10 @@
 
 namespace App\Http\Filters;
 
-use App\CPV;
-use App\DatasetType;
-use Illuminate\Database\Query\Builder;
+use App\Models\CPV;
+use App\Models\DatasetType;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
-use Kblais\QueryFilter\QueryFilter;
 
 class DatasetFilter extends QueryFilter
 {
@@ -76,12 +74,14 @@ class DatasetFilter extends QueryFilter
         $this->sortDirection = substr($field, 0, 1) == '-' ? 'desc' : 'asc';
         $this->sortedBy = substr($field, 0, 1) == '-' ? substr($field,1) : $field;
 
+        // name_sort haelt die ersten 191 Zeichen von name und ist im Gegensatz zum
+        // TEXT-Feld indiziert, sortiert wird daher ueber den Index statt per filesort
         if ($this->sortedBy == 'offeror') {
-            return $this->builder->orderBy('offerors.name',$this->sortDirection);
+            return $this->builder->orderBy('offerors.name_sort',$this->sortDirection);
         }
 
         if ($this->sortedBy == 'contractor') {
-            return $this->builder->orderBy('contractors.name',$this->sortDirection);
+            return $this->builder->orderBy('contractors.name_sort',$this->sortDirection);
         }
 
         if ($this->sortedBy == 'cpv') {
@@ -92,6 +92,12 @@ class DatasetFilter extends QueryFilter
     }
 
     public function types($values) {
+        // query-filter 3.x hands the raw request value over, including '' and non-arrays
+        // (1.x dropped empty values before calling). count() on those is a TypeError.
+        if (!is_array($values)) {
+            return $this->builder;
+        }
+
         $count = count($values);
 
         if ($count == 0 || $count >= 2) {
@@ -210,7 +216,7 @@ class DatasetFilter extends QueryFilter
         $value = $like ? rtrim(rtrim($value,'*'),'0') : rtrim($value,'0');
         $value = strlen($value) == 1 ? $value . '0' : $value;
 
-        if ($like || $this->request->has('cpv_like')) {
+        if ($like || $this->request()->has('cpv_like')) {
             return $this->builder->where('cpv_code','like',$value.'%');
         } else {
             return $this->builder->where('cpv_code',CPV::zeroFill($value));
@@ -222,7 +228,13 @@ class DatasetFilter extends QueryFilter
      * @return $this|\Illuminate\Database\Eloquent\Builder
      */
     public function dateFrom($value) {
-        if (!array_key_exists($this->request->input('date_type'),$this->datesMap)) {
+        // an empty date input reaches this method since query-filter 3.x, and
+        // Carbon::parse('') is "now", which would silently filter everything away
+        if ($value === null || $value === '') {
+            return $this->builder;
+        }
+
+        if (!array_key_exists($this->request()->input('date_type'),$this->datesMap)) {
             return $this->builder;
         }
 
@@ -231,7 +243,7 @@ class DatasetFilter extends QueryFilter
             // time of 00:00:00 is perfect as it is the beginning of the day and we want
             // to include the whole day
             $dateFrom  = Carbon::parse($value);
-            $dateField = $this->datesMap[$this->request->input('date_type')];
+            $dateField = $this->datesMap[$this->request()->input('date_type')];
             $this->appliedFilters['date_from'] = $value;
 
             return $this->builder->where($dateField,'>=',$dateFrom);
@@ -246,7 +258,12 @@ class DatasetFilter extends QueryFilter
      * @return $this|\Illuminate\Database\Eloquent\Builder
      */
     public function dateTo($value) {
-        if (!array_key_exists($this->request->input('date_type'),$this->datesMap)) {
+        // see dateFrom()
+        if ($value === null || $value === '') {
+            return $this->builder;
+        }
+
+        if (!array_key_exists($this->request()->input('date_type'),$this->datesMap)) {
             return $this->builder;
         }
 
@@ -254,7 +271,7 @@ class DatasetFilter extends QueryFilter
             // input is DATE only. so carbon datetime will be <yyyy-mm-dd> 00:00:00
             // to include the whole day we want to set the time to 23:59:59
             $dateTo  = Carbon::parse($value)->setHour(23)->setMinute(59)->setSecond(59);
-            $dateField = $this->datesMap[$this->request->input('date_type')];
+            $dateField = $this->datesMap[$this->request()->input('date_type')];
             $this->appliedFilters['date_to'] = $value;
 
             return $this->builder->where($dateField,'<=',$dateTo);
@@ -268,7 +285,7 @@ class DatasetFilter extends QueryFilter
         // this param does nothing on its own
         // value of $this->request('date_param') will be used in dateFrom/dateTo methods
         // only remember in combination with date_from or date_to
-        if ($this->request->input('date_from') || $this->request->input('date_to')) {
+        if ($this->request()->input('date_from') || $this->request()->input('date_to')) {
             $this->appliedFilters['date_type'] = $value;
         }
     }
@@ -315,17 +332,53 @@ class DatasetFilter extends QueryFilter
 
         $this->appliedFilters['search'] = $value;
 
-        $where = $this->builder->where(function($query) use ($value) {
-            return $query->where('title','like','%'.$value.'%')
-                ->orWhere('description','like','%'.$value.'%')
-                ->orWhere('offerors.name','like','%'.$value.'%')
-                ->orWhere('offerors.national_id',$value)
-                ->orWhere('offerors.reference_number',$value)
-                ->orWhere('contractors.name','like','%'.$value.'%')
-                ->orWhere('contractors.national_id',$value);
-        });
+        $term = $this->fulltextTerm($value);
 
-        return $where;
+        if ($term === '') {
+            // nur Sonderzeichen eingegeben, nichts wonach sich suchen liesse
+            return $this->builder;
+        }
+
+        // Frueher hing die Suche als OR ueber drei Tabellen im WHERE des Joins: MySQL musste
+        // dafuer erst den kompletten Join bilden und dann jede Zeile einzeln pruefen, die
+        // LIKE-Wildcards liessen ausserdem keinen Index zu (~1.8s allein fuer count(*)).
+        // Stattdessen wird die Treffermenge vorab als UNION zusammengesetzt, jeder Zweig fuer
+        // sich ueber einen Index, und erst dann auf datasets gejoint (~0.4s).
+        $matches = DB::table('datasets')
+            ->select('id as dataset_id')
+            ->whereRaw('MATCH(title, description) AGAINST (? IN BOOLEAN MODE)',[$term])
+            ->union(DB::table('offerors')->select('dataset_id')->where('is_extra',0)
+                ->whereRaw('MATCH(name) AGAINST (? IN BOOLEAN MODE)',[$term]))
+            ->union(DB::table('offerors')->select('dataset_id')->where('is_extra',0)
+                ->where('national_id',$value))
+            ->union(DB::table('offerors')->select('dataset_id')->where('is_extra',0)
+                ->where('reference_number',$value))
+            ->union(DB::table('contractors')->select('dataset_id')->where('is_extra',0)
+                ->whereRaw('MATCH(name) AGAINST (? IN BOOLEAN MODE)',[$term]))
+            ->union(DB::table('contractors')->select('dataset_id')->where('is_extra',0)
+                ->where('national_id',$value));
+
+        // UNION entfernt Duplikate, der Join vervielfacht die datasets-Zeilen also nicht
+        return $this->builder->joinSub($matches,'search_match','search_match.dataset_id','=','datasets.id');
+    }
+
+    /**
+     * Sucheingabe in einen Boolean-Mode-Ausdruck uebersetzen.
+     *
+     * Die Operatoren des Boolean Mode werden entfernt, sonst laesst sich mit einer Eingabe
+     * wie "a -b" ein Syntaxfehler ausloesen. Jedes Wort wird als Pflichtwort mit
+     * Prefix-Suche angehaengt ("wiener linien" -> "+wiener* +linien*").
+     *
+     * @param string $value
+     * @return string
+     */
+    protected function fulltextTerm($value) {
+        $cleaned = preg_replace('/[+\-*~<>()"@]+/u',' ',$value);
+        $words   = preg_split('/\s+/u',trim($cleaned),-1,PREG_SPLIT_NO_EMPTY);
+
+        return implode(' ',array_map(function($word) {
+            return '+'.$word.'*';
+        },$words));
     }
 
     // HELPERS ---------------------------------------------------------------------------------------------------------
@@ -343,15 +396,15 @@ class DatasetFilter extends QueryFilter
     public function has($keyOne, $keyTwo = null) {
         // these are all arrays
         if ($keyOne == 'types' || $keyOne == 'contract_types' || $keyOne == 'nuts') {
-            return $this->request->has($keyOne) && in_array($keyTwo,$this->request->input($keyOne));
+            return $this->request()->has($keyOne) && in_array($keyTwo,(array) $this->request()->input($keyOne));
         }
 
         // this one is not
         if ($keyOne == 'date_type') {
-            return $this->request->has($keyOne) && $this->request->input($keyOne) === $keyTwo;
+            return $this->request()->has($keyOne) && $this->request()->input($keyOne) === $keyTwo;
         }
 
-        return $this->request->has($keyOne);
+        return $this->request()->has($keyOne);
     }
 
     /**
@@ -377,7 +430,7 @@ class DatasetFilter extends QueryFilter
     public function makeSortUrl($field,$direction) {
 
         $url = url()->current();
-        $params = $this->request->except('sort');
+        $params = $this->request()->except('sort');
         $params['sort'] = ($direction == 'desc' ? '-' : '') . $field;
 
         return $url . '?' . http_build_query($params);

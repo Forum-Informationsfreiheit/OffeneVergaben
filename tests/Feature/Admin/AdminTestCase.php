@@ -3,8 +3,8 @@
 namespace Tests\Feature\Admin;
 
 use App\Http\Middleware\VerifyCsrfToken;
-use App\Role;
-use App\User;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Tests\TestCase;
@@ -50,7 +50,7 @@ abstract class AdminTestCase extends TestCase
 
     protected function createUser($roleId)
     {
-        return factory(User::class)->create(['role_id' => $roleId]);
+        return User::factory()->create(['role_id' => $roleId]);
     }
 
     protected function createEditor()

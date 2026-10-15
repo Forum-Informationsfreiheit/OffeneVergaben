@@ -2,7 +2,7 @@
 
 namespace Tests\Feature\Http\Filters;
 
-use App\Dataset;
+use App\Models\Dataset;
 use App\Http\Filters\DatasetFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;

@@ -3,8 +3,8 @@
 namespace Tests\Feature\Auth;
 
 use App\Http\Middleware\VerifyCsrfToken;
-use App\Role;
-use App\User;
+use App\Models\Role;
+use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 use Tests\Feature\PublicTestCase;

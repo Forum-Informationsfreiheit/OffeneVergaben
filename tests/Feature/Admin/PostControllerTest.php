@@ -2,8 +2,8 @@
 
 namespace Tests\Feature\Admin;
 
-use App\Post;
-use App\Tag;
+use App\Models\Post;
+use App\Models\Tag;
 use Illuminate\Support\Str;
 
 class PostControllerTest extends AdminTestCase

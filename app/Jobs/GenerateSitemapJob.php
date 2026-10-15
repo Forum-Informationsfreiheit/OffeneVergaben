@@ -2,18 +2,13 @@
 
 namespace App\Jobs;
 
-use App\Contractor;
-use App\CPV;
-use App\Dataset;
-use App\Offeror;
-use App\Organization;
-use App\Page;
-use App\Post;
+use App\Models\Contractor;
+use App\Models\CPV;
+use App\Models\Dataset;
+use App\Models\Offeror;
+use App\Models\Page;
+use App\Models\Post;
 use Carbon\Carbon;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
-use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Support\Facades\DB;
 use Spatie\Sitemap\Sitemap;

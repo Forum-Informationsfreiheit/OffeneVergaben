@@ -3,8 +3,8 @@
 namespace Tests\Feature\Jobs;
 
 use App\Jobs\GenerateSitemapJob;
-use App\Page;
-use App\Post;
+use App\Models\Page;
+use App\Models\Post;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
 
@@ -212,7 +212,7 @@ class GenerateSitemapJobTest extends JobTestCase
 
     private function assertUrlWithPriority($xml, $path, $priority)
     {
-        $this->assertRegExp(
+        $this->assertMatchesRegularExpression(
             '#<loc>'.preg_quote(url($path), '#').'</loc>\s*(<lastmod>[^<]*</lastmod>\s*)?(<changefreq>[^<]*</changefreq>\s*)?'
                 .'<priority>'.preg_quote($priority, '#').'</priority>#',
             $xml

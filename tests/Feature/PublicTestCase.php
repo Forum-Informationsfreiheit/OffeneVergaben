@@ -2,7 +2,7 @@
 
 namespace Tests\Feature;
 
-use App\Role;
+use App\Models\Role;
 
 /**
  * Base class for the tests of the public routes in routes/web.php.

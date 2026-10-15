@@ -4,7 +4,7 @@ namespace Tests\Feature\Http\Filters;
 
 use App\Http\Filters\OrganizationAsContractorFilter;
 use App\Http\Filters\OrganizationAsOfferorFilter;
-use App\Organization;
+use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Tests\Feature\DatabaseTestCase;

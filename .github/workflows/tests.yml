@@ -14,7 +14,7 @@ jobs:
   phpunit:
     # Only dev -> master. This also skips Dependabot PRs, whose token may not write comments.
     if: github.head_ref == 'dev'
-    # Pinned so a newer ubuntu-latest cannot break the PHP 7.4 / Xdebug 2 setup.
+    # Pinned so a newer ubuntu-latest cannot break the PHP 8.1 / Xdebug setup.
     runs-on: ubuntu-24.04
 
     env:
@@ -48,12 +48,11 @@ jobs:
             --character-set-server=utf8mb4 \
             --collation-server=utf8mb4_unicode_ci
 
-      # PHPUnit 7.5 only understands Xdebug 2 for coverage (see Dockerfile).
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: '7.4'
+          php-version: "8.1"
           extensions: exif, gd, pdo_mysql, zip
-          coverage: xdebug2
+          coverage: xdebug
 
       - uses: ramsey/composer-install@v4
 

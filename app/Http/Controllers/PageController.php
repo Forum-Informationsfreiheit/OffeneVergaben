@@ -2,10 +2,10 @@
 
 namespace App\Http\Controllers;
 
-use App\Dataset;
-use App\Organization;
-use App\Page;
-use App\Post;
+use App\Models\Dataset;
+use App\Models\Organization;
+use App\Models\Page;
+use App\Models\Post;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 

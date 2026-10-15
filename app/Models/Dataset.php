@@ -1,17 +1,150 @@
 <?php
 
-namespace App;
+namespace App\Models;
 
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Lang;
-use Kblais\QueryFilter\FilterableTrait;
+use Kblais\QueryFilter\Filterable;
 
+/**
+ * App\Models\Dataset
+ *
+ * @property int $id
+ * @property int|null $metaset_id
+ * @property int $version
+ * @property bool $is_current_version
+ * @property int|null $scraper_kerndaten_id
+ * @property \Illuminate\Support\Carbon|null $disabled_at
+ * @property string|null $type_code
+ * @property string|null $cpv_code
+ * @property string|null $nuts_code
+ * @property string|null $url_document
+ * @property int|null $url_is_restricted
+ * @property string|null $url_participation
+ * @property string|null $contract_type
+ * @property string|null $title
+ * @property string|null $description
+ * @property \Illuminate\Support\Carbon|null $date_start
+ * @property \Illuminate\Support\Carbon|null $date_end
+ * @property int|null $duration
+ * @property \Illuminate\Support\Carbon|null $datetime_receipt_tenders
+ * @property int|null $is_lot
+ * @property int|null $is_framework
+ * @property \Illuminate\Support\Carbon|null $date_conclusion_contract
+ * @property int|null $nb_tenders_received
+ * @property int|null $nb_sme_tender
+ * @property int|null $nb_sme_contractor
+ * @property int|null $val_total
+ * @property int|null $val_total_before
+ * @property int|null $val_total_after
+ * @property string|null $info_modifications
+ * @property string|null $justification
+ * @property \Illuminate\Support\Carbon|null $date_first_publication
+ * @property \Illuminate\Support\Carbon|null $datetime_last_change
+ * @property \Illuminate\Support\Carbon|null $deadline_standstill
+ * @property int|null $rd_notification
+ * @property string|null $ocm_title
+ * @property string|null $ocm_contract_type
+ * @property string|null $procedure_description
+ * @property bool|null $threshold
+ * @property string|null $url_revocation
+ * @property string|null $url_revocation_statement
+ * @property int|null $nb_participants
+ * @property int|null $nb_participants_sme
+ * @property string|null $item_lastmod
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read \App\Models\Contractor|null $contractor
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Contractor> $contractors
+ * @property-read int|null $contractors_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Contractor> $contractorsAdditional
+ * @property-read int|null $contractors_additional_count
+ * @property-read \App\Models\CPV|null $cpv
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CPV> $cpvs
+ * @property-read int|null $cpvs_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\CPV> $cpvsAdditional
+ * @property-read int|null $cpvs_additional_count
+ * @property-read mixed $description_formatted
+ * @property-read mixed $info_modifications_formatted
+ * @property-read mixed $justification_formatted
+ * @property-read mixed $other_versions
+ * @property-read mixed $procedure_description_formatted
+ * @property-read mixed $title_formatted
+ * @property-read mixed $val_total_after_formatted
+ * @property-read mixed $val_total_before_formatted
+ * @property-read mixed $val_total_formatted
+ * @property-read mixed $version_links
+ * @property-read mixed $xml
+ * @property-read \App\Models\Metaset|null $metaset
+ * @property-read \App\Models\NUTS|null $nuts
+ * @property-read \App\Models\Offeror|null $offeror
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Offeror> $offerors
+ * @property-read int|null $offerors_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Offeror> $offerorsAdditional
+ * @property-read int|null $offerors_additional_count
+ * @property-read \Illuminate\Database\Eloquent\Collection<int, \App\Models\Procedure> $procedures
+ * @property-read int|null $procedures_count
+ * @property-read \App\Models\ScraperKerndaten|null $scraperKerndaten
+ * @property-read \App\Models\DatasetType|null $type
+ * @method static Builder|Dataset current()
+ * @method static Builder|Dataset enabled()
+ * @method static Builder|Dataset filter(\Kblais\QueryFilter\QueryFilter $filters)
+ * @method static Builder|Dataset newModelQuery()
+ * @method static Builder|Dataset newQuery()
+ * @method static Builder|Dataset query()
+ * @method static Builder|Dataset whereContractType($value)
+ * @method static Builder|Dataset whereCpvCode($value)
+ * @method static Builder|Dataset whereCreatedAt($value)
+ * @method static Builder|Dataset whereDateConclusionContract($value)
+ * @method static Builder|Dataset whereDateEnd($value)
+ * @method static Builder|Dataset whereDateFirstPublication($value)
+ * @method static Builder|Dataset whereDateStart($value)
+ * @method static Builder|Dataset whereDatetimeLastChange($value)
+ * @method static Builder|Dataset whereDatetimeReceiptTenders($value)
+ * @method static Builder|Dataset whereDeadlineStandstill($value)
+ * @method static Builder|Dataset whereDescription($value)
+ * @method static Builder|Dataset whereDisabledAt($value)
+ * @method static Builder|Dataset whereDuration($value)
+ * @method static Builder|Dataset whereId($value)
+ * @method static Builder|Dataset whereInfoModifications($value)
+ * @method static Builder|Dataset whereIsCurrentVersion($value)
+ * @method static Builder|Dataset whereIsFramework($value)
+ * @method static Builder|Dataset whereIsLot($value)
+ * @method static Builder|Dataset whereItemLastmod($value)
+ * @method static Builder|Dataset whereJustification($value)
+ * @method static Builder|Dataset whereMetasetId($value)
+ * @method static Builder|Dataset whereNbParticipants($value)
+ * @method static Builder|Dataset whereNbParticipantsSme($value)
+ * @method static Builder|Dataset whereNbSmeContractor($value)
+ * @method static Builder|Dataset whereNbSmeTender($value)
+ * @method static Builder|Dataset whereNbTendersReceived($value)
+ * @method static Builder|Dataset whereNutsCode($value)
+ * @method static Builder|Dataset whereOcmContractType($value)
+ * @method static Builder|Dataset whereOcmTitle($value)
+ * @method static Builder|Dataset whereProcedureDescription($value)
+ * @method static Builder|Dataset whereRdNotification($value)
+ * @method static Builder|Dataset whereScraperKerndatenId($value)
+ * @method static Builder|Dataset whereThreshold($value)
+ * @method static Builder|Dataset whereTitle($value)
+ * @method static Builder|Dataset whereTypeCode($value)
+ * @method static Builder|Dataset whereUpdatedAt($value)
+ * @method static Builder|Dataset whereUrlDocument($value)
+ * @method static Builder|Dataset whereUrlIsRestricted($value)
+ * @method static Builder|Dataset whereUrlParticipation($value)
+ * @method static Builder|Dataset whereUrlRevocation($value)
+ * @method static Builder|Dataset whereUrlRevocationStatement($value)
+ * @method static Builder|Dataset whereValTotal($value)
+ * @method static Builder|Dataset whereValTotalAfter($value)
+ * @method static Builder|Dataset whereValTotalBefore($value)
+ * @method static Builder|Dataset whereVersion($value)
+ * @mixin \Eloquent
+ */
 class Dataset extends Model
 {
-    use FilterableTrait;
+    use Filterable;
 
     protected $xml;
 
@@ -59,59 +192,59 @@ class Dataset extends Model
 
     // RELATIONS -------------------------------------------------------------------------------------------------------
     public function type() {
-        return $this->belongsTo('App\DatasetType','type_code');
+        return $this->belongsTo('App\Models\DatasetType','type_code');
     }
 
     public function metaset() {
-        return $this->belongsTo('App\Metaset');
+        return $this->belongsTo('App\Models\Metaset');
     }
 
     public function scraperKerndaten() {
-        return $this->belongsTo('App\ScraperKerndaten','scraper_kerndaten_id','id');
+        return $this->belongsTo('App\Models\ScraperKerndaten','scraper_kerndaten_id','id');
     }
 
     public function offeror() {
-        return $this->hasOne('App\Offeror')->where('is_extra',0);
+        return $this->hasOne('App\Models\Offeror')->where('is_extra',0);
     }
 
     public function offerors() {
-        return $this->hasMany('App\Offeror');
+        return $this->hasMany('App\Models\Offeror');
     }
 
     public function offerorsAdditional(){
-        return $this->hasMany('App\Offeror')->where('is_extra',1);
+        return $this->hasMany('App\Models\Offeror')->where('is_extra',1);
     }
 
     public function contractor() {
-        return $this->hasOne('App\Contractor')->where('is_extra',0);
+        return $this->hasOne('App\Models\Contractor')->where('is_extra',0);
     }
 
     public function contractors() {
-        return $this->hasMany('App\Contractor');
+        return $this->hasMany('App\Models\Contractor');
     }
 
     public function contractorsAdditional() {
-        return $this->hasMany('App\Contractor')->where('is_extra',1);
+        return $this->hasMany('App\Models\Contractor')->where('is_extra',1);
     }
 
     public function nuts() {
-        return $this->belongsTo('App\NUTS','nuts_code');
+        return $this->belongsTo('App\Models\NUTS','nuts_code');
     }
 
     public function cpv() {
-        return $this->belongsTo('App\CPV','cpv_code');
+        return $this->belongsTo('App\Models\CPV','cpv_code');
     }
 
     public function cpvs() {
-        return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code');
+        return $this->belongsToMany('App\Models\CPV','cpv_dataset','dataset_id','cpv_code');
     }
 
     public function cpvsAdditional() {
-        return $this->belongsToMany('App\CPV','cpv_dataset','dataset_id','cpv_code')->where('main',0);
+        return $this->belongsToMany('App\Models\CPV','cpv_dataset','dataset_id','cpv_code')->where('main',0);
     }
 
     public function procedures() {
-        return $this->belongsToMany('App\Procedure','dataset_procedure','dataset_id','procedure_code');
+        return $this->belongsToMany('App\Models\Procedure','dataset_procedure','dataset_id','procedure_code');
     }
 
     // ACCESSORS -------------------------------------------------------------------------------------------------------

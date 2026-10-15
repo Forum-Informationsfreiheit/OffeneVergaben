@@ -3,7 +3,7 @@
 namespace Tests\Feature\Auth;
 
 use App\Http\Middleware\VerifyCsrfToken;
-use App\Role;
+use App\Models\Role;
 use Tests\Feature\PublicTestCase;
 
 class LoginControllerTest extends PublicTestCase
