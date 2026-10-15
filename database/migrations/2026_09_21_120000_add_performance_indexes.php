@@ -53,11 +53,15 @@ class AddPerformanceIndexes extends Migration
         // Hand angelegt, eine frisch migrierte Datenbank hat ihn nicht. Ohne ihn verweigert
         // MySQL das Loeschen des FK-Index (Fehler 1553), daher wird er bei Bedarf unter
         // demselben Namen angelegt.
+        //
+        // Auf einer frisch migrierten Datenbank ist der FK-Index implizit (von MySQL fuer den
+        // Foreign Key angelegt) und verschwindet von selbst, sobald `dataset_id` den FK deckt.
+        // Ein unbedingtes DROP INDEX bricht dort mit Fehler 1091 ab.
         foreach (['offerors','contractors'] as $table) {
             if (!$this->indexExists($table,'dataset_id')) {
                 DB::statement("ALTER TABLE `$table` ADD INDEX `dataset_id` (dataset_id, is_extra)");
             }
-            DB::statement("ALTER TABLE `$table` DROP INDEX `{$table}_dataset_id_foreign`");
+            $this->dropIndexIfExists($table,"{$table}_dataset_id_foreign");
         }
     }
 
