@@ -39,6 +39,8 @@ class RouteServiceProvider extends ServiceProvider
 
         $this->mapWebRoutes();
 
+        $this->mapPublicRoutes();
+
         $this->mapWebAdminRoutes();
     }
 
@@ -54,6 +56,18 @@ class RouteServiceProvider extends ServiceProvider
         Route::middleware('web')
              ->namespace($this->namespace)
              ->group(base_path('routes/web.php'));
+    }
+
+    /**
+     * Define the public routes: no session, cookies or CSRF for anonymous visitors (see Kernel 'public' group).
+     *
+     * @return void
+     */
+    protected function mapPublicRoutes()
+    {
+        Route::middleware('public')
+             ->namespace($this->namespace)
+             ->group(base_path('routes/public.php'));
     }
 
     /**

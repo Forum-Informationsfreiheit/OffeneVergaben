@@ -12,12 +12,17 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Validator;
-use Laracasts\Flash\Flash;
+use App\Support\PublicMessages as Msg;
 
 class SubscriptionController extends Controller
 {
     const ALL = 'all';
 
+    /**
+     * Subscribe is called by the form on the (cached) aufträge page via fetch and answered with JSON:
+     * { success: bool, message: string, errors: { field: [string] } }
+     * Without JavaScript the same result is rendered as a page.
+     */
     public function subscribe(Request $request) {
         // Custom validator here, so errors can be stored in a named bag, for flexible display options
         $validator = Validator::make($request->all(), [
@@ -26,7 +31,7 @@ class SubscriptionController extends Controller
             'confirm' => 'required',
             'query' => 'required',
         ],[         // custom messages
-            'confirm.required' => 'Die Bedingungen zum Datenschutz müssen gelesen und akzeptiert werden.'
+            'confirm.required' => Msg::text(Msg::SUBSCRIBE_CONFIRM_REQUIRED)
         ]);
 
         // "Protective Measure" Honeypot: if the honeypot field is included ignore the request
@@ -34,26 +39,25 @@ class SubscriptionController extends Controller
         // On pageload a (static) css class is added to the input that hides (display:nones) the field
         if ($request->input('pm_title')) {
             usleep(rand(1,250000)); // add a tiny bit of fake execution time on top (max 0.25s)
-            return back();
+            return $this->subscribeResponse($request, true, Msg::text(Msg::SUBSCRIBE_CREATED));
         }
 
         // Check the query string for sanity
         if (!$this->validateSubscriptionQuery($request->input('query'))) {
-            Flash::error('Fehler bei Filterabfrage.');
-            return back();
+            return $this->subscribeResponse($request, false, Msg::text(Msg::SUBSCRIBE_INVALID_QUERY), 422);
         }
 
         // check uniqueness of querystring for this email
         $validator->after(function($validator) use($request) {
             $subscriber = User::where('email',$request->input('email'))->first();
             if ($subscriber && Subscription::where('user_id',$subscriber->id)->where('query',$request->input('query'))->first()) {
-                $validator->errors()->add('query','Die Benachrichtigung zu dieser Abfrage ist bereits eingerichtet.');
+                $validator->errors()->add('query', Msg::text(Msg::SUBSCRIBE_ALREADY_EXISTS));
             }
         });
 
         // Stop right here if validation fails
         if ($validator->fails()) {
-            return back()->withErrors($validator,'subscription')->withinput();
+            return $this->subscribeResponse($request, false, null, 422, $validator->errors()->toArray());
         }
 
         // Looking good
@@ -85,9 +89,7 @@ class SubscriptionController extends Controller
 
             $user->sendSubscriptionVerificationNotification($subscription);
 
-            Flash::success('Benachrichtigung wurde erstellt. Um die Benachrichtigung zu aktivieren, klicken Sie auf den Bestätigungs-Link den Sie in Kürze von uns per E-Mail erhalten. Sollten Sie keine E-Mail erhalten haben überprüfen Sie bitte Ihren Spam-Ordner.');
-
-            return back()->with(['subscribed' => true]);
+            return $this->subscribeResponse($request, true, Msg::text(Msg::SUBSCRIBE_CREATED));
         } catch(\Exception $ex) {
             Log::error('Exception occured on SubscriptionController:subscribe',[
                 'message' => $ex->getMessage(),
@@ -101,22 +103,33 @@ class SubscriptionController extends Controller
                 throw $ex;
             }
 
-            Flash::error('Beim Erstellen der Benachrichtigung ist ein Fehler aufgetreten.');
+            return $this->subscribeResponse($request, false, Msg::text(Msg::SUBSCRIBE_FAILED), 500);
+        }
+    }
+
+    /**
+     * @param array $errors field => [messages], the messages are listed above the form
+     */
+    protected function subscribeResponse(Request $request, bool $success, ?string $message, int $status = 200, array $errors = []) {
+        if ($request->expectsJson()) {
+            return response()->json(compact('success', 'message', 'errors'), $status);
         }
 
-        return back()->with(['subscribed' => false]);
+        return response()->view('public.subscriptions.result', [
+            'success' => $success,
+            'messages' => $message ? [$message] : array_merge(...array_values($errors)),
+        ], $status);
     }
 
     /**
      * Signed route!
      *
      * Verify is called directly from a subscription verification email via a signed link.
-     * On successful verification user will be redirected to public aufträge page
-     * and see a flashed success message.
+     * On successful verification the user sees a confirmation page (no redirect/flash: public pages have no session).
      *
      * @param $id
      * @param $email
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function verify($id, $email) {
         $subscription = Subscription::findOrFail($id);
@@ -141,9 +154,7 @@ class SubscriptionController extends Controller
             'email' => $email,
         ]);
 
-        Flash::success('Benachrichtigung '.$subscription->title.' wurde bestätigt. ');
-
-        return redirect(route('public::auftraege'));
+        return $this->resultView(Msg::text(Msg::VERIFY_SUCCESS, ['title' => $subscription->title]));
     }
 
     /**
@@ -196,7 +207,7 @@ class SubscriptionController extends Controller
      *
      * @param $id
      * @param $email
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     public function unsubscribe($id, $email) {
         if ($id == self::ALL) {
@@ -220,16 +231,14 @@ class SubscriptionController extends Controller
         // keep info in log file
         Log::info('Subscription deleted by subscriber.',['subscriber' => $subscriber, 'title' => $title, 'query' => $query ]);
 
-        Flash::success("Benachrichtigung {$title} beendet.");
-
-        return redirect(route('public::auftraege'));
+        return $this->resultView(Msg::text(Msg::UNSUBSCRIBE_SUCCESS, ['title' => $title]));
     }
 
     /**
      * On unsubscribe also delete the subscriber (user)
      *
      * @param $email
-     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Routing\Redirector
+     * @return \Illuminate\Contracts\View\Factory|\Illuminate\View\View
      */
     protected function unsubscribeAll($email) {
         $subscriber = User::where('email',$email)->first();
@@ -253,9 +262,11 @@ class SubscriptionController extends Controller
 
         Log::info('Subscriber and all subscriptions deleted.',[ 'subscriber' => $subscriber->email ]);
 
-        Flash::success("Alle Benachrichtigungen wurden beendet, Sie werden von uns keine weiteren E-Mail Benachrichtigungen erhalten.");
+        return $this->resultView(Msg::text(Msg::UNSUBSCRIBE_ALL_SUCCESS));
+    }
 
-        return redirect(route('public::auftraege'));
+    protected function resultView(string $message) {
+        return view('public.subscriptions.result', ['success' => true, 'messages' => [$message]]);
     }
 
     /**

@@ -56,7 +56,7 @@
     </div>
     <div class="row">
         <div class="col">
-            <div id="subscribeWrapper" class="subscribe-wrapper {{ $errors->subscription->isEmpty() ? 'collapsed' : '' }}">
+            <div id="subscribeWrapper" class="subscribe-wrapper collapsed">
                 <div class="subscribe-head">
                     <span class="icon-wrapper subscribe">
                         @svg('/img/icons/benachrichtigung.svg','subscribe')&nbsp;&nbsp;
@@ -154,6 +154,64 @@
             evt.preventDefault();
             return false;
         });
+    </script>
+    <script>
+        // Subscribe form: the page is cached and has no session, so the result of POST /subscribe (JSON) is shown here
+        (function() {
+            var form = document.getElementById('subscribeForm');
+            var box = document.getElementById('subscribeMessages');
+            var button = document.getElementById('subscribeSubmit');
+
+            function show(level, messages) {
+                box.className = 'alert alert-' + level;
+                box.textContent = '';
+                var list = document.createElement('ul');
+                list.className = 'm-0';
+                messages.forEach(function(text) {
+                    var li = document.createElement('li');
+                    li.textContent = text;
+                    list.appendChild(li);
+                });
+                box.appendChild(list);
+                box.hidden = false;
+            }
+
+            form.addEventListener('submit', function(evt) {
+                evt.preventDefault();
+                button.disabled = true;
+                Array.prototype.forEach.call(form.querySelectorAll('.is-invalid'), function(el) {
+                    el.classList.remove('is-invalid');
+                });
+
+                fetch(form.action, {
+                    method: 'POST',
+                    body: new FormData(form),
+                    headers: { 'Accept': 'application/json', 'X-Requested-With': 'XMLHttpRequest' }
+                }).then(function(response) {
+                    return response.json().then(function(data) {
+                        return { ok: response.ok, data: data };
+                    });
+                }).then(function(result) {
+                    if (result.ok) {
+                        show('success', [result.data.message]);
+                        button.textContent = 'Benachrichtigung eingerichtet';
+                        return; // stays disabled
+                    }
+
+                    var messages = result.data.message ? [result.data.message] : [];
+                    Object.keys(result.data.errors || {}).forEach(function(field) {
+                        messages = messages.concat(result.data.errors[field]);
+                        var input = form.querySelector('[name="' + field + '"]');
+                        if (input) { input.classList.add('is-invalid'); }
+                    });
+                    show('danger', messages);
+                    button.disabled = false;
+                }).catch(function() {
+                    show('danger', [@json(\App\Support\PublicMessages::text(\App\Support\PublicMessages::SUBSCRIBE_FAILED))]);
+                    button.disabled = false;
+                });
+            });
+        })();
     </script>
     <script>
         (function(app) {

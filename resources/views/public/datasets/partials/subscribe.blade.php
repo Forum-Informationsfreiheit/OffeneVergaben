@@ -1,13 +1,5 @@
-@if($errors->subscription->any())
-    <div class="alert alert-danger">
-        <ul class="m-0">
-            @foreach ($errors->subscription->all() as $subError)
-                <li>{{ $subError }}</li>
-            @endforeach
-        </ul>
-    </div>
-@endif
-<form id="subscribeForm" method="POST" action="{{ route('public::subscribe') }}">
+<div id="subscribeMessages" role="alert" hidden></div>
+<form id="subscribeForm" method="POST" novalidate action="{{ route('public::subscribe') }}">
     <div class="row">
         <div class="col-md-12">
             <p style="line-height: 1.5; font-size: 0.85rem" class="mb-4">
@@ -20,14 +12,14 @@
             <div class="form-group">
                 <label for="subscribeTitle" style="display: none;">Bezeichnung</label>
                 <input name="pm_title" type="text" class="form-control" value="" placeholder='z.B. "Aufträge ab 1 Mio"'> {{-- Honeypot --}}
-                <input name="title" type="text" class="form-control {{ $errors->subscription->has('title') ? 'is-invalid' : '' }}" id="subscribeTitle" aria-describedby="subscribeTitleHelp" placeholder='z.B. "Aufträge ab 1 Mio. €"' value="{{ old('title') }}">
+                <input name="title" type="text" class="form-control" id="subscribeTitle" aria-describedby="subscribeTitleHelp" placeholder='z.B. "Aufträge ab 1 Mio. €"'>
                 <small id="subscribeTitleHelp" class="form-text text-muted">Aussagekräfitge Bezeichnung</small>
             </div>
         </div>
         <div class="col-md-6">
             <div class="form-group">
                 <label for="subscribeEmail" style="display: none;">Email</label>
-                <input name="email" type="email" class="form-control {{ $errors->subscription->has('email') ? 'is-invalid' : '' }}" id="subscribeEmail" aria-describedby="subscribeEmailHelp" placeholder='z.B. "marlene.musterfrau@provider.at"' value="{{ old('email') }}">
+                <input name="email" type="email" class="form-control" id="subscribeEmail" aria-describedby="subscribeEmailHelp" placeholder='z.B. "marlene.musterfrau@provider.at"'>
                 <small id="subscribeEmailHelp" class="form-text text-muted">Benachrichtigungen an diese Email Adresse schicken. Wir verwenden Ihre Email-Adresse nur, um  Informationen zu OffeneVergaben.at zu übermitteln, und geben diese nicht an Dritte weiter. Sie können Benachrichtigungen jederzeit abbestellen.</small>
             </div>
         </div>
@@ -42,7 +34,7 @@
     <div class="row">
         <div class="col-md-6">
             <div class="form-check">
-                <input name="confirm" class="form-check-input {{ $errors->subscription->has('confirm') ? 'is-invalid' : '' }}" {!! old('confirm') ? 'checked="checked"' : '' !!} type="checkbox" value="1" id="subscribeCheck" autocomplete="off">
+                <input name="confirm" class="form-check-input" type="checkbox" value="1" id="subscribeCheck" autocomplete="off">
                 <label class="form-check-label" for="subscribeCheck">
                     Ich habe die <a target="_blank" href="{{ url('/datenschutz') }}">Datenschutzerklärung</a> gelesen und stimme dieser zu.
                 </label>
@@ -51,17 +43,10 @@
     </div>
     <div class="row">
         <div class="col-md-6">
-            {{ csrf_field() }}
             <input type="hidden" name="query" value="{{ $queryString }}">
-            @if(session('subscribed') === TRUE)
-                <button class="btn btn-primary mt-3" type="submit" disabled="disabled">
-                    <i class="far fa-check-circle"></i>&nbsp;Benachrichtigung eingerichtet
-                </button>
-                @else
-                <button class="btn btn-primary mt-3" type="submit">
-                    Aktivieren
-                </button>
-            @endif
+            <button id="subscribeSubmit" class="btn btn-primary mt-3" type="submit">
+                Aktivieren
+            </button>
 </div>
 </div>
 </form>

@@ -11,36 +11,7 @@
 |
 */
 
-Route::get('/', 'PageController@frontpage');
-
-Route::get('/aufträge','DatasetController@index')->name('public::auftraege');
-Route::get('/aufträge/{id}','DatasetController@show')->name('public::auftrag');
-Route::get('/aufträge/{id}/xml','DatasetController@showXml')->name('public::auftragsxml');
-
-Route::get('/lieferanten','ContractorController@index')->name('public::lieferanten');
-Route::get('/lieferanten/{id}','ContractorController@show')->name('public::lieferant');
-
-Route::get('/auftraggeber','OfferorController@index')->name('public::auftraggeber');
-Route::get('/auftraggeber/{id}','OfferorController@show')->name('public::show-auftraggeber');
-
-Route::get('/branchen','CpvController@index')->name('public::branchen');
-Route::get('/branchen/search', 'CpvController@ajaxSearch')->name('public::ajax-cpv-search');
-
-Route::get('/suchen','PageController@searchResultsPage')->name('public::suchen');
-
-Route::get('/downloads','DownloadController@index')->name('public::downloads');
-Route::get('/downloads/{fileName}','DownloadController@downloadStaticFile')->name('public::download-static-file');
-
-Route::get('/neuigkeiten', 'PostController@index')->name('public::posts');
-Route::get('/neuigkeiten/{slug}', 'PostController@show')->name('public::show-post');
-
-// reserved routes for dynamic page content, directly under domain (no other url prefix)
-Route::get('/impressum',   'PageController@reserved');
-Route::get('/datenschutz', 'PageController@reserved');
-Route::get('/überuns',     'PageController@reserved');
-Route::get('/frequently-asked-questions',  'PageController@reserved');
-Route::get('/faq',function() { return redirect('/frequently-asked-questions'); });
-Route::get('/page/{slug}', 'PageController@page')->name('public::show-page');
+// Public pages and subscription routes are in public.php (no session for anonymous visitors)
 
 // Auth routes, only /login is open, others (register,passwort reset and email verification are not)
 if (App::environment('production')) {
@@ -49,26 +20,29 @@ if (App::environment('production')) {
     Auth::routes();
 }
 
-// Subscription routes
-// NOTE that the verification route needs to be signed as indicated by the middleware
-Route::post('/subscribe',     'SubscriptionController@subscribe')->name('public::subscribe');
-Route::get('/subscriptions/{id}/verify/{email}', 'SubscriptionController@verify')
-    ->middleware('signed')
-    ->name('public::verify-subscription');
-Route::get('/subscriptions/{id}/cancel/{email}', 'SubscriptionController@cancel')
-    ->middleware('signed')
-    ->name('public::cancel-subscription');
-Route::get('/subscriptions/{id}/unsubscribe/{email}', 'SubscriptionController@unsubscribe')
-    ->middleware('signed')
-    ->name('public::unsubscribe');
-
-
 // TEST routes, don't run in production
 Route::group(['prefix' => 'test'], function () {
     if (App::environment('production')) {
         return;
     }
 
-    // ...
+    // overview of all user facing messages of the public routes and where they are shown
+    Route::get('messages', function () {
+        $validationMessages = [];
+        foreach ([
+            'title'   => ['required' => ['required', []], 'max' => ['max.string', ['max' => 190]]],
+            'email'   => ['required' => ['required', []], 'email' => ['email', []]],
+            'query'   => ['required' => ['required', []]],
+        ] as $field => $rules) {
+            foreach ($rules as $rule => [$line, $replace]) {
+                $validationMessages[] = [$field, $rule, trans('validation.' . $line, $replace + ['attribute' => trans('validation.attributes.' . $field) === 'validation.attributes.' . $field ? $field : trans('validation.attributes.' . $field)])];
+            }
+        }
+
+        return view('test.messages', [
+            'catalog' => \App\Support\PublicMessages::catalog(),
+            'validationMessages' => $validationMessages,
+        ]);
+    });
 });
 
