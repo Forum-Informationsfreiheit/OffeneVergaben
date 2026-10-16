@@ -3,7 +3,6 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <meta name="csrf-token" content="{{ csrf_token() }}">
     <!-- Open Graph -->
     <meta property="og:title" content="@yield('page:title',config('app.name'))" />
     <meta property="og:description" content="@yield('page:description',__('global.meta.description'))" />
@@ -44,7 +43,6 @@
 
             <!-- Begin Page Content -->
             <div class="container page-content">
-                @include('flash::message')
 
                 @yield('page:content')
             </div>

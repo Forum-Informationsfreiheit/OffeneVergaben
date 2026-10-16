@@ -92,16 +92,16 @@ class DownloadControllerTest extends PublicTestCase
     /**
      * @dataProvider invalidFormatProvider
      */
-    public function testMissingOrUnsupportedFormatRedirectsWithError(array $format)
+    public function testMissingOrUnsupportedFormatShowsError(array $format)
     {
         $this->cacheCurrentDump();
 
         $response = $this->get(route('public::download-static-file', ['fileName' => 'kerndaten_dump_daily'] + $format));
 
-        $response->assertRedirect(route('public::downloads'));
-        $response->assertSessionHas('flash_notification', function ($messages) {
-            return $messages->first()->level === 'danger';
-        });
+        $response->assertStatus(422);
+        $response->assertViewIs('public.downloads.error');
+        $response->assertViewHas('message');
+        $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
         $this->assertEmpty(glob(public_path('tmp/'.self::LINK_PREFIX.'*.zip')));
     }
 

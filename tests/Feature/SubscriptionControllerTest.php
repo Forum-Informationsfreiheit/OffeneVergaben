@@ -3,7 +3,7 @@
 namespace Tests\Feature;
 
 use App\Http\Controllers\SubscriptionController;
-use App\Http\Middleware\VerifyCsrfToken;
+use App\Support\PublicMessages;
 use App\Notifications\VerifySubscription;
 use App\Models\Role;
 use App\Models\Subscription;
@@ -29,9 +29,6 @@ class SubscriptionControllerTest extends PublicTestCase
     {
         parent::setUp();
 
-        // the subscribe form is sent without CSRF token, independent of APP_ENV
-        $this->withoutMiddleware(VerifyCsrfToken::class);
-
         Notification::fake();
     }
 
@@ -39,11 +36,14 @@ class SubscriptionControllerTest extends PublicTestCase
     {
         $input = $this->subscribeInput();
 
-        $response = $this->from(route('public::auftraege'))->post('/subscribe', $input);
+        $response = $this->postJson('/subscribe', $input);
 
-        $response->assertRedirect(route('public::auftraege'));
-        $response->assertSessionHasNoErrors();
-        $response->assertSessionHas('subscribed', true);
+        $response->assertOk();
+        $response->assertExactJson([
+            'success' => true,
+            'message' => PublicMessages::text(PublicMessages::SUBSCRIBE_CREATED),
+            'errors'  => [],
+        ]);
         $this->assertDatabaseHas('users', [
             'email'             => $input['email'],
             'role_id'           => Role::SUBSCRIBER,
@@ -68,10 +68,9 @@ class SubscriptionControllerTest extends PublicTestCase
     {
         $editor = $this->createUser(Role::EDITOR);
 
-        $response = $this->from(route('public::auftraege'))
-            ->post('/subscribe', $this->subscribeInput(['email' => $editor->email]));
+        $response = $this->postJson('/subscribe', $this->subscribeInput(['email' => $editor->email]));
 
-        $response->assertSessionHasNoErrors();
+        $response->assertOk();
         $this->assertDatabaseHas('users', ['id' => $editor->id, 'role_id' => Role::EDITOR]);
         $this->assertDatabaseHas('subscriptions', ['user_id' => $editor->id, 'query' => self::QUERY]);
         Notification::assertSentTo($editor, VerifySubscription::class);
@@ -82,10 +81,11 @@ class SubscriptionControllerTest extends PublicTestCase
         $subscriber = $this->createUser(Role::SUBSCRIBER);
         $this->createSubscription($subscriber);
 
-        $response = $this->from(route('public::auftraege'))
-            ->post('/subscribe', $this->subscribeInput(['email' => $subscriber->email]));
+        $response = $this->postJson('/subscribe', $this->subscribeInput(['email' => $subscriber->email]));
 
-        $response->assertSessionHasErrors('query', null, 'subscription');
+        $response->assertStatus(422);
+        $response->assertJsonPath('success', false);
+        $response->assertJsonPath('errors.query.0', PublicMessages::text(PublicMessages::SUBSCRIBE_ALREADY_EXISTS));
         $this->assertSame(1, $subscriber->subscriptions()->count());
         Notification::assertNothingSent();
     }
@@ -97,10 +97,11 @@ class SubscriptionControllerTest extends PublicTestCase
     {
         $input = $this->subscribeInput($input);
 
-        $response = $this->from(route('public::auftraege'))->post('/subscribe', $input);
+        $response = $this->postJson('/subscribe', $input);
 
-        $response->assertRedirect(route('public::auftraege'));
-        $response->assertSessionHasErrors($field, null, 'subscription');
+        $response->assertStatus(422);
+        $response->assertJsonPath('success', false);
+        $response->assertJsonValidationErrors($field);
         $this->assertDatabaseMissing('users', ['email' => $input['email']]);
         Notification::assertNothingSent();
     }
@@ -115,28 +116,25 @@ class SubscriptionControllerTest extends PublicTestCase
     {
         $input = $this->subscribeInput(['query' => $query]);
 
-        $response = $this->from(route('public::auftraege'))->post('/subscribe', $input);
+        $response = $this->postJson('/subscribe', $input);
 
-        $response->assertRedirect(route('public::auftraege'));
-        $response->assertSessionHas('flash_notification', function ($messages) {
-            return $messages->first()->level === 'danger';
-        });
+        $response->assertStatus(422);
+        $response->assertJsonPath('message', PublicMessages::text(PublicMessages::SUBSCRIBE_INVALID_QUERY));
         $this->assertDatabaseMissing('users', ['email' => $input['email']]);
         Notification::assertNothingSent();
     }
 
     /**
-     * Only bots fill the hidden honeypot field pm_title. Their request is dropped without any feedback.
+     * Only bots fill the hidden honeypot field pm_title. Their request is dropped, the answer looks like a success.
      */
     public function testHoneypotRequestIsIgnored()
     {
         $input = $this->subscribeInput(['pm_title' => 'Aufträge ab 1 Mio']);
 
-        $response = $this->from(route('public::auftraege'))->post('/subscribe', $input);
+        $response = $this->postJson('/subscribe', $input);
 
-        $response->assertRedirect(route('public::auftraege'));
-        $response->assertSessionHasNoErrors();
-        $response->assertSessionMissing('subscribed');
+        $response->assertOk();
+        $response->assertJsonPath('success', true);
         $this->assertDatabaseMissing('users', ['email' => $input['email']]);
         Notification::assertNothingSent();
     }
@@ -151,13 +149,48 @@ class SubscriptionControllerTest extends PublicTestCase
         Log::shouldReceive('info');
         Log::shouldReceive('error')->once();
 
-        $response = $this->from(route('public::auftraege'))->post('/subscribe', $this->subscribeInput());
+        $response = $this->postJson('/subscribe', $this->subscribeInput());
 
-        $response->assertRedirect(route('public::auftraege'));
-        $response->assertSessionHas('subscribed', false);
-        $response->assertSessionHas('flash_notification', function ($messages) {
-            return $messages->first()->level === 'danger';
-        });
+        $response->assertStatus(500);
+        $response->assertJsonPath('success', false);
+        $response->assertJsonPath('message', PublicMessages::text(PublicMessages::SUBSCRIBE_FAILED));
+    }
+
+    /**
+     * Without JavaScript the form is posted normally and the result is shown as page.
+     */
+    public function testSubscribeWithoutJavascriptShowsResultPage()
+    {
+        $response = $this->post('/subscribe', $this->subscribeInput());
+
+        $response->assertOk();
+        $response->assertViewIs('public.subscriptions.result');
+        $response->assertSee(PublicMessages::text(PublicMessages::SUBSCRIBE_CREATED));
+    }
+
+    /**
+     * The form is on cached pages: no CSRF token, no session and no cookies involved.
+     */
+    public function testSubscribeNeedsNoSessionAndSetsNoCookies()
+    {
+        $response = $this->postJson('/subscribe', $this->subscribeInput());
+
+        $response->assertOk();
+        $this->assertEmpty($response->headers->getCookies());
+        $this->assertStringNotContainsString('public', $response->headers->get('Cache-Control'));
+    }
+
+    /**
+     * @dataProvider signedRoutesProvider
+     */
+    public function testSubscriptionLinksAreNeverCached($routeName)
+    {
+        $subscriber   = $this->createUser(Role::SUBSCRIBER);
+        $subscription = $this->createSubscription($subscriber, ['verified_at' => now()]);
+
+        $response = $this->get(URL::signedRoute($routeName, ['id' => $subscription->id, 'email' => $subscriber->email]));
+
+        $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
     }
 
     /**
@@ -181,7 +214,9 @@ class SubscriptionControllerTest extends PublicTestCase
 
         $response = $this->get($this->verificationUrl($subscription));
 
-        $response->assertRedirect(route('public::auftraege'));
+        $response->assertOk();
+        $response->assertViewIs('public.subscriptions.result');
+        $response->assertSee(PublicMessages::text(PublicMessages::VERIFY_SUCCESS, ['title' => $subscription->title]));
         $this->assertNotNull($subscription->fresh()->verified_at);
         $this->assertNotNull($subscriber->fresh()->email_verified_at);
     }
@@ -194,7 +229,7 @@ class SubscriptionControllerTest extends PublicTestCase
 
         $response = $this->get($this->verificationUrl($subscription));
 
-        $response->assertRedirect(route('public::auftraege'));
+        $response->assertOk();
         $this->assertEquals($verifiedAt, $subscriber->fresh()->email_verified_at);
     }
 
@@ -316,7 +351,9 @@ class SubscriptionControllerTest extends PublicTestCase
 
         $response = $this->get($cancelled->unsubscribeUrl);
 
-        $response->assertRedirect(route('public::auftraege'));
+        $response->assertOk();
+        $response->assertViewIs('public.subscriptions.result');
+        $response->assertSee(PublicMessages::text(PublicMessages::UNSUBSCRIBE_SUCCESS, ['title' => $cancelled->title]));
         $this->assertDatabaseMissing('subscriptions', ['id' => $cancelled->id]);
         $this->assertDatabaseHas('subscriptions', ['id' => $kept->id]);
         $this->assertDatabaseHas('users', ['id' => $subscriber->id]);
@@ -329,7 +366,8 @@ class SubscriptionControllerTest extends PublicTestCase
 
         $response = $this->get($subscriber->unsubscribeAllUrl);
 
-        $response->assertRedirect(route('public::auftraege'));
+        $response->assertOk();
+        $response->assertSee(PublicMessages::text(PublicMessages::UNSUBSCRIBE_ALL_SUCCESS));
         $this->assertDatabaseMissing('users', ['id' => $subscriber->id]);
         $this->assertDatabaseMissing('subscriptions', ['id' => $subscription->id]);
     }
@@ -343,7 +381,7 @@ class SubscriptionControllerTest extends PublicTestCase
 
         $response = $this->get($editor->unsubscribeAllUrl);
 
-        $response->assertRedirect(route('public::auftraege'));
+        $response->assertOk();
         $this->assertDatabaseHas('users', ['id' => $editor->id]);
     }
 

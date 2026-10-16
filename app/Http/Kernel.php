@@ -42,6 +42,12 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
 
+        // Public pages: no session, cookies or CSRF for anonymous visitors, so responses can be cached
+        'public' => [
+            \App\Http\Middleware\StartSessionIfPresent::class,
+            \Illuminate\Routing\Middleware\SubstituteBindings::class,
+        ],
+
         'web_admin' => [
             \App\Http\Middleware\AuthorizeWebAdminAreaAccess::class,
         ],
@@ -64,6 +70,7 @@ class Kernel extends HttpKernel
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'bindings' => \Illuminate\Routing\Middleware\SubstituteBindings::class,
         'cache.headers' => \Illuminate\Http\Middleware\SetCacheHeaders::class,
+        'cache.public' => \App\Http\Middleware\SetPublicCacheHeaders::class,
         'can' => \Illuminate\Auth\Middleware\Authorize::class,
         'guest' => \App\Http\Middleware\RedirectIfAuthenticated::class,
         'signed' => \Illuminate\Routing\Middleware\ValidateSignature::class,

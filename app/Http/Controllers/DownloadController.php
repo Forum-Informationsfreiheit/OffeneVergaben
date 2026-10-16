@@ -6,7 +6,7 @@ use App\Jobs\MakeDatasetsCsvDumpJob;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Str;
-use Laracasts\Flash\Flash;
+use App\Support\PublicMessages as Msg;
 
 class DownloadController extends Controller
 {
@@ -44,14 +44,12 @@ class DownloadController extends Controller
 
         // Format Angabe in der URL required
         if (!request('format')) {
-            Flash::error('Download Format nicht angegeben.');
-            return redirect(route('public::downloads'));
+            return $this->errorView(Msg::DOWNLOAD_FORMAT_MISSING, 422);
         }
 
         // Aber derzeit nur CSV unterstüzt
         if (!in_array(request('format'),$this->supportedFormat)) {
-            Flash::error('Unbekanntes Format angegeben.');
-            return redirect(route('public::downloads'));
+            return $this->errorView(Msg::DOWNLOAD_FORMAT_UNKNOWN, 422);
         }
 
         // prepare file, symlink etc.
@@ -69,8 +67,7 @@ class DownloadController extends Controller
         $res = symlink($filePath,$linkPath);
 
         if (!$res) {
-            Flash::error('Beim Erstellen des Downloads ist ein Fehler aufgetreten.');
-            return redirect(route('public::downloads'));
+            return $this->errorView(Msg::DOWNLOAD_FAILED, 500);
         }
 
         $size     = filesize($filePath);
@@ -79,5 +76,12 @@ class DownloadController extends Controller
         $link     = url('tmp/'.$tmpName);
 
         return view('public.downloads.show',compact('title','format','link','timestamp','size'));
+    }
+
+    /**
+     * Public pages have no session, so errors are rendered directly instead of flashed on a redirect.
+     */
+    protected function errorView($messageKey, $status) {
+        return response()->view('public.downloads.error', ['message' => Msg::text($messageKey)], $status);
     }
 }

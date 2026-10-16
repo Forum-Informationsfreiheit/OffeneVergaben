@@ -72,6 +72,11 @@ return [
 
     'url' => env('APP_URL', 'http://localhost'),
 
+    /*
+    | Seconds shared caches (reverse proxy, CDN) may keep public pages, see SetPublicCacheHeaders. 0 disables.
+    */
+    'public_cache_ttl' => (int) env('PUBLIC_CACHE_TTL', 300),
+
     'asset_url' => env('ASSET_URL', null),
 
     /*
