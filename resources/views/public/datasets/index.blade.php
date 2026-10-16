@@ -35,6 +35,11 @@
     </div>
     <div class="row">
         <div class="col">
+            @include('public.partials.donation')
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
             <div class="float-left results-meta">
                 {{-- Auf hunderter runden --}}
                 <span class="count">{{ $totalItems > 100 ? 'ungefähr ' . number_format(round($totalItems,-2),0,',','.') : number_format($totalItems,0,',','.') }} Ergebnisse</span>

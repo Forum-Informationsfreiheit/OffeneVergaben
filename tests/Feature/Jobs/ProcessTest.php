@@ -8,6 +8,7 @@ use App\Models\ScraperKerndaten;
 use App\Models\ScraperQuelle;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use Tests\Fixtures\Eforms;
 use Tests\Fixtures\Kerndaten;
 
 /**
@@ -425,16 +426,83 @@ class ProcessTest extends JobTestCase
         ]);
     }
 
+    public function testKerndatenDatasetsAreMarkedAsKerndaten()
+    {
+        $record = $this->makeRecord(Kerndaten::xml('KD_8_2_Z1'));
+
+        $this->processor([$record])->handle();
+
+        $this->assertDatabaseHas('datasets', [
+            'id'                  => $record->app_dataset_id,
+            'source_format'       => 'kerndaten',
+            'source_subtype'      => null,
+            'further_information' => null,
+        ]);
+    }
+
     /**
-     * TODO: bug — for a record without CONTRACTING_BODY (or OBJECT_CONTRACT) DOMKerndaten fails with a TypeError.
-     * Process::handle() only catches \Exception, so the run stops and the following records are not processed.
-     * Catch \Throwable there (or let DOMKerndaten throw an \Exception for missing elements), then remove
-     * markTestIncomplete() here.
+     * eForms notices are stored in the same tables as Kerndaten, marked with their source format.
+     */
+    public function testCreatesDatasetFromEformsAward()
+    {
+        DB::table('procedures')->insertOrIgnore(['code' => 'OTH_SINGLE', 'name' => 'OTH_SINGLE']);
+        $record = $this->makeRecord(Eforms::xml('can-standard'));
+
+        $this->processor([$record])->handle();
+
+        $this->assertTrue($record->saved);
+        $this->assertDatabaseHas('datasets', [
+            'id'                       => $record->app_dataset_id,
+            'source_format'            => 'eforms',
+            'source_subtype'           => 'E4',
+            'type_code'                => 'KD_8_2_Z1',
+            'title'                    => 'Sanierung der Ortsdurchfahrt Musterdorf',
+            'cpv_code'                 => '99100000',
+            'nuts_code'                => 'ZZ999',
+            'contract_type'            => 'WORKS',
+            'is_lot'                   => 1,
+            'threshold'                => 0,
+            'nb_tenders_received'      => 4,
+            'val_total'                => 123456789,
+            'date_conclusion_contract' => '2026-03-01 00:00:00',
+        ]);
+        $this->assertEquals(
+            ['OTH_SINGLE'],
+            DB::table('dataset_procedure')->where('dataset_id', $record->app_dataset_id)->pluck('procedure_code')->all()
+        );
+        $this->assertEquals(
+            ['Testgemeinde Musterdorf' => 0, 'Testverband Musterregion' => 1],
+            DB::table('offerors')->where('dataset_id', $record->app_dataset_id)->pluck('is_extra', 'name')->all()
+        );
+        $this->assertEquals(
+            ['Muster Bau GmbH' => 0, 'Beispiel Asphalt KG' => 1],
+            DB::table('contractors')->where('dataset_id', $record->app_dataset_id)->pluck('is_extra', 'name')->all()
+        );
+
+        // the unmapped fields, e.g. the values of the tenders
+        $info = json_decode(DB::table('datasets')->where('id', $record->app_dataset_id)->value('further_information'), true);
+        $this->assertSame('1.13', $info['sdk']);
+        $this->assertContains('Angebot: TEN-0001', array_column($info['groups'], 'title'));
+        // lot titles for the full-text search
+        $this->assertSame("Fahrbahn\nGehsteige", DB::table('datasets')->where('id', $record->app_dataset_id)->value('search_text'));
+    }
+
+    public function testRecordOfUnknownFormatIsSkipped()
+    {
+        $unknown = $this->makeRecord('<Bekanntmachung><Titel>Kein bekanntes Format</Titel></Bekanntmachung>');
+        $record  = $this->makeRecord(Kerndaten::xml('KD_8_2_Z1'));
+
+        $this->processor([$unknown, $record])->handle();
+
+        $this->assertFalse($unknown->saved);
+        $this->assertTrue($record->saved);
+    }
+
+    /**
+     * For a record without CONTRACTING_BODY DOMKerndaten fails with a TypeError, which must not stop the run.
      */
     public function testRecordWithoutContractingBodyIsSkipped()
     {
-        $this->markTestIncomplete('A TypeError in DOMKerndaten stops Process::handle(), which only catches \Exception.');
-
         $incomplete = $this->makeRecord('<KD_8_2_Z1><OBJECT_CONTRACT><TITLE><P>Ohne Auftraggeber</P></TITLE></OBJECT_CONTRACT></KD_8_2_Z1>');
         $record     = $this->makeRecord(Kerndaten::xml('KD_8_2_Z1'));
 

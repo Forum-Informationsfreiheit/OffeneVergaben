@@ -182,12 +182,16 @@ if (! function_exists('nl_to_br')) {
 if (!function_exists('procedure_label')) {
     function procedure_label($procedures) {
         $p = is_array($procedures) ? $procedures : [ $procedures ];
+        if (count($p) > 1 && in_array('DPS', $p)) {
+            // a dynamic purchasing system is established via one of the other procedures, e.g. PT_OPEN + DPS
+            return procedure_label(array_values(array_diff($p, ['DPS']))) . ' (dynamisches Beschaffungssystem)';
+        }
         if (count($p) == 1) {
             // 'singles'
             if ($p[0] == 'PT_OPEN') {
                 return 'offenes Verfahren';
             }
-            if ($p[0] == 'PT_COMPETITIVE_DIALOG') {
+            if ($p[0] == 'PT_COMPETITIVE_DIALOGUE') {
                 return 'wettbewerblicher Dialog';
             }
             if ($p[0] == 'PT_COMPETITIVE_NEGOTIATION') {
@@ -205,6 +209,20 @@ if (!function_exists('procedure_label')) {
             if ($p[0] == 'PT_DIRECT') {
                 return 'Direktvergabe';
             }
+            // eForms procedure types without Kerndaten equivalent, labels as in the eForms SDK (code_de.xml)
+            // 'oth-single' / 'oth-mult': the actual (national) procedure is not specified
+            if ($p[0] == 'OTH_SINGLE') {
+                return 'sonstiges einstufiges Verfahren';
+            }
+            if ($p[0] == 'OTH_MULT') {
+                return 'sonstiges zweistufiges Verfahren';
+            }
+            if ($p[0] == 'COMP_TEND') {
+                return 'wettbewerbliches Vergabeverfahren (Art. 5 Abs. 3 VO (EG) Nr. 1370/2007)';
+            }
+            if ($p[0] == 'EXP_INT_RAIL') {
+                return 'Aufruf zur Interessenbekundung, nur Schiene (Art. 5 Abs. 3b VO (EG) Nr. 1370/2007)';
+            }
         }
         if (count($p) == 2) {
             // 'doubles'
@@ -212,19 +230,19 @@ if (!function_exists('procedure_label')) {
                 return 'nicht offenes Verfahren mit vorheriger Bekanntmachung';
             }
             if(in_array('PT_RESTRICTED',$p) && in_array('PT_WITHOUT_PRIOR_NOTICE',$p)) {
-                return 'nicht offenes Verfahren ohne vorheriger Bekanntmachung';
+                return 'nicht offenes Verfahren ohne vorherige Bekanntmachung';
             }
             if(in_array('PT_COMPETITIVE_NEGOTIATION',$p) && in_array('PT_WITH_PRIOR_NOTICE',$p)) {
                 return 'Verhandlungsverfahren mit vorheriger Bekanntmachung';
             }
             if(in_array('PT_COMPETITIVE_NEGOTIATION',$p) && in_array('PT_WITHOUT_PRIOR_NOTICE',$p)) {
-                return 'Verhandlungsverfahren ohne vorheriger Bekanntmachung';
+                return 'Verhandlungsverfahren ohne vorherige Bekanntmachung';
             }
             if(in_array('PT_SPECIAL_SERVICE',$p) && in_array('PT_WITH_PRIOR_NOTICE',$p)) {
                 return 'besonderer Dienstleistungsauftrag mit vorheriger Bekanntmachung';
             }
             if(in_array('PT_SPECIAL_SERVICE',$p) && in_array('PT_WITHOUT_PRIOR_NOTICE',$p)) {
-                return 'besonderer Dienstleistungsauftrag ohne vorheriger Bekanntmachung';
+                return 'besonderer Dienstleistungsauftrag ohne vorherige Bekanntmachung';
             }
             if(in_array('PT_DIRECT',$p) && in_array('PT_WITH_PRIOR_NOTICE',$p)) {
                 return 'Direktvergabe mit vorheriger Bekanntmachung';

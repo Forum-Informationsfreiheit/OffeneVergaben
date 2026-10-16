@@ -1,0 +1,94 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ContractNotice xmlns="urn:oasis:names:specification:ubl:schema:xsd:ContractNotice-2"
+    xmlns:cac="urn:oasis:names:specification:ubl:schema:xsd:CommonAggregateComponents-2"
+    xmlns:cbc="urn:oasis:names:specification:ubl:schema:xsd:CommonBasicComponents-2"
+    xmlns:efac="http://data.europa.eu/p27/eforms-ubl-extension-aggregate-components/1"
+    xmlns:efbc="http://data.europa.eu/p27/eforms-ubl-extension-basic-components/1"
+    xmlns:efext="http://data.europa.eu/p27/eforms-ubl-extensions/1"
+    xmlns:ext="urn:oasis:names:specification:ubl:schema:xsd:CommonExtensionComponents-2">
+    <ext:UBLExtensions>
+        <ext:UBLExtension>
+            <ext:ExtensionContent>
+                <efext:EformsExtension>
+                    <efac:NoticeSubType>
+                        <cbc:SubTypeCode listName="notice-subtype">16</cbc:SubTypeCode>
+                    </efac:NoticeSubType>
+                    <efac:Organizations>
+                        <efac:Organization>
+                            <efac:Company>
+                                <cac:PartyIdentification><cbc:ID schemeName="organization">ORG-0001</cbc:ID></cac:PartyIdentification>
+                                <cac:PartyName><cbc:Name languageID="DEU">Testgemeinde Musterdorf</cbc:Name></cac:PartyName>
+                                <cac:PartyLegalEntity><cbc:CompanyID>99999</cbc:CompanyID></cac:PartyLegalEntity>
+                            </efac:Company>
+                        </efac:Organization>
+                    </efac:Organizations>
+                </efext:EformsExtension>
+            </ext:ExtensionContent>
+        </ext:UBLExtension>
+    </ext:UBLExtensions>
+    <cbc:UBLVersionID>2.3</cbc:UBLVersionID>
+    <cbc:CustomizationID>eforms-sdk-1.13</cbc:CustomizationID>
+    <cbc:ID schemeName="notice-id">FN_99999_16_20260115090000</cbc:ID>
+    <cbc:ContractFolderID>00000000-0000-0000-0000-000000000043</cbc:ContractFolderID>
+    <cbc:IssueDate>2026-01-15+01:00</cbc:IssueDate>
+    <cbc:IssueTime>09:00:00+01:00</cbc:IssueTime>
+    <cbc:VersionID>01</cbc:VersionID>
+    <cbc:RegulatoryDomain>32014L0024</cbc:RegulatoryDomain>
+    <cbc:NoticeTypeCode listName="competition">cn-standard</cbc:NoticeTypeCode>
+    <cbc:NoticeLanguageCode>DEU</cbc:NoticeLanguageCode>
+    <cac:ContractingParty>
+        <cac:Party><cac:PartyIdentification><cbc:ID schemeName="organization">ORG-0001</cbc:ID></cac:PartyIdentification></cac:Party>
+    </cac:ContractingParty>
+    <cac:TenderingProcess>
+        <cbc:ProcedureCode listName="procurement-procedure-type">open</cbc:ProcedureCode>
+    </cac:TenderingProcess>
+    <cac:ProcurementProject>
+        <cbc:ID schemeName="InternalID">MD-2026-43</cbc:ID>
+        <cbc:Name languageID="DEU">IT-Ausstattung Gemeindeamt Musterdorf</cbc:Name>
+        <cbc:Description languageID="DEU">Rahmenvereinbarung für Arbeitsplatzrechner</cbc:Description>
+        <cbc:ProcurementTypeCode listName="contract-nature">supplies</cbc:ProcurementTypeCode>
+        <cac:MainCommodityClassification><cbc:ItemClassificationCode listName="cpv">99100000</cbc:ItemClassificationCode></cac:MainCommodityClassification>
+        <cac:RealizedLocation>
+            <cac:Address><cac:Country><cbc:IdentificationCode listName="country">AUT</cbc:IdentificationCode></cac:Country></cac:Address>
+        </cac:RealizedLocation>
+    </cac:ProcurementProject>
+    <cac:ProcurementProjectLot>
+        <cbc:ID schemeName="Lot">LOT-0001</cbc:ID>
+        <cac:TenderingTerms>
+            <cac:CallForTendersDocumentReference>
+                <cbc:ID>ADOC-0001</cbc:ID>
+                <cbc:DocumentType>non-restricted-document</cbc:DocumentType>
+                <cac:Attachment><cac:ExternalReference><cbc:URI>https://vergabe.musterdorf.example/2026-43</cbc:URI></cac:ExternalReference></cac:Attachment>
+            </cac:CallForTendersDocumentReference>
+            <cac:TenderRecipientParty><cbc:EndpointID>https://vergabe.musterdorf.example/2026-43/teilnahme</cbc:EndpointID></cac:TenderRecipientParty>
+        </cac:TenderingTerms>
+        <cac:TenderingProcess>
+            <cac:TenderSubmissionDeadlinePeriod>
+                <cbc:EndDate>2026-02-20+01:00</cbc:EndDate>
+                <cbc:EndTime>12:00:00+01:00</cbc:EndTime>
+            </cac:TenderSubmissionDeadlinePeriod>
+            <cac:ContractingSystem><cbc:ContractingSystemTypeCode listName="framework-agreement">fa-wo-rc</cbc:ContractingSystemTypeCode></cac:ContractingSystem>
+            <cac:ContractingSystem><cbc:ContractingSystemTypeCode listName="dps-usage">none</cbc:ContractingSystemTypeCode></cac:ContractingSystem>
+        </cac:TenderingProcess>
+        <cac:ProcurementProject>
+            <cbc:Name languageID="DEU">Notebooks</cbc:Name>
+            <cac:MainCommodityClassification><cbc:ItemClassificationCode listName="cpv">99110000</cbc:ItemClassificationCode></cac:MainCommodityClassification>
+            <cac:PlannedPeriod><cbc:DurationMeasure unitCode="MONTH">48</cbc:DurationMeasure></cac:PlannedPeriod>
+        </cac:ProcurementProject>
+    </cac:ProcurementProjectLot>
+    <cac:ProcurementProjectLot>
+        <cbc:ID schemeName="Lot">LOT-0002</cbc:ID>
+        <cac:TenderingProcess>
+            <cac:TenderSubmissionDeadlinePeriod>
+                <cbc:EndDate>2026-02-15+01:00</cbc:EndDate>
+                <cbc:EndTime>12:00:00+01:00</cbc:EndTime>
+            </cac:TenderSubmissionDeadlinePeriod>
+            <cac:ContractingSystem><cbc:ContractingSystemTypeCode listName="framework-agreement">fa-wo-rc</cbc:ContractingSystemTypeCode></cac:ContractingSystem>
+            <cac:ContractingSystem><cbc:ContractingSystemTypeCode listName="dps-usage">none</cbc:ContractingSystemTypeCode></cac:ContractingSystem>
+        </cac:TenderingProcess>
+        <cac:ProcurementProject>
+            <cbc:Name languageID="DEU">Monitore</cbc:Name>
+            <cac:MainCommodityClassification><cbc:ItemClassificationCode listName="cpv">99120000</cbc:ItemClassificationCode></cac:MainCommodityClassification>
+        </cac:ProcurementProject>
+    </cac:ProcurementProjectLot>
+</ContractNotice>

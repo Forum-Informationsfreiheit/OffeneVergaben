@@ -99,6 +99,47 @@ class DatasetControllerTest extends PublicTestCase
         $response->assertSee(route('public::auftragsxml', ['id' => $id]));
     }
 
+    public function testShowDisplaysEformsSubtype()
+    {
+        // without description, which used to leave an output buffer open (null as content of @section('page:description'))
+        $id = $this->createDataset(['source_format' => 'eforms', 'source_subtype' => 'E4']);
+
+        $response = $this->get(route('public::auftrag', $id));
+
+        $response->assertStatus(200);
+        $response->assertSee('eForms E4: Freiwillige Vergabebekanntmachung');
+    }
+
+    public function testShowDisplaysFurtherInformation()
+    {
+        $id = $this->createDataset(['source_format' => 'eforms', 'source_subtype' => 'E4', 'further_information' => json_encode([
+            'sdk'    => '1.13',
+            'groups' => [[
+                'title'   => 'Organisation: Landesverwaltungsgericht Musterland',
+                'entries' => [
+                    ['field' => 'BT-510(a)-Organization-Company', 'label' => 'Postanschrift', 'value' => 'Musterstraße 1 <b>'],
+                    ['field' => 'BT-505-Organization-Company', 'label' => 'Internetadresse', 'value' => 'https://lvwg.musterland.example'],
+                ],
+            ]],
+        ])]);
+
+        $response = $this->get(route('public::auftrag', $id));
+
+        $response->assertSee('Weitere Angaben aus der Bekanntmachung');
+        $response->assertSee('Organisation: Landesverwaltungsgericht Musterland');
+        // values are shown as they are, escaped; urls as links
+        $response->assertSee('<th>Postanschrift</th>', false);
+        $response->assertSee('Musterstraße 1 &lt;b&gt;', false);
+        $response->assertSee('<a rel="nofollow" target="_blank" href="https://lvwg.musterland.example">', false);
+    }
+
+    public function testShowWithoutFurtherInformationHasNoSection()
+    {
+        $response = $this->get(route('public::auftrag', $this->createDataset(['description' => 'x'])));
+
+        $response->assertDontSee('Weitere Angaben aus der Bekanntmachung');
+    }
+
     public function testShowLinksOtherVersions()
     {
         $metasetId = $this->createMetaset();
@@ -171,6 +212,7 @@ class DatasetControllerTest extends PublicTestCase
         $scraper->beginTransaction();
 
         try {
+            $this->createScraperQuelle();
             $kerndatenId = $scraper->table('kerndaten')->insertGetId([
                 'quelle'       => 'test',
                 'item_id'      => 'public-test-'.Str::random(8),

@@ -1,0 +1,38 @@
+// Donation call-out (public/partials/donation.blade.php): /aufträge between the filter and the results,
+// homepage below the big search field
+
+.donation-callout {
+  margin-bottom: 20px;
+  padding: 0.9rem 1.1rem;
+  background-color: $lightblue;
+  color: $black;
+
+  p {
+    margin: 0;
+    line-height: 1.5; // the global p rule sets 2rem
+  }
+
+  a {
+    color: $blue;
+    text-decoration: underline;
+
+    &:hover,
+    &:focus {
+      color: #29699a; // $blue, darker
+    }
+  }
+}
+
+// page of a single dataset: one line below the data table
+.donation-callout-small {
+  padding: 0.5rem 0.8rem;
+  font-size: 0.85rem;
+}
+
+// the homepage lead section is light blue itself: white box there, spaced from the search field
+section.lead .donation-callout {
+  margin-top: 1.5rem;
+  margin-bottom: 0;
+  background-color: #fff;
+  font-size: 1rem;
+}

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Dataset;
+use App\Models\DatasetType;
 use Carbon\Carbon;
 use Tests\TestCase;
 
@@ -77,5 +78,33 @@ class DatasetTest extends TestCase
         $dataset->item_lastmod = null;
 
         $this->assertNull($dataset->item_lastmod);
+    }
+
+    public function testTypeOfKerndatenShowsTheirType()
+    {
+        $dataset = (new Dataset())->forceFill(['type_code' => 'KD_8_2_Z1', 'source_format' => 'kerndaten']);
+        $dataset->setRelation('type', (new DatasetType())->forceFill(['code' => 'KD_8_2_Z1', 'description' => 'Kerndaten für vergebene Aufträge']));
+
+        $this->assertSame('KD_8_2_Z1 Kerndaten für vergebene Aufträge', $dataset->typeToString());
+    }
+
+    /**
+     * eForms datasets show their notice subtype.
+     */
+    public function testTypeOfEformsShowsSubtype()
+    {
+        $dataset = (new Dataset())->forceFill(['type_code' => 'KD_8_2_Z1', 'source_format' => 'eforms', 'source_subtype' => 'E4']);
+
+        $this->assertSame(
+            'eForms E4: Freiwillige Vergabebekanntmachung',
+            $dataset->typeToString()
+        );
+    }
+
+    public function testTypeOfEformsWithUnknownSubtype()
+    {
+        $dataset = (new Dataset())->forceFill(['type_code' => 'KD_8_1_Z1', 'source_format' => 'eforms', 'source_subtype' => 'E9']);
+
+        $this->assertSame('eForms-Bekanntmachung E9', $dataset->typeToString());
     }
 }

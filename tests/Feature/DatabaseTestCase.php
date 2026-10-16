@@ -120,6 +120,20 @@ abstract class DatabaseTestCase extends TestCase
         return CPV::find($code);
     }
 
+    /**
+     * Creates the scraper source (quellen) that test kerndaten rows refer to: the scraper schema has a foreign key
+     * kerndaten.quelle -> quellen.alias. Call it inside the test's own transaction on mysql_scraper, which is not
+     * covered by DatabaseTransactions.
+     */
+    protected function createScraperQuelle($alias = 'test')
+    {
+        DB::connection('mysql_scraper')->table('quellen')->insertOrIgnore([
+            'alias'  => $alias,
+            'name'   => 'Testquelle',
+            'active' => 1,
+        ]);
+    }
+
     protected function createMetaset()
     {
         return DB::table('metasets')->insertGetId([

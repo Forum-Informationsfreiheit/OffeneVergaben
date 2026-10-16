@@ -48,6 +48,8 @@ class DatasetFilter extends QueryFilter
 
     protected $nutsArray = [
         'NAT',
+        // place of performance: Austria, without region (e.g. eForms "anywhere in the country")
+        'AT',
         'AT11','AT12','AT13',
         'AT21','AT22',
         'AT31','AT32','AT33','AT34'
@@ -347,6 +349,9 @@ class DatasetFilter extends QueryFilter
         $matches = DB::table('datasets')
             ->select('id as dataset_id')
             ->whereRaw('MATCH(title, description) AGAINST (? IN BOOLEAN MODE)',[$term])
+            // eForms: lot titles and descriptions
+            ->union(DB::table('datasets')->select('id as dataset_id')
+                ->whereRaw('MATCH(search_text) AGAINST (? IN BOOLEAN MODE)',[$term]))
             ->union(DB::table('offerors')->select('dataset_id')->where('is_extra',0)
                 ->whereRaw('MATCH(name) AGAINST (? IN BOOLEAN MODE)',[$term]))
             ->union(DB::table('offerors')->select('dataset_id')->where('is_extra',0)

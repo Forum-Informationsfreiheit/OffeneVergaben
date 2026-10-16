@@ -158,6 +158,10 @@
                         <input class="form-check-input" type="checkbox" value="NAT" name="nuts[]" id="filterNutsInt" {{ $filters->has('nuts','NAT') ? 'checked' : '' }} >
                         <label class="form-check-label" for="filterNutsInt">International</label>
                     </div>
+                    <div class="form-check mb-2">
+                        <input class="form-check-input" type="checkbox" value="AT" name="nuts[]" id="filterNutsAT" {{ $filters->has('nuts','AT') ? 'checked' : '' }} >
+                        <label class="form-check-label" for="filterNutsAT">ganz Österreich</label>
+                    </div>
                     <div class="form-check">
                         <input class="form-check-input" type="checkbox" value="AT11" name="nuts[]" id="filterNuts11" {{ $filters->has('nuts','AT11') ? 'checked' : '' }} >
                         <label class="form-check-label" for="filterNuts11">Burgenland</label>

@@ -21,6 +21,8 @@ use Illuminate\Support\Str;
  */
 class DOMKerndaten
 {
+    use TracksUnparsedNodes;
+
     /**
      * @var DOMDocument $document
      */
@@ -54,6 +56,8 @@ class DOMKerndaten
         $this->info = $info;
 
         $this->loadAll();
+
+        $this->logUnparsed('Kerndaten');
 
         if (false) {        // DEBUG ONE RECORD
             dump('type --------------------------');
@@ -102,7 +106,9 @@ class DOMKerndaten
     }
 
     public function loadAll() {
-        $this->type = $this->document->firstChild->tagName;
+        // documentElement, not firstChild: some publishers put a comment before the root element
+        $this->type = $this->document->documentElement->tagName;
+        $this->consume($this->document->documentElement);
 
         $this->loadContractingBody();
         $this->loadObjectContract();
@@ -117,6 +123,10 @@ class DOMKerndaten
     public function getData() {
         $data = new \stdClass();
 
+        $data->sourceFormat = 'kerndaten';
+        $data->sourceSubtype = null;        // eForms only, for Kerndaten the type says it all
+        $data->furtherInformation = null;   // eForms only, there are no labels for unmapped Kerndaten elements
+        $data->searchText = null;           // eForms only: lot titles and descriptions
         $data->type = $this->type;
         $data->contractingBody = $this->contractingBody;
         $data->objectContract = $this->objectContract;
@@ -272,7 +282,7 @@ class DOMKerndaten
             $domDuration = $this->getFirstElementByTagName($domOdescr, 'DURATION');
 
             // store duration as DAYS, in case source data is specified in months automatically calculate day value
-            if ($domDuration->hasAttribute('TYPE') && $domDuration->getAttribute('TYPE') == 'MONTH') {
+            if ($this->getAttributeString($domDuration, 'TYPE') == 'MONTH') {
                 $oc->duration = intval($this->getString($domDuration)) * 30;
             } else {
                 $oc->duration = intval($this->getString($domDuration));
@@ -620,6 +630,8 @@ class DOMKerndaten
      */
     public function getValue($element) {
         if ($element) {
+            $this->consume($element, true);
+
             return $element->nodeValue;
         }
 
@@ -632,6 +644,8 @@ class DOMKerndaten
      */
     public function getString($element) {
         if ($element) {
+            $this->consume($element, true);
+
             $value = trim(strip_tags($element->nodeValue));
 
             return $value ? $value : null;
@@ -647,6 +661,8 @@ class DOMKerndaten
      */
     public function getAttributeString($element, $attribute) {
         if ($element && $element->hasAttribute($attribute)) {
+            $this->consume($element->getAttributeNode($attribute));
+
             $value = trim($element->getAttribute($attribute));
 
             return $value ? $value : null;
@@ -657,6 +673,8 @@ class DOMKerndaten
 
     public function getDate($element) {
         if ($element) {
+            $this->consume($element, true);
+
             try {
                 $value = trim($element->nodeValue);
 
@@ -769,7 +787,7 @@ class DOMKerndaten
         */
 
         if ($element->hasChildNodes() && $element->getElementsByTagName($tagName)->length) {
-            return $element->getElementsByTagName($tagName)->item(0);
+            return $this->consume($element->getElementsByTagName($tagName)->item(0));
         }
 
         return null;

@@ -11,6 +11,9 @@ namespace Tests\Fixtures;
  */
 class Kerndaten
 {
+    // directory below tests/Fixtures
+    const DIR = 'kerndaten';
+
     /**
      * @param string $type file name without .xml
      * @param array $replacements search => replace. Every search string has to occur exactly once in the file,
@@ -19,11 +22,11 @@ class Kerndaten
      */
     public static function xml($type, array $replacements = [])
     {
-        $xml = file_get_contents(__DIR__.'/kerndaten/'.$type.'.xml');
+        $xml = file_get_contents(__DIR__.'/'.static::DIR.'/'.$type.'.xml');
 
         foreach (array_keys($replacements) as $search) {
             if (substr_count($xml, $search) !== 1) {
-                throw new \InvalidArgumentException("'$search' does not occur exactly once in kerndaten/$type.xml.");
+                throw new \InvalidArgumentException("'$search' does not occur exactly once in ".static::DIR."/$type.xml.");
             }
         }
 
