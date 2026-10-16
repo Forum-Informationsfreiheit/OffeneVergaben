@@ -41,4 +41,4 @@
 @if($channel !== 'dataset')
 Wir betreiben {{ config('app.name') }} seit 2021 ohne weiterer Finanzierung ehrenamtlich und mussten gerade signifikant Arbeit investieren, um von Behörden geänderte Veröffentlichungsformate zu unterstützen.<br>
 @endif
-Mit einer <span style="color: #e54f5c;" aria-hidden="true">&#10084;</span>&nbsp;<a href="https://www.fragdenstaat.at/spenden">Spende an das Forum Informationsfreiheit</a> können Sie helfen, den Betrieb von {{ config('app.name') }} sicherzustellen.
+Mit einer <span style="color: #e54f5c;" aria-hidden="true">&#10084;</span>&nbsp;<a href="https://fragdenstaat.at/spenden/?pk_keyword=offenevergaben">Spende an das Forum Informationsfreiheit</a> können Sie helfen, den Betrieb von {{ config('app.name') }} sicherzustellen.
