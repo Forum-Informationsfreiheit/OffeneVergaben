@@ -68,8 +68,10 @@ class DatasetControllerTest extends PublicTestCase
         $token   = Str::random(10);
         $suffix  = Str::random(10);
         $offeror = $this->createOrganization(['name' => 'Gemeinde '.$token]);
-        $this->createDataset(['title' => 'Gefunden '.$suffix], $offeror);
-        $this->createDataset(['title' => 'Nicht gesucht '.$suffix]);
+        $this->commitTestData([
+            $this->createDataset(['title' => 'Gefunden '.$suffix], $offeror),
+            $this->createDataset(['title' => 'Nicht gesucht '.$suffix]),
+        ]);
 
         $response = $this->get(route('public::auftraege', ['search' => $token]));
 

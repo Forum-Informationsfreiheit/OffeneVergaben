@@ -29,6 +29,9 @@ abstract class DatabaseTestCase extends TestCase
     // item_lastmod is a MySQL TIMESTAMP, which ends at 2038-01-19 03:14:07 UTC.
     const ITEM_LASTMOD = '2037-01-01 00:00:00.000000';
 
+    // see commitTestData()
+    private $createdOrganizationIds = [];
+
     protected function setUp(): void
     {
         parent::setUp();
@@ -67,9 +70,37 @@ abstract class DatabaseTestCase extends TestCase
 
     protected function createOrganization(array $attributes = [])
     {
-        return Organization::forceCreate(array_merge([
+        $organization = Organization::forceCreate(array_merge([
             'name' => 'Testorganisation '.Str::random(10),
         ], $attributes));
+        $this->createdOrganizationIds[] = $organization->id;
+
+        return $organization;
+    }
+
+    /**
+     * Commits the records the test created so far and deletes the given datasets and all created organizations
+     * after the test (offerors and contractors are deleted by their foreign keys).
+     *
+     * InnoDB adds rows to a FULLTEXT index only on commit, so the search filter (MATCH ... AGAINST) doesn't find
+     * records inserted inside the test transaction. Note that committing also makes the reference rows from
+     * setUp() (roles, dataset type, user 1) permanent if the database didn't have them yet.
+     */
+    protected function commitTestData(array $datasetIds)
+    {
+        DB::commit();
+        // everything after this runs in a transaction again, which DatabaseTransactions rolls back as usual
+        DB::beginTransaction();
+
+        $organizationIds = $this->createdOrganizationIds;
+
+        // runs after the rollback of DatabaseTransactions, which is registered first
+        $this->beforeApplicationDestroyed(function () use ($datasetIds, $organizationIds) {
+            $metasetIds = DB::table('datasets')->whereIn('id', $datasetIds)->pluck('metaset_id');
+            DB::table('datasets')->whereIn('id', $datasetIds)->delete();
+            DB::table('metasets')->whereIn('id', $metasetIds)->delete();
+            DB::table('organizations')->whereIn('id', $organizationIds)->delete();
+        });
     }
 
     /**

@@ -211,8 +211,10 @@ class Dataset extends Model
         return $this->hasMany('App\Models\Offeror');
     }
 
+    // ohne orderBy haengt die Reihenfolge vom Index ab, den MySQL waehlt: ueber ix_extra_namesort_ds
+    // kommen die Zeilen nach Namen sortiert statt in der Reihenfolge der Quelle
     public function offerorsAdditional(){
-        return $this->hasMany('App\Models\Offeror')->where('is_extra',1);
+        return $this->hasMany('App\Models\Offeror')->where('is_extra',1)->orderBy('id');
     }
 
     public function contractor() {
@@ -224,7 +226,8 @@ class Dataset extends Model
     }
 
     public function contractorsAdditional() {
-        return $this->hasMany('App\Models\Contractor')->where('is_extra',1);
+        // siehe offerorsAdditional()
+        return $this->hasMany('App\Models\Contractor')->where('is_extra',1)->orderBy('id');
     }
 
     public function nuts() {

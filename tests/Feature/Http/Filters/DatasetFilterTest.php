@@ -257,6 +257,7 @@ class DatasetFilterTest extends DatabaseTestCase
             'other'       => $this->createDataset(),
         ];
         $this->addContractor($datasets['contractor'], $this->createOrganization(['name' => 'Bau GmbH '.$token]));
+        $this->commitTestData(array_values($datasets));
 
         $this->assertEqualsCanonicalizing(['title', 'description', 'offeror', 'contractor'], $this->matching('search='.$token, $datasets));
     }
