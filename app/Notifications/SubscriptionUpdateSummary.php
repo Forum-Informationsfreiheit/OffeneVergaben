@@ -67,6 +67,6 @@ class SubscriptionUpdateSummary extends Notification
     }
 
     protected function mailFromAddress() {
-        return env('APP_MAIL_DEFAULT_FROM_ADDRESS',env('MAIL_FROM_ADDRESS'));
+        return config('mail.default_from_address');
     }
 }

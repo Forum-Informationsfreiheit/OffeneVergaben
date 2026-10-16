@@ -8,41 +8,17 @@ use Illuminate\Support\Facades\Log;
 use Tests\TestCase;
 
 /**
- * The schedule in App\Console\Kernel. The times of the daily jobs come from APP_SCHEDULE_*_TIMESTRING.
+ * The schedule in App\Console\Kernel. The times of the daily jobs come from config('app.schedule.*'), set by the
+ * APP_SCHEDULE_*_TIMESTRING environment variables.
  */
 class ScheduleTest extends TestCase
 {
-    /**
-     * @var array ['_SERVER' => [...], '_ENV' => [...]] values before the test, null for variables that were not set
-     */
-    private $originalEnvironment = ['_SERVER' => [], '_ENV' => []];
-
-    protected function tearDown(): void
-    {
-        foreach ($this->originalEnvironment['_SERVER'] as $key => $value) {
-            if ($value === null) {
-                unset($_SERVER[$key]);
-            } else {
-                $_SERVER[$key] = $value;
-            }
-        }
-        foreach ($this->originalEnvironment['_ENV'] as $key => $value) {
-            if ($value === null) {
-                unset($_ENV[$key]);
-            } else {
-                $_ENV[$key] = $value;
-            }
-        }
-
-        parent::tearDown();
-    }
-
     public function testSchedulesCommands()
     {
         $commands = $this->scheduledCommands([
-            'APP_SCHEDULE_PROCESS_AT_TIMESTRING'                          => '02:15',
-            'APP_SCHEDULE_DUMP_AT_TIMESTRING'                             => '04:30',
-            'APP_SCHEDULE_SEND_SUBSCRIPTION_SUMMARY_UPDATE_AT_TIMESTRING' => '07:00',
+            'process_at'                   => '02:15',
+            'dump_at'                      => '04:30',
+            'send_subscription_updates_at' => '07:00',
         ]);
 
         $this->assertSame([
@@ -58,9 +34,9 @@ class ScheduleTest extends TestCase
     public function testDailyJobsWithoutTimeAreNotScheduled()
     {
         $commands = $this->scheduledCommands([
-            'APP_SCHEDULE_PROCESS_AT_TIMESTRING'                          => '',
-            'APP_SCHEDULE_DUMP_AT_TIMESTRING'                             => '',
-            'APP_SCHEDULE_SEND_SUBSCRIPTION_SUMMARY_UPDATE_AT_TIMESTRING' => '',
+            'process_at'                   => '',
+            'dump_at'                      => '',
+            'send_subscription_updates_at' => '',
         ]);
 
         $this->assertSame(['fif:clean-up-subscriptions', 'fif:clean-up-tmp-links', 'fif:generate-sitemap'], array_keys($commands));
@@ -71,9 +47,9 @@ class ScheduleTest extends TestCase
         Log::shouldReceive('error')->once();
 
         $commands = $this->scheduledCommands([
-            'APP_SCHEDULE_PROCESS_AT_TIMESTRING'                          => 'irgendwann',
-            'APP_SCHEDULE_DUMP_AT_TIMESTRING'                             => '04:30',
-            'APP_SCHEDULE_SEND_SUBSCRIPTION_SUMMARY_UPDATE_AT_TIMESTRING' => '',
+            'process_at'                   => 'irgendwann',
+            'dump_at'                      => '04:30',
+            'send_subscription_updates_at' => '',
         ]);
 
         $this->assertArrayNotHasKey('fif:process', $commands);
@@ -81,19 +57,11 @@ class ScheduleTest extends TestCase
     }
 
     /**
-     * Builds the schedule with the given environment variables and returns command => cron expression.
+     * Builds the schedule with the given times (config app.schedule) and returns command => cron expression.
      */
-    private function scheduledCommands(array $environment)
+    private function scheduledCommands(array $times)
     {
-        foreach ($environment as $key => $value) {
-            if (!array_key_exists($key, $this->originalEnvironment['_ENV'])) {
-                $this->originalEnvironment['_SERVER'][$key] = $_SERVER[$key] ?? null;
-                $this->originalEnvironment['_ENV'][$key] = $_ENV[$key] ?? null;
-            }
-            // env() reads $_SERVER first, then $_ENV (phpdotenv 5); .env fills both
-            $_SERVER[$key] = $value;
-            $_ENV[$key] = $value;
-        }
+        config(['app.schedule' => $times]);
 
         $schedule = new Schedule();
         (function () use ($schedule) {

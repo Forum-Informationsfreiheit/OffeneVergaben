@@ -53,6 +53,10 @@ Unlike re-running `fif:process`, this creates no new dataset version: datasets k
 
 Not needed for this deployment: there are no eForms datasets on live yet.
 
+### Configuration can be cached
+
+The schedule times (`APP_SCHEDULE_*_TIMESTRING`), the senders of the notifications (`APP_MAIL_DEFAULT_FROM_ADDRESS`, `APP_MAIL_ALERTS_FROM_ADDRESS`) and `GOOGLE_ANALYTICS_ID` were read with `env()` in the code. With a cached configuration (`php artisan config:cache`) Laravel doesn't load `.env`, `env()` then returns nothing outside `config/`: the daily jobs (processing, CSV dump, subscription summaries) wouldn't be scheduled and the notifications would have no sender. They are now read from `config/app.php` and `config/mail.php`. Nothing to do; the environment variables stay the same, and caching the configuration is safe now.
+
 ### Unparsed elements are logged
 
 For each record, elements and attributes that the parser does not read are logged as a warning (`… record contains unparsed elements`) with their XPaths. For eForms notices that list is long (addresses, review bodies, values per lot, …) and shows what could still be mapped.

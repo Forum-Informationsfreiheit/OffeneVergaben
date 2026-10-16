@@ -260,6 +260,7 @@
                     @endif
                 </tbody>
             </table>
+            @include('public.partials.donation', ['channel' => 'dataset'])
             @if(!empty($dataset->further_information['groups']))
                 {{-- eForms only: all information without own column, with the official names of the eForms SDK --}}
                 <h2 class="h5 mt-4">Weitere Angaben aus der Bekanntmachung</h2>

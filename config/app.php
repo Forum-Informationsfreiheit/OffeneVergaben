@@ -30,6 +30,24 @@ return [
 
     /*
     |--------------------------------------------------------------------------
+    | Schedule
+    |--------------------------------------------------------------------------
+    |
+    | Times (HH:MM) of the daily jobs in App\Console\Kernel; a job without time is not scheduled.
+    |
+    */
+
+    'schedule' => [
+        'process_at'                   => env('APP_SCHEDULE_PROCESS_AT_TIMESTRING'),
+        'dump_at'                      => env('APP_SCHEDULE_DUMP_AT_TIMESTRING'),
+        'send_subscription_updates_at' => env('APP_SCHEDULE_SEND_SUBSCRIPTION_SUMMARY_UPDATE_AT_TIMESTRING'),
+    ],
+
+    // Google Analytics tracking id of the public pages, none: no tracking
+    'google_analytics_id' => env('GOOGLE_ANALYTICS_ID'),
+
+    /*
+    |--------------------------------------------------------------------------
     | Application Debug Mode
     |--------------------------------------------------------------------------
     |

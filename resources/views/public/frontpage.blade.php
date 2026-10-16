@@ -22,6 +22,7 @@
                 </div>
             </div>
         </form>
+        @include('public.partials.donation')
     </div>
 @stop
 

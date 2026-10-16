@@ -61,7 +61,7 @@
 </div>
 
 @if(app()->environment('production') && env('GOOGLE_ANALYTICS_ID'))
-    @include('public.partials.google-analytics', ['gaId' => env('GOOGLE_ANALYTICS_ID')])
+    @include('public.partials.google-analytics', ['gaId' => config('app.google_analytics_id')])
 @endif
 @yield('body:append')
 </body>

@@ -36,7 +36,7 @@ class Kernel extends ConsoleKernel
         */
 
         // XML processing ----------------------------------------
-        $processAt = env('APP_SCHEDULE_PROCESS_AT_TIMESTRING');
+        $processAt = config('app.schedule.process_at');
         if ($processAt && $this->validateTimeString($processAt)) {
             $schedule->command('fif:process')->dailyAt($processAt)
                 // 2024-12-20 add organization stats calculation start right after processing has finished
@@ -46,13 +46,13 @@ class Kernel extends ConsoleKernel
         }
 
         // Make CSV Dump
-        $dumpAt = env('APP_SCHEDULE_DUMP_AT_TIMESTRING');
+        $dumpAt = config('app.schedule.dump_at');
         if ($dumpAt && $this->validateTimeString($dumpAt)) {
             $schedule->command('fif:dump-datasets')->dailyAt($dumpAt);
         }
 
         // Send subscription update notifications
-        $sendAt = env('APP_SCHEDULE_SEND_SUBSCRIPTION_SUMMARY_UPDATE_AT_TIMESTRING');
+        $sendAt = config('app.schedule.send_subscription_updates_at');
         if ($sendAt && $this->validateTimeString($sendAt)) {
             $schedule->command('fif:send-subscription-updates')->dailyAt($sendAt);
         }

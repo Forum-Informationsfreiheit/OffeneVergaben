@@ -82,7 +82,6 @@ info("MW Mail From Debug", [ 'fromArg1' => $this->mailFromAddress(), 'fromArg2' 
     }
 
     protected function mailFromAddress() {
-	    //return "ov@offenevergaben.at";
-	    return env('APP_MAIL_ALERTS_FROM_ADDRESS',env('MAIL_FROM_ADDRESS'));
+        return config('mail.alerts_from_address');
     }
 }

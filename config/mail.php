@@ -71,6 +71,10 @@ return [
         'name' => env('MAIL_FROM_NAME', 'Example'),
     ],
 
+    // senders of the notifications: subscription update summaries, subscription verifications
+    'default_from_address' => env('APP_MAIL_DEFAULT_FROM_ADDRESS', env('MAIL_FROM_ADDRESS')),
+    'alerts_from_address'  => env('APP_MAIL_ALERTS_FROM_ADDRESS', env('MAIL_FROM_ADDRESS')),
+
     /*
     |--------------------------------------------------------------------------
     | Markdown Mail Settings
