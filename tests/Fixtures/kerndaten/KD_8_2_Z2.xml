@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KD_8_2_Z2>
+    <CONTRACTING_BODY>
+        <ADDRESS_CONTRACTING_BODY>
+            <OFFICIALNAME>Testgemeinde Musterdorf</OFFICIALNAME>
+            <NATIONALID>99999</NATIONALID>
+        </ADDRESS_CONTRACTING_BODY>
+    </CONTRACTING_BODY>
+    <OBJECT_CONTRACT>
+        <TITLE>
+            <P>Architekturwettbewerb Gemeindezentrum Musterdorf</P>
+        </TITLE>
+        <CPV_MAIN>
+            <CPV_CODE CODE="99100000"/>
+        </CPV_MAIN>
+    </OBJECT_CONTRACT>
+    <RESULTS>
+        <AWARDED_PRIZE>
+            <NB_PARTICIPANTS>12</NB_PARTICIPANTS>
+            <NB_PARTICIPANTS_SME>9</NB_PARTICIPANTS_SME>
+            <VAL_PRIZE CURRENCY="EUR">25000</VAL_PRIZE>
+            <WINNER>
+                <ADDRESS_WINNER>
+                    <OFFICIALNAME>Musterarchitekten ZT GmbH</OFFICIALNAME>
+                    <NATIONALID>999996x</NATIONALID>
+                </ADDRESS_WINNER>
+            </WINNER>
+        </AWARDED_PRIZE>
+    </RESULTS>
+</KD_8_2_Z2>

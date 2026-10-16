@@ -1,0 +1,85 @@
+<?php
+
+namespace App\Models;
+
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\URL;
+
+/**
+ * App\Models\Subscription
+ *
+ * @property int $id
+ * @property int $user_id
+ * @property string $type
+ * @property string $title
+ * @property string $query
+ * @property \Illuminate\Support\Carbon|null $verified_at
+ * @property string|null $last_notified_at
+ * @property \Illuminate\Support\Carbon|null $created_at
+ * @property \Illuminate\Support\Carbon|null $updated_at
+ * @property-read String $cancel_url
+ * @property-read String $unsubscribe_url
+ * @property-read \App\Models\User $subscriber
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription newModelQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription newQuery()
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription query()
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription verified()
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereCreatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereLastNotifiedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereQuery($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereTitle($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereType($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereUpdatedAt($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereUserId($value)
+ * @method static \Illuminate\Database\Eloquent\Builder|Subscription whereVerifiedAt($value)
+ * @mixin \Eloquent
+ */
+class Subscription extends Model
+{
+    const TYPE_DATASET      = 'dataset';
+    const TYPE_ORGANIZATION = 'organization';
+
+    // Subscription that are not verified within time window
+    // will be removed from the database
+    const VERIFY_SUBSCRIPTION_IN_MINUTES = 60;
+
+    protected $dates = [
+        'verified_at'
+    ];
+
+    // RELATIONS -------------------------------------------------------------------------------------------------------
+    public function subscriber() {
+        return $this->belongsTo('App\Models\User','user_id');
+    }
+
+    // SCOPES ----------------------------------------------------------------------------------------------------------
+    public static function scopeVerified($query) {
+        return $query->whereNotNull('verified_at');
+    }
+
+    // ACCESSORS -------------------------------------------------------------------------------------------------------
+    /**
+     * Cancel URL --> CONFIRM cancelling of the subscription
+     *
+     * @return String signed cancel subscription url
+     */
+    public function getCancelUrlAttribute() {
+        return URL::signedRoute(
+            'public::cancel-subscription',
+            [ 'id' => $this->id, 'email' => $this->subscriber->email ]
+        );
+    }
+
+    /**
+     * Unsubscribe URL --> directly unsubscribe (=destroy) subscription
+     *
+     * @return String signed unsubscribe url
+     */
+    public function getUnsubscribeUrlAttribute() {
+        return URL::signedRoute(
+            'public::unsubscribe',
+            [ 'id' => $this->id, 'email' => $this->subscriber->email ]
+        );
+    }
+}

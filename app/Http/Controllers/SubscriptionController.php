@@ -2,16 +2,15 @@
 
 namespace App\Http\Controllers;
 
-use App\Dataset;
+use App\Models\Dataset;
 use App\Http\Filters\DatasetFilter;
-use App\Role;
-use App\Subscription;
-use App\User;
+use App\Models\Role;
+use App\Models\Subscription;
+use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Validator;
 use Laracasts\Flash\Flash;
 

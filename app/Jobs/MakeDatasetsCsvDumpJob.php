@@ -2,18 +2,11 @@
 
 namespace App\Jobs;
 
-use App\Dataset;
-use App\Http\Controllers\DownloadController;
+use App\Models\Dataset;
 use Carbon\Carbon;
-use Illuminate\Bus\Queueable;
-use Illuminate\Queue\SerializesModels;
-use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
-use Illuminate\Support\Facades\Cache;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
-use Illuminate\Support\Facades\Storage;
 
 class MakeDatasetsCsvDumpJob implements ShouldQueue
 {

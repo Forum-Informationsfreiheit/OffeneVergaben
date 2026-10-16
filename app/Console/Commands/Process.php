@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\ScraperKerndaten;
+use App\Models\ScraperKerndaten;
 use Carbon\Carbon;
 use Illuminate\Console\Command;
 use Illuminate\Support\Facades\Log;

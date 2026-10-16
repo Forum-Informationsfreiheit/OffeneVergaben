@@ -91,7 +91,7 @@ class DOMKerndaten
             }
         } catch(\Exception $ex) {
             Log::channel('processor_daily')->error('Unable to create DOMDocument from string argument',['code' => $ex->getCode(), 'message' => $ex->getMessage(),'xmlString' => $xmlString ]);    
-	    throw new \Exception('Unable to create DOMDocument from string argument',null,$ex);
+	    throw new \Exception('Unable to create DOMDocument from string argument',0,$ex);
         }
 
         return $doc;

@@ -15,7 +15,7 @@ class CreateUsersTable extends Migration
     {
         Schema::create('users', function (Blueprint $table) {
             $table->bigIncrements('id');
-            $table->unsignedInteger('role_id')->default(\App\Role::DEFAULT_ROLE);
+            $table->unsignedInteger('role_id')->default(\App\Models\Role::DEFAULT_ROLE);
             $table->string('name');
             $table->string('email')->unique();
             $table->timestamp('email_verified_at')->nullable();

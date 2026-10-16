@@ -1,0 +1,88 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<KD_8_2_Z1>
+    <CONTRACTING_BODY>
+        <ADDRESS_CONTRACTING_BODY>
+            <OFFICIALNAME>Testgemeinde Musterdorf</OFFICIALNAME>
+            <NATIONALID>99999</NATIONALID>
+            <PHONE>+43 1 2345678</PHONE>
+            <E_MAIL>vergabe@musterdorf.example</E_MAIL>
+            <CONTACT>Maria Muster</CONTACT>
+            <DOMAIN>federal</DOMAIN>
+        </ADDRESS_CONTRACTING_BODY>
+        <ADDRESS_CONTRACTING_BODY_ADDITIONAL>
+            <OFFICIALNAME>Testverband Musterregion</OFFICIALNAME>
+            <NATIONALID>999998z</NATIONALID>
+            <REFERENCE_NUMBER>MR-2026-7</REFERENCE_NUMBER>
+        </ADDRESS_CONTRACTING_BODY_ADDITIONAL>
+        <URL_DOCUMENT>https://vergabe.musterdorf.example/2026-42</URL_DOCUMENT>
+        <URL_PARTICIPATION>https://vergabe.musterdorf.example/2026-42/teilnahme</URL_PARTICIPATION>
+        <DOCUMENT_FULL/>
+    </CONTRACTING_BODY>
+    <OBJECT_CONTRACT>
+        <TITLE>
+            <P>Sanierung der Ortsdurchfahrt Musterdorf</P>
+        </TITLE>
+        <REFERENCE_NUMBER>MD-2026-42</REFERENCE_NUMBER>
+        <CPV_MAIN>
+            <CPV_CODE CODE="99100000"/>
+        </CPV_MAIN>
+        <TYPE_CONTRACT CTYPE="WORKS"/>
+        <SHORT_DESCR>
+            <P>Erneuerung der Fahrbahn</P>
+            <P>und der Gehsteige</P>
+        </SHORT_DESCR>
+        <LOT_DIVISION/>
+        <OBJECT_DESCR>
+            <CPV_ADDITIONAL>
+                <CPV_CODE CODE="99110000"/>
+            </CPV_ADDITIONAL>
+            <CPV_ADDITIONAL>
+                <CPV_CODE CODE="99120000"/>
+            </CPV_ADDITIONAL>
+            <NUTS CODE="ZZ999"/>
+            <DATE_START>2026-04-01</DATE_START>
+            <DATE_END>2026-10-31</DATE_END>
+            <DURATION TYPE="MONTH">7</DURATION>
+        </OBJECT_DESCR>
+    </OBJECT_CONTRACT>
+    <PROCEDURE>
+        <PT_OPEN/>
+        <FRAMEWORK/>
+        <DATETIME_RECEIPT_TENDERS>2026-02-15T12:00:00</DATETIME_RECEIPT_TENDERS>
+    </PROCEDURE>
+    <AWARD_CONTRACT>
+        <AWARDED_CONTRACT>
+            <DATE_CONCLUSION_CONTRACT>2026-03-01</DATE_CONCLUSION_CONTRACT>
+            <NB_TENDERS_RECEIVED>4</NB_TENDERS_RECEIVED>
+            <NB_SME_TENDER>3</NB_SME_TENDER>
+            <VAL_TOTAL CURRENCY="EUR">1234567.89</VAL_TOTAL>
+            <CONTRACTOR>
+                <ADDRESS_CONTRACTOR>
+                    <OFFICIALNAME>Muster Bau GmbH</OFFICIALNAME>
+                    <NATIONALID>999997y</NATIONALID>
+                </ADDRESS_CONTRACTOR>
+            </CONTRACTOR>
+            <CONTRACTOR>
+                <ADDRESS_CONTRACTOR>
+                    <OFFICIALNAME>Beispiel Asphalt KG</OFFICIALNAME>
+                    <NATIONALID>9999999999999</NATIONALID>
+                </ADDRESS_CONTRACTOR>
+            </CONTRACTOR>
+        </AWARDED_CONTRACT>
+    </AWARD_CONTRACT>
+    <ADDITIONAL_CORE_DATA>
+        <D_JUSTIFICATION>
+            <P>Keine Begründung erforderlich</P>
+        </D_JUSTIFICATION>
+        <DATE_FIRST_PUBLICATION>2026-01-10</DATE_FIRST_PUBLICATION>
+        <DATETIME_LAST_CHANGE>2026-03-02T09:30:00</DATETIME_LAST_CHANGE>
+        <DEADLINE_STANDSTILL>2026-03-12</DEADLINE_STANDSTILL>
+        <PROCEDURE_SHORT_DESCRIPTION>
+            <P>Offenes Verfahren im Oberschwellenbereich</P>
+        </PROCEDURE_SHORT_DESCRIPTION>
+        <ABOVETHRESHOLD/>
+        <URL_REVOCATION>https://vergabe.musterdorf.example/2026-42/widerruf</URL_REVOCATION>
+        <URL_REVOCATION_STATEMENT>https://vergabe.musterdorf.example/2026-42/widerrufserklaerung</URL_REVOCATION_STATEMENT>
+        <RD_NOTIFICATION/>
+    </ADDITIONAL_CORE_DATA>
+</KD_8_2_Z1>

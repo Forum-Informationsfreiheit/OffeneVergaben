@@ -37,7 +37,7 @@
                         <td>{!! !$page->published_at ? "<i class='fas fa-lock'></i>" : "" !!}</td>
                         <td>{{ $page->title }}</td>
                         <td>{{ $page->slug }}</td>
-                        <td>{{ $page->created_at->format('d.m.Y') }} <span class="btn btn-primary btn-circle btn-xs">{{ strtoupper($page->author->initials) }}</span></td>
+                        <td>{{ $page->created_at->format('d.m.Y') }} @if($page->author)<span class="btn btn-primary btn-circle btn-xs">{{ strtoupper($page->author->initials) }}</span>@endif</td>
                         <td>{{ $page->updated_at->format('d.m.Y') }}</td>
                         @can('update-tags')
                             <td>
@@ -63,7 +63,7 @@
                                 <a class="action-link delete"
                                    data-confirm-delete
                                    data-delete-id="{{ $page->id }}"
-                                   data-delete-string="{{ $page->titel }}"
+                                   data-delete-string="{{ $page->title }}"
                                    data-toggle="modal"
                                    data-target="#confirmDeletePageModal"
                                    href="#" role="button"

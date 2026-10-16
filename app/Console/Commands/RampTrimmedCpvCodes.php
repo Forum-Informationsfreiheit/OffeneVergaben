@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\CPV;
+use App\Models\CPV;
 use Illuminate\Console\Command;
 
 class RampTrimmedCpvCodes extends Command

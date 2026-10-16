@@ -114,6 +114,7 @@ if (! function_exists('convert_number_to_cents')) {
 
         $arr = explode($decimalSep,$value);
 
+        // TODO: this function crashes when given 100, but it should convert to 10000
         $numberOfDecimals = strlen($arr[1]);
 
         if ($numberOfDecimals === 1) {
@@ -135,6 +136,8 @@ if (! function_exists('ui_shorten')) {
             return $text;
         }
 
+        // TODO: this should be "if (mb_strlen($text) > $length)"
+        // strlen give the length of a string in bytes while mb_substr works on char
         if (strlen($text) > $length) {
             return mb_substr($text,0,$length) . '...';
         } else {
@@ -171,6 +174,7 @@ if (! function_exists('nl_to_br')) {
 
         $t = preg_replace("/(\r\n|\n|\r)/", "<br />", $text);
 
+        // TODO: we could return $t directly; test cases stay green
         return str_replace(['\rn','\n','\r'],'<br />',$t);      // why is this necessary ??
     }
 }
@@ -246,6 +250,7 @@ if (!function_exists('procedure_label')) {
         }
 
         // nothing ? should never happen
+        // TODO: I think this should log an error
         return join(', ',$p);
     }
 
