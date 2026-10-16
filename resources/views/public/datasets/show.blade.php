@@ -1,7 +1,7 @@
 @extends('public.layouts.default')
 
 @section('page:title',$dataset->title)
-@section('page:description',$dataset->title != $dataset->description ? $dataset->description : '')
+@section('page:description',$dataset->title != $dataset->description ? (string) $dataset->description : '')
 
 @section('body:class','dataset')
 
@@ -28,7 +28,7 @@
                 <tbody>
                     <tr>
                         <th>Art</th>
-                        <td>{{ $dataset->type->toString() }}</td>
+                        <td>{{ $dataset->typeToString() }}</td>
                     </tr>
                     <tr>
                         <th>Bezeichnung</th>
@@ -260,6 +260,33 @@
                     @endif
                 </tbody>
             </table>
+            @if(!empty($dataset->further_information['groups']))
+                {{-- eForms only: all information without own column, with the official names of the eForms SDK --}}
+                <h2 class="h5 mt-4">Weitere Angaben aus der Bekanntmachung</h2>
+                @foreach($dataset->further_information['groups'] as $group)
+                    <table class="table ov-table ov-table-vertical table-sm table-bordered">
+                        <thead>
+                            <tr>
+                                <th colspan="2">{{ $group['title'] }}</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            @foreach($group['entries'] as $entry)
+                                <tr>
+                                    <th>{{ $entry['label'] }}</th>
+                                    <td>
+                                        @if(filter_var($entry['value'], FILTER_VALIDATE_URL) && preg_match('#^https?://#', $entry['value']))
+                                            <a rel="nofollow" target="_blank" href="{{ $entry['value'] }}">{{ $entry['value'] }}</a>
+                                        @else
+                                            {{ $entry['value'] }}
+                                        @endif
+                                    </td>
+                                </tr>
+                            @endforeach
+                        </tbody>
+                    </table>
+                @endforeach
+            @endif
             <div class="meta">
                 Version {{ $dataset->version }}@if($dataset->otherVersions)&nbsp;(<span class="version-links-inline">{!! $dataset->versionLinks !!}</span>)@endif, <a rel="nofollow" target="_blank" href="{{ route('public::auftragsxml',[ 'id' => $dataset->id ]) }}">XML</a>, zuletzt aktualisiert: {{ $dataset->item_lastmod->format('d.m.Y') }}
             </div>

@@ -151,6 +151,8 @@ class Dataset extends Model
     protected $casts = [
         'is_current_version' => 'boolean',
         'threshold' => 'boolean',
+        // eForms only: [ 'sdk' => ..., 'groups' => [ [ 'title' => ..., 'entries' => [ [ 'field', 'label', 'value' ] ] ] ] ]
+        'further_information' => 'array',
     ];
 
     protected $dates = [
@@ -478,6 +480,24 @@ class Dataset extends Model
      */
     public function label($attribute) {
         return self::labelStatic($attribute,$this->type_code);
+    }
+
+    /**
+     * The dataset type for display: for Kerndaten code and description of the type, for eForms the notice
+     * subtype, e.g. "eForms E4: Freiwillige Vergabebekanntmachung".
+     *
+     * @return string
+     */
+    public function typeToString() {
+        if ($this->source_format !== 'eforms') {
+            return $this->type ? $this->type->toString() : (string)$this->type_code;
+        }
+
+        $key = 'dataset.eforms_subtypes.'.$this->source_subtype;
+
+        return $this->source_subtype && Lang::has($key) ?
+            'eForms '.$this->source_subtype.': '.Lang::get($key) :
+            trim('eForms-Bekanntmachung '.$this->source_subtype);
     }
 
 /*

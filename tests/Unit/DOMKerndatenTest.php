@@ -277,17 +277,52 @@ class DOMKerndatenTest extends TestCase
     }
 
     /**
-     * TODO: bug — DOMKerndaten::loadAll() reads the type from $document->firstChild, which is not the root element if
-     * the file starts with a comment or processing instruction (it then fails with "Undefined property"). Use
-     * $document->documentElement, then remove markTestIncomplete() here.
+     * The type is read from the root element, also if the file starts with a comment (e.g. AGES exports).
      */
     public function testTypeIsRootElementAfterLeadingComment()
     {
-        $this->markTestIncomplete('DOMKerndaten::loadAll() uses firstChild instead of documentElement.');
-
         $xml = Kerndaten::xml('KD_8_2_Z1', ['<KD_8_2_Z1>' => '<!-- Export vom 01.03.2026 --><KD_8_2_Z1>']);
 
         $this->assertSame('KD_8_2_Z1', $this->parse($xml)->type);
+    }
+
+    /**
+     * @dataProvider fixtureProvider
+     */
+    public function testFixturesHaveNoUnparsedElements($type)
+    {
+        $this->assertSame([], (new DOMKerndaten(Kerndaten::xml($type), new NullLogger()))->getUnparsed());
+    }
+
+    public function fixtureProvider()
+    {
+        return [['KD_8_2_Z1'], ['KD_8_2_Z2'], ['KD_8_2_Z3']];
+    }
+
+    public function testUnparsedElementsAndAttributesAreLoggedAsXPaths()
+    {
+        $xml = Kerndaten::xml('KD_8_2_Z1', [
+            '<FRAMEWORK/>'                   => '<FRAMEWORK><SINGLE_OPERATOR/></FRAMEWORK>',
+            '<TYPE_CONTRACT CTYPE="WORKS"/>' => '<TYPE_CONTRACT CTYPE="WORKS" EXTRA="1"/><MAIN_SITE><P></P></MAIN_SITE>',
+            '</KD_8_2_Z1>'                   =>'<COMPLEMENTARY_INFO><DATE_DISPATCH_NOTICE>2026-01-09</DATE_DISPATCH_NOTICE></COMPLEMENTARY_INFO></KD_8_2_Z1>',
+        ]);
+
+        $expected = [
+            '/KD_8_2_Z1/OBJECT_CONTRACT/TYPE_CONTRACT/@EXTRA',
+            '/KD_8_2_Z1/OBJECT_CONTRACT/MAIN_SITE (empty)',
+            '/KD_8_2_Z1/PROCEDURE/FRAMEWORK/SINGLE_OPERATOR (empty)',
+            '/KD_8_2_Z1/COMPLEMENTARY_INFO',
+        ];
+
+        $log = Mockery::mock(LoggerInterface::class);
+        $log->shouldReceive('warning')->once()->with('Kerndaten record contains unparsed elements', [
+            'record_id' => 7,
+            'unparsed'  => $expected,
+        ]);
+
+        $kerndaten = new DOMKerndaten($xml, $log, ['record_id' => 7]);
+
+        $this->assertSame($expected, $kerndaten->getUnparsed());
     }
 
     private function parse($xml)

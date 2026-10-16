@@ -5,12 +5,11 @@ namespace App\Jobs;
 use App\Models\Contractor;
 use App\Models\CPV;
 use App\Models\Dataset;
-use App\DOMKerndaten;
+use App\RecordParser;
 use App\Models\Metaset;
-use App\NationalIdParser;
+use App\OrganizationMatcher;
 use App\Models\NUTS;
 use App\Models\Offeror;
-use App\Models\Organization;
 use App\Models\ScraperKerndaten;
 use Carbon\Carbon;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -72,10 +71,11 @@ class Process
 		$success = 0;
 
 		try {
-			$dom = new DOMKerndaten($record->xml,null,[ 'record_id' => $record->id ]);
+			$data = $this->parse($record);
 
-			$success = $this->process($record,$dom->getData());
-		} catch(\Exception $ex) {
+			$success = $data ? $this->process($record,$data) : 0;
+		} catch(\Throwable $ex) {
+			// \Throwable: a TypeError on unexpected input must not stop the processing of the following records
 			$this->log->debug("Failed Parsing Record ID {$record->id}");
 			$this->log->debug($ex);
 		}
@@ -106,6 +106,17 @@ class Process
         $data = ScraperKerndaten::whereIn('id',$ids)->get();
 
         return $data;
+    }
+
+    /**
+     * @param ScraperKerndaten $record
+     *
+     * @return \stdClass|null  data as returned by DOMKerndaten::getData(), null if the format is unknown
+     *
+     * @throws \Exception if the xml can't be loaded or parsed
+     */
+    protected function parse($record) {
+        return RecordParser::parse($record->xml, $this->log, $record->id);
     }
 
     /**
@@ -149,6 +160,9 @@ class Process
             $dataset->version = $record->version;
             $dataset->is_current_version = 1;          // confidently set the newest dataset as the current version
 
+            $dataset->source_format = $data->sourceFormat;
+            $dataset->source_subtype = $data->sourceSubtype;
+            $dataset->further_information = $data->furtherInformation;
             $dataset->type_code = $data->type;
             $dataset->cpv_code = $data->objectContract->cpv;
             $dataset->nuts_code = $data->objectContract->nuts;
@@ -404,7 +418,8 @@ class Process
 
             return true;
 
-        } catch(\Exception $ex) {
+        } catch(\Throwable $ex) {
+            // \Throwable: also roll back on errors (e.g. TypeError), otherwise the transaction would stay open
             $this->log->error('Unable to write dataset for record:'.$record->id.' to database.');
             $this->log->error($ex->getCode() . ' ' . $ex->getMessage(),['trace' => $ex->getTraceAsString(),'data' => $data, 'record_id' => $record->id ]);
 
@@ -423,69 +438,7 @@ class Process
      * @return null|\App\Models\Organization
      */
     protected function matchOrCreateOrganization($id, $name) {
-        $parser = null;
-        if ($id !== null) {
-            $parser = new NationalIdParser($id);
-            $parser->parse();
-        }
-
-        // nice?
-        if ($parser && $parser->isValid() && !$parser->isUnknown()) {
-            $formatted = $parser->getFormattedId();
-            $type = strtolower($parser->getType());     // transform to lower case so it can be used in where clause
-
-            $existing = Organization::where($type,$formatted)->first();
-
-            if ($existing) {
-                return $existing;
-            } else {
-                // new up!
-                return Organization::createFromType($formatted,$type,$name);
-            }
-        }
-
-        // not so nice
-        if ($parser && $parser->isValid() && $parser->isUnknown()) {
-            $existing = Organization::where('ukn',$id)->first();
-
-            if ($existing) {
-                return $existing;
-            } else {
-                // new up!
-                return Organization::createFromUnknownType($id, $name);
-            }
-        }
-
-        // opposite of nice
-        $existing = Organization::where('name',$name)->get();  // lucky match?
-        if ($existing->count() === 1) {
-            $existing = $existing->first();
-        } else if ($existing->count() > 1) {
-            // yikes, multiple organizations with the same name in db
-            // try to find the super generic version
-            $existing = Organization::where('name',$name)
-                ->whereNull('fn')
-                ->whereNull('gln')
-                ->whereNull('gkz')
-                ->whereNull('ukn')
-                ->where('is_identified',0)
-                ->get();
-
-            if ($existing->count() === 1) {
-                $existing = $existing->first();
-            } else {
-                $existing = null;
-            }
-        } else {
-            $existing = null;
-        }
-
-        if ($existing) {
-            return $existing;
-        } else {
-            // new organization!
-            return Organization::createGeneric($name);
-        }
+        return (new OrganizationMatcher())->matchOrCreate($id, $name);
     }
 
     /**

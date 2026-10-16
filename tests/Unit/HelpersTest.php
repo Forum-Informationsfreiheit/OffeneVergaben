@@ -131,19 +131,29 @@ class HelpersTest extends TestCase
             "nothing matches 2"          => [["test", "hello"], "test, hello"],
             "is no array"                => ["PT_OPEN", "offenes Verfahren"],
             "PT_OPEN"                    => [["PT_OPEN"], "offenes Verfahren"],
-            "PT_COMPETITIVE_DIALOG"      => [["PT_COMPETITIVE_DIALOG"], "wettbewerblicher Dialog"],
+            "PT_COMPETITIVE_DIALOGUE"    => [["PT_COMPETITIVE_DIALOGUE"], "wettbewerblicher Dialog"],
             "PT_COMPETITIVE_NEGOTIATION" => [["PT_COMPETITIVE_NEGOTIATION"], "Verhandlungsverfahren"],
             "PT_INNOVATION_PARTNERSHIP"  => [["PT_INNOVATION_PARTNERSHIP"], "Innovationspartnerschaft"],
             "PT_SPECIAL_SERVICE"         => [["PT_SPECIAL_SERVICE"], "Besonderer Dienstleistungsauftrag"],
             "DPS"                        => [["DPS"], "dynamisches Beschaffungssystem"],
             "PT_DIRECT"                  => [["PT_DIRECT"], "Direktvergabe"],
+            "OTH_SINGLE"                 => [["OTH_SINGLE"], "sonstiges einstufiges Verfahren"],
+            "OTH_MULT"                   => [["OTH_MULT"], "sonstiges zweistufiges Verfahren"],
+            "COMP_TEND"                  => [["COMP_TEND"], "wettbewerbliches Vergabeverfahren (Art. 5 Abs. 3 VO (EG) Nr. 1370/2007)"],
+            "EXP_INT_RAIL"               => [["EXP_INT_RAIL"], "Aufruf zur Interessenbekundung, nur Schiene (Art. 5 Abs. 3b VO (EG) Nr. 1370/2007)"],
+            "OTH_MULT + DPS"             => [["OTH_MULT","DPS"], "sonstiges zweistufiges Verfahren (dynamisches Beschaffungssystem)"],
+            "PT_OPEN + DPS"              =>[["PT_OPEN","DPS"], "offenes Verfahren (dynamisches Beschaffungssystem)"],
+            "DPS + PT_RESTRICTED + PT_WITH_PRIOR_NOTICE" => [
+                ["DPS","PT_RESTRICTED","PT_WITH_PRIOR_NOTICE"],
+                "nicht offenes Verfahren mit vorheriger Bekanntmachung (dynamisches Beschaffungssystem)"
+            ],
             "PT_RESTRICTED + PT_WITH_PRIOR_NOTICE" => [
                 ["PT_RESTRICTED","PT_WITH_PRIOR_NOTICE"], 
                 "nicht offenes Verfahren mit vorheriger Bekanntmachung"
             ],
             "PT_RESTRICTED + PT_WITHOUT_PRIOR_NOTICE" => [
                 ["PT_RESTRICTED","PT_WITHOUT_PRIOR_NOTICE"], 
-                "nicht offenes Verfahren ohne vorheriger Bekanntmachung"
+                "nicht offenes Verfahren ohne vorherige Bekanntmachung"
             ],
             "PT_COMPETITIVE_NEGOTIATION + PT_WITH_PRIOR_NOTICE" => [
                 ["PT_COMPETITIVE_NEGOTIATION","PT_WITH_PRIOR_NOTICE"], 
@@ -151,7 +161,7 @@ class HelpersTest extends TestCase
             ],
             "PT_COMPETITIVE_NEGOTIATION + PT_WITHOUT_PRIOR_NOTICE" => [
                 ["PT_COMPETITIVE_NEGOTIATION","PT_WITHOUT_PRIOR_NOTICE"], 
-                "Verhandlungsverfahren ohne vorheriger Bekanntmachung"
+                "Verhandlungsverfahren ohne vorherige Bekanntmachung"
             ],
             "PT_SPECIAL_SERVICE + PT_WITH_PRIOR_NOTICE" => [
                 ["PT_SPECIAL_SERVICE","PT_WITH_PRIOR_NOTICE"], 
@@ -159,7 +169,7 @@ class HelpersTest extends TestCase
             ],
             "PT_SPECIAL_SERVICE + PT_WITHOUT_PRIOR_NOTICE" => [
                 ["PT_SPECIAL_SERVICE","PT_WITHOUT_PRIOR_NOTICE"], 
-                "besonderer Dienstleistungsauftrag ohne vorheriger Bekanntmachung"
+                "besonderer Dienstleistungsauftrag ohne vorherige Bekanntmachung"
             ],
             "PT_DIRECT + PT_WITH_PRIOR_NOTICE" => [
                 ["PT_DIRECT","PT_WITH_PRIOR_NOTICE"], 
