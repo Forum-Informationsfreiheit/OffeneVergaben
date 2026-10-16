@@ -126,6 +126,7 @@ class DOMKerndaten
         $data->sourceFormat = 'kerndaten';
         $data->sourceSubtype = null;        // eForms only, for Kerndaten the type says it all
         $data->furtherInformation = null;   // eForms only, there are no labels for unmapped Kerndaten elements
+        $data->searchText = null;           // eForms only: lot titles and descriptions
         $data->type = $this->type;
         $data->contractingBody = $this->contractingBody;
         $data->objectContract = $this->objectContract;

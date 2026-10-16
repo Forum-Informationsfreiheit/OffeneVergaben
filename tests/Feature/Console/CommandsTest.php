@@ -100,6 +100,7 @@ class CommandsTest extends JobTestCase
 
             $info = json_decode(DB::table('datasets')->where('id', $eforms)->value('further_information'), true);
             $this->assertContains('Angebot: TEN-0001', array_column($info['groups'], 'title'));
+            $this->assertSame("Fahrbahn\nGehsteige", DB::table('datasets')->where('id', $eforms)->value('search_text'));
             $this->assertSame('Titel bleibt', DB::table('datasets')->where('id', $eforms)->value('title'));
             $this->assertSame(1, DB::table('datasets')->where('scraper_kerndaten_id', $kerndatenId)->where('source_format', 'eforms')->count());
             // Kerndaten datasets have no further information

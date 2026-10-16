@@ -325,6 +325,14 @@ class DOMKerndatenTest extends TestCase
         $this->assertSame($expected, $kerndaten->getUnparsed());
     }
 
+    public function testKerndatenHaveNoFurtherInformationOrSearchText()
+    {
+        $data = $this->parse(Kerndaten::xml('KD_8_2_Z1'));
+
+        $this->assertNull($data->furtherInformation);
+        $this->assertNull($data->searchText);
+    }
+
     private function parse($xml)
     {
         return (new DOMKerndaten($xml, new NullLogger()))->getData();

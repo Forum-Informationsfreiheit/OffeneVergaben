@@ -106,6 +106,19 @@ class EformsFurtherInformationTest extends TestCase
         }), 'value'));
     }
 
+    public function testSearchTextHasLotTitlesAndDescriptions()
+    {
+        $xml = Eforms::xml('cn-standard', [
+            '<cbc:Name languageID="DEU">Notebooks</cbc:Name>' => '<cbc:Name languageID="DEU">Notebooks</cbc:Name>'
+                .'<cbc:Description languageID="ENG">Laptops</cbc:Description><cbc:Description languageID="DEU">Tragbare Rechner</cbc:Description>',
+        ]);
+
+        $data = (new DOMEforms($xml, new NullLogger()))->getData();
+
+        // titles and descriptions of the lots, in German; not the procedure title (searched anyway) or other texts
+        $this->assertSame("Notebooks\nMonitore\nTragbare Rechner", $data->searchText);
+    }
+
     public function testFallsBackToNewestBundledVersion()
     {
         $this->assertSame('1.13', EformsFurtherInformation::resolveVersion('eforms-sdk-1.13'));

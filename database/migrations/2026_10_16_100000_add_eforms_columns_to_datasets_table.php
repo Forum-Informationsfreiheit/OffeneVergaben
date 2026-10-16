@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -15,6 +16,8 @@ use Illuminate\Database\Migrations\Migration;
  * - further_information: bei eForms alle Angaben, fuer die es keine Spalte gibt, lesbar mit den deutschen
  *   Bezeichnungen des eForms SDK (siehe App\EformsFurtherInformation). Laesst sich jederzeit aus dem XML
  *   neu erzeugen (php artisan fif:update-from-xml --further-information).
+ * - search_text: bei eForms Titel und Beschreibungen der Lose, fuer die Volltextsuche (siehe
+ *   App\EformsFurtherInformation::SEARCH_FIELDS). Wird mit --further-information ebenfalls neu erzeugt.
  */
 class AddEformsColumnsToDatasetsTable extends Migration
 {
@@ -31,7 +34,11 @@ class AddEformsColumnsToDatasetsTable extends Migration
             $table->string('source_format', 20)->default('kerndaten');
             $table->string('source_subtype', 10)->nullable();
             $table->json('further_information')->nullable();
+            $table->text('search_text')->nullable();
         });
+
+        // wie ft_title_desc (Migration 2026_09_21_150000); bei Kerndaten ist die Spalte leer, der Index bleibt klein
+        DB::statement('ALTER TABLE datasets ADD FULLTEXT ft_search_text (search_text)');
     }
 
     /**
@@ -42,7 +49,8 @@ class AddEformsColumnsToDatasetsTable extends Migration
     public function down()
     {
         Schema::table('datasets', function (Blueprint $table) {
-            $table->dropColumn(['source_format', 'source_subtype', 'further_information']);
+            $table->dropIndex('ft_search_text');
+            $table->dropColumn(['source_format', 'source_subtype', 'further_information', 'search_text']);
         });
     }
 }

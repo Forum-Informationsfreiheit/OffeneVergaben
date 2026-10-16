@@ -163,6 +163,7 @@ class Process
             $dataset->source_format = $data->sourceFormat;
             $dataset->source_subtype = $data->sourceSubtype;
             $dataset->further_information = $data->furtherInformation;
+            $dataset->search_text = $data->searchText;
             $dataset->type_code = $data->type;
             $dataset->cpv_code = $data->objectContract->cpv;
             $dataset->nuts_code = $data->objectContract->nuts;

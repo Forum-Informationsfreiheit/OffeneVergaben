@@ -14,7 +14,7 @@ php artisan migrate --force
 
 The production entrypoint does this itself if `RUN_MIGRATIONS=true` is set. The migrations:
 
-- add `datasets.source_format` (`kerndaten` or `eforms`), `datasets.source_subtype` (the eForms notice subtype, e.g. `29` or `E4`; empty for Kerndaten) and `datasets.further_information` (JSON, see below). eForms notices also get a `KD_*` type, the subtype keeps the more specific eForms type. Existing datasets get `kerndaten`. MySQL rebuilds `datasets` for this (it has full-text indexes, so the columns can't be added instantly): about a minute for 260,000 datasets on a dev machine, during which the table can't be written. Run it while `fif:process` is not running.
+- add `datasets.source_format` (`kerndaten` or `eforms`), `datasets.source_subtype` (the eForms notice subtype, e.g. `29` or `E4`; empty for Kerndaten) `datasets.further_information` (JSON, see below) and `datasets.search_text` with a full-text index (lot titles and descriptions of eForms notices, searched by the dataset search). eForms notices also get a `KD_*` type, the subtype keeps the more specific eForms type. Existing datasets get `kerndaten`. MySQL rebuilds `datasets` for this (it has full-text indexes, so the columns can't be added instantly): about a minute for 260,000 datasets on a dev machine, during which the table can't be written. Run it while `fif:process` is not running.
 - add the procedure codes `OTH_SINGLE`, `OTH_MULT`, `COMP_TEND` and `EXP_INT_RAIL` to `procedures`. eForms gives no Austrian procedure type, only "other single-stage" or "other two-stage procedure" (`oth-single`, `oth-mult`); `comp-tend` and `exp-int-rail` are procedures for public passenger transport (regulation 1370/2007) without Kerndaten equivalent. Without these rows, eForms datasets can't be stored (foreign key of `dataset_procedure`).
 
 Deploy the migrations before `fif:process` runs with the new code.
@@ -45,7 +45,7 @@ php artisan fif:update-from-xml --offerors --dataset_id=42         # contracting
 php artisan fif:update-from-xml --offerors --format=all            # of all datasets (takes a while)
 ```
 
-- `--further-information` re-creates `datasets.further_information` (eForms only), e.g. after more fields got mapped or a new SDK version was imported.
+- `--further-information` re-creates `datasets.further_information` and `datasets.search_text` (eForms only), e.g. after more fields got mapped or a new SDK version was imported.
 - `--deadline` re-derives `datasets.datetime_receipt_tenders`. eForms notices of two-stage procedures only give a deadline for requests to participate (BT-1311), which is used since this version.
 - `--offerors` re-derives the contracting bodies: national id, contact data, reference number, and the organization they are linked to (same matching as `fif:process`). Example: EVN's eForms notices give the buyer's company register number only as endpoint (BT-509), which is used since this version.
 

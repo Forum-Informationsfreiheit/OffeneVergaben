@@ -146,8 +146,9 @@ class DOMEforms
         $this->data = $this->load();
 
         // everything the parser has not read, human readable (the SDK version of the notice decides about the fields)
-        $this->data->furtherInformation = (new EformsFurtherInformation($this->text('cbc:CustomizationID')))
-            ->extract($this->xpath, $this->consumed);
+        $furtherInformation = new EformsFurtherInformation($this->text('cbc:CustomizationID'));
+        $this->data->furtherInformation = $furtherInformation->extract($this->xpath, $this->consumed);
+        $this->data->searchText = $furtherInformation->searchText($this->xpath);
 
         $this->logUnparsed('eForms');
     }

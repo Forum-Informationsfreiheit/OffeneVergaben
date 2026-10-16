@@ -483,6 +483,8 @@ class ProcessTest extends JobTestCase
         $info = json_decode(DB::table('datasets')->where('id', $record->app_dataset_id)->value('further_information'), true);
         $this->assertSame('1.13', $info['sdk']);
         $this->assertContains('Angebot: TEN-0001', array_column($info['groups'], 'title'));
+        // lot titles for the full-text search
+        $this->assertSame("Fahrbahn\nGehsteige", DB::table('datasets')->where('id', $record->app_dataset_id)->value('search_text'));
     }
 
     public function testRecordOfUnknownFormatIsSkipped()

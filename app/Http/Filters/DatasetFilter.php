@@ -349,6 +349,9 @@ class DatasetFilter extends QueryFilter
         $matches = DB::table('datasets')
             ->select('id as dataset_id')
             ->whereRaw('MATCH(title, description) AGAINST (? IN BOOLEAN MODE)',[$term])
+            // eForms: lot titles and descriptions
+            ->union(DB::table('datasets')->select('id as dataset_id')
+                ->whereRaw('MATCH(search_text) AGAINST (? IN BOOLEAN MODE)',[$term]))
             ->union(DB::table('offerors')->select('dataset_id')->where('is_extra',0)
                 ->whereRaw('MATCH(name) AGAINST (? IN BOOLEAN MODE)',[$term]))
             ->union(DB::table('offerors')->select('dataset_id')->where('is_extra',0)

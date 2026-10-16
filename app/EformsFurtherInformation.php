@@ -48,6 +48,10 @@ class EformsFurtherInformation
         'contract'     => 'BT-721-Contract',
     ];
 
+    // free texts that describe the subject of the procurement beyond title and description: searchable (datasets.search_text).
+    // Deliberately not all free texts: additional information (BT-300) e.g. is mostly legal boilerplate and contact data.
+    const SEARCH_FIELDS = ['BT-21-Lot', 'BT-24-Lot', 'BT-21-LotsGroup', 'BT-24-LotsGroup', 'BT-21-Part', 'BT-24-Part'];
+
     // multilingual texts: the language shown if a text is given in several languages
     const LANGUAGE = 'DEU';
 
@@ -192,6 +196,27 @@ class EformsFurtherInformation
         });
 
         return $fields;
+    }
+
+    /**
+     * Texts for the full-text search, see SEARCH_FIELDS.
+     *
+     * @param DOMXPath $xpath  of the notice, with the eForms namespace prefixes registered
+     * @return string|null  distinct texts, one per line
+     */
+    public function searchText(DOMXPath $xpath) {
+        $texts = [];
+
+        foreach (self::SEARCH_FIELDS as $id) {
+            foreach (@$xpath->query($this->fields[$id]['xpath'] ?? '') ?: [] as $node) {
+                $text = trim(preg_replace('/\s+/u', ' ', $node->textContent));
+                if ($text !== '' && $this->isShownLanguage($node)) {
+                    $texts[$text] = true;
+                }
+            }
+        }
+
+        return $texts ? implode("\n", array_keys($texts)) : null;
     }
 
     /**

@@ -400,6 +400,19 @@ class DatasetFilterTest extends DatabaseTestCase
      *
      * @param array $datasets name => dataset id
      */
+    /**
+     * The search also covers the lot titles and descriptions of eForms datasets (search_text).
+     *
+     * Checked on the query: InnoDB updates full-text indexes on commit, the test transactions are never committed, so
+     * MATCH doesn't see rows created by tests (which is also why the other full-text search tests fail).
+     */
+    public function testSearchCoversSearchText()
+    {
+        $query = Dataset::indexQuery()->filter(new DatasetFilter(Request::create('/?search=Notebooks')));
+
+        $this->assertStringContainsString('MATCH(search_text) AGAINST (? IN BOOLEAN MODE)', $query->toSql());
+    }
+
     private function matching($queryString, array $datasets)
     {
         $ids = Dataset::indexQuery()

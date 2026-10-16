@@ -15,7 +15,7 @@ use Psr\Log\NullLogger;
  * Unlike fif:process, this creates no new dataset version: the datasets keep their ids (and urls), and subscribers
  * are not notified again. Only the selected parts are changed:
  *
- * --further-information  datasets.further_information (eForms only)
+ * --further-information  datasets.further_information and datasets.search_text (eForms only)
  * --offerors             the contracting bodies (offerors): national id, contact data, reference number and the
  *                        organization they are linked to
  * --deadline             datasets.datetime_receipt_tenders (eForms: also the deadline for requests to participate)
@@ -28,7 +28,7 @@ class UpdateFromXml extends Command
      * @var string
      */
     protected $signature = 'fif:update-from-xml
-        {--further-information : re-create the further information (eForms only)}
+        {--further-information : re-create the further information and search text (eForms only)}
         {--offerors : re-derive the contracting bodies and their organizations}
         {--deadline : re-derive the deadline for tenders (or requests to participate)}
         {--format=eforms : datasets of this source format: eforms, kerndaten or all}
@@ -126,6 +126,7 @@ class UpdateFromXml extends Command
             // query builder: keeps updated_at, which tells when the dataset was processed
             DB::table('datasets')->where('id', $dataset->id)->update([
                 'further_information' => json_encode($data->furtherInformation, JSON_UNESCAPED_UNICODE),
+                'search_text'         => $data->searchText,
             ]);
         }
 
