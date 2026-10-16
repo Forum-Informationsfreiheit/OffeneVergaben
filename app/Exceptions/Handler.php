@@ -35,7 +35,12 @@ class Handler extends ExceptionHandler
      */
     public function register()
     {
-        //
+        // Report exceptions to Sentry / Bugsink (only if SENTRY_DSN is set, otherwise the 'sentry' binding is a no-op client)
+        $this->reportable(function (Throwable $e) {
+            if (app()->bound('sentry')) {
+                app('sentry')->captureException($e);
+            }
+        });
     }
 
     /**

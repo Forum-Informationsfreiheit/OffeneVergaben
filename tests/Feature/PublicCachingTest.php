@@ -33,6 +33,7 @@ class PublicCachingTest extends PublicTestCase
         $this->assertEmpty($response->headers->getCookies());
         $this->assertStringContainsString('public', $response->headers->get('Cache-Control'));
         $this->assertStringContainsString('s-maxage=' . config('app.public_cache_ttl'), $response->headers->get('Cache-Control'));
+        $this->assertSame((string) config('app.public_cache_ttl'), $response->headers->get('X-Accel-Expires'));
         $response->assertDontSee('csrf-token', false);
         $response->assertDontSee('name="_token"', false);
     }
@@ -44,6 +45,7 @@ class PublicCachingTest extends PublicTestCase
         $response->assertOk();
         $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
         $this->assertStringNotContainsString('public', $response->headers->get('Cache-Control'));
+        $this->assertNull($response->headers->get('X-Accel-Expires'));
     }
 
     public function testResponseForLoggedInUserIsNotCacheable()
