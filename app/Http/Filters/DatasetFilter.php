@@ -48,6 +48,8 @@ class DatasetFilter extends QueryFilter
 
     protected $nutsArray = [
         'NAT',
+        // place of performance: Austria, without region (e.g. eForms "anywhere in the country")
+        'AT',
         'AT11','AT12','AT13',
         'AT21','AT22',
         'AT31','AT32','AT33','AT34'

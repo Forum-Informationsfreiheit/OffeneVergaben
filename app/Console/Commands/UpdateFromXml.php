@@ -18,6 +18,7 @@ use Psr\Log\NullLogger;
  * --further-information  datasets.further_information (eForms only)
  * --offerors             the contracting bodies (offerors): national id, contact data, reference number and the
  *                        organization they are linked to
+ * --deadline             datasets.datetime_receipt_tenders (eForms: also the deadline for requests to participate)
  */
 class UpdateFromXml extends Command
 {
@@ -29,6 +30,7 @@ class UpdateFromXml extends Command
     protected $signature = 'fif:update-from-xml
         {--further-information : re-create the further information (eForms only)}
         {--offerors : re-derive the contracting bodies and their organizations}
+        {--deadline : re-derive the deadline for tenders (or requests to participate)}
         {--format=eforms : datasets of this source format: eforms, kerndaten or all}
         {--dataset_id=* : only these datasets}
         {--dry-run : only show what would change}';
@@ -53,7 +55,7 @@ class UpdateFromXml extends Command
     // ids of organizations whose datasets changed (for fif:update-organization-stats)
     protected $affectedOrganizations = [];
 
-    protected $counts = ['datasets' => 0, 'further_information' => 0, 'offerors' => 0, 'skipped' => 0, 'failed' => 0];
+    protected $counts = ['datasets' => 0, 'further_information' => 0, 'offerors' => 0, 'deadlines' => 0, 'skipped' => 0, 'failed' => 0];
 
     /**
      * Execute the console command.
@@ -62,8 +64,8 @@ class UpdateFromXml extends Command
      */
     public function handle()
     {
-        if (!$this->option('further-information') && !$this->option('offerors')) {
-            $this->error('Nothing to do: use --further-information and/or --offerors.');
+        if (!$this->option('further-information') && !$this->option('offerors') && !$this->option('deadline')) {
+            $this->error('Nothing to do: use --further-information, --offerors and/or --deadline.');
             return 1;
         }
 
@@ -79,7 +81,7 @@ class UpdateFromXml extends Command
             $query->whereIn('id', $this->option('dataset_id'));
         }
 
-        $query->select(['id', 'scraper_kerndaten_id', 'source_format'])->orderBy('id')->chunk(200, function ($datasets) {
+        $query->select(['id', 'scraper_kerndaten_id', 'source_format', 'datetime_receipt_tenders'])->orderBy('id')->chunk(200, function ($datasets) {
             $xmls = ScraperKerndaten::whereIn('id', $datasets->pluck('scraper_kerndaten_id'))->pluck('xml', 'id');
 
             foreach ($datasets as $dataset) {
@@ -103,6 +105,9 @@ class UpdateFromXml extends Command
                         if ($this->option('offerors')) {
                             $this->updateOfferors($dataset, $data);
                         }
+                        if ($this->option('deadline')) {
+                            $this->updateDeadline($dataset, $data);
+                        }
                     });
                 } catch (\Throwable $ex) {
                     $this->error("Dataset {$dataset->id}: " . $ex->getMessage());
@@ -125,6 +130,23 @@ class UpdateFromXml extends Command
         }
 
         $this->counts['further_information']++;
+    }
+
+    protected function updateDeadline($dataset, $data) {
+        // as Process: the deadline is in the procedure, which not every type has
+        $deadline = $data->procedure && $data->procedure->dateTimeReceiptTenders ?
+            $data->procedure->dateTimeReceiptTenders->format('Y-m-d H:i:s') : null;
+
+        if ((string)$deadline === (string)$dataset->datetime_receipt_tenders) {
+            return;
+        }
+
+        $this->line("Dataset {$dataset->id}: datetime_receipt_tenders " . var_export($dataset->datetime_receipt_tenders, true) . ' → ' . var_export($deadline, true));
+        $this->counts['deadlines']++;
+
+        if (!$this->dryRun) {
+            DB::table('datasets')->where('id', $dataset->id)->update(['datetime_receipt_tenders' => $deadline]);
+        }
     }
 
     /**
@@ -206,8 +228,8 @@ class UpdateFromXml extends Command
     protected function report() {
         $verb = $this->dryRun ? 'Would update' : 'Updated';
 
-        $this->info(sprintf('%d datasets checked. %s: further information of %d datasets, %d offerors. %d skipped, %d failed.',
-            $this->counts['datasets'], $verb, $this->counts['further_information'], $this->counts['offerors'],
+        $this->info(sprintf('%d datasets checked. %s: further information of %d datasets, %d offerors, %d deadlines. %d skipped, %d failed.',
+            $this->counts['datasets'], $verb, $this->counts['further_information'], $this->counts['offerors'], $this->counts['deadlines'],
             $this->counts['skipped'], $this->counts['failed']));
 
         $organizations = array_keys(array_filter($this->affectedOrganizations));

@@ -158,6 +158,24 @@ class CommandsTest extends JobTestCase
         });
     }
 
+    /**
+     * Two-stage procedures: the deadline for requests to participate, which earlier versions didn't read.
+     */
+    public function testUpdateFromXmlSetsDeadline()
+    {
+        $this->withScraperTransaction(function () {
+            $xml = str_replace('TenderSubmissionDeadlinePeriod>', 'ParticipationRequestReceptionPeriod>', Eforms::xml('cn-standard'));
+            $datasetId = $this->createDataset([
+                'source_format'        => 'eforms',
+                'scraper_kerndaten_id' => $this->insertKerndaten(['xml' => $xml]),
+            ]);
+
+            $this->artisan('fif:update-from-xml', ['--deadline' => true, '--dataset_id' => [$datasetId]])->assertExitCode(0)->run();
+
+            $this->assertDatabaseHas('datasets', ['id' => $datasetId, 'datetime_receipt_tenders' => '2026-02-15 12:00:00']);
+        });
+    }
+
     public function testUpdateFromXmlNeedsSomethingToDo()
     {
         $this->artisan('fif:update-from-xml')->assertExitCode(1)->run();

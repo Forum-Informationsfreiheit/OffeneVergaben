@@ -46,6 +46,7 @@ php artisan fif:update-from-xml --offerors --format=all            # of all data
 ```
 
 - `--further-information` re-creates `datasets.further_information` (eForms only), e.g. after more fields got mapped or a new SDK version was imported.
+- `--deadline` re-derives `datasets.datetime_receipt_tenders`. eForms notices of two-stage procedures only give a deadline for requests to participate (BT-1311), which is used since this version.
 - `--offerors` re-derives the contracting bodies: national id, contact data, reference number, and the organization they are linked to (same matching as `fif:process`). Example: EVN's eForms notices give the buyer's company register number only as endpoint (BT-509), which is used since this version.
 
 Unlike re-running `fif:process`, this creates no new dataset version: datasets keep their ids and urls, and subscribers are not notified again. Use `--dry-run` first; a dry run doesn't create organizations either. If organization links change, the command lists the affected organizations, whose statistics then need `php artisan fif:update-organization-stats --organization=<id>`.

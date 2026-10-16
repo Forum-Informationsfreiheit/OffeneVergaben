@@ -215,7 +215,8 @@ class DatasetFilterTest extends DatabaseTestCase
     }
 
     /**
-     * NUTS region codes are matched by their first 4 characters, NAT means everything outside of Austria.
+     * NUTS region codes are matched by their first 4 characters, NAT means everything outside of Austria, AT Austria
+     * without region.
      *
      * @dataProvider nutsProvider
      */
@@ -225,11 +226,13 @@ class DatasetFilterTest extends DatabaseTestCase
             ['code' => 'AT130', 'name' => 'Wien', 'level' => 3, 'country_code' => 'AT'],
             ['code' => 'AT221', 'name' => 'Graz', 'level' => 3, 'country_code' => 'AT'],
             ['code' => 'DE300', 'name' => 'Berlin', 'level' => 3, 'country_code' => 'DE'],
+            ['code' => 'AT', 'name' => 'Österreich', 'level' => 0, 'country_code' => 'AT'],
         ]);
         $datasets = [
             'Wien'         => $this->createDataset(['nuts_code' => 'AT130']),
             'Graz'         => $this->createDataset(['nuts_code' => 'AT221']),
             'Berlin'       => $this->createDataset(['nuts_code' => 'DE300']),
+            'Österreich'   => $this->createDataset(['nuts_code' => 'AT']),
             'without nuts' => $this->createDataset(),
         ];
 
@@ -243,6 +246,9 @@ class DatasetFilterTest extends DatabaseTestCase
             'several regions'             => ['nuts[]=AT13&nuts[]=AT22', ['Wien', 'Graz']],
             'international'               => ['nuts[]=NAT', ['Berlin']],
             'international and a region'  => ['nuts[]=NAT&nuts[]=AT22', ['Graz', 'Berlin']],
+            // not the regions, which start with AT as well
+            'all of austria'              => ['nuts[]=AT', ['Österreich']],
+            'all of austria and a region' => ['nuts[]=AT&nuts[]=AT13', ['Österreich', 'Wien']],
         ];
     }
 

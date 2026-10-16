@@ -387,14 +387,10 @@ class DOMEforms
     protected function loadProcedure() {
         $p = new \stdClass();
 
-        // the earliest deadline of all lots
-        $p->dateTimeReceiptTenders = null;
-        foreach ($this->nodes(self::LOT . '/cac:TenderingProcess/cac:TenderSubmissionDeadlinePeriod') as $period) {
-            $deadline = $this->dateTime($this->text('cbc:EndDate', $period), $this->text('cbc:EndTime', $period));
-            if ($deadline && (!$p->dateTimeReceiptTenders || $deadline->lessThan($p->dateTimeReceiptTenders))) {
-                $p->dateTimeReceiptTenders = $deadline;
-            }
-        }
+        // the earliest deadline of all lots: for tenders (BT-131), else, in two-stage procedures, for requests to
+        // participate (BT-1311); the Kerndaten deadline covers both
+        $p->dateTimeReceiptTenders = $this->earliestDeadline('cac:TenderSubmissionDeadlinePeriod')
+            ?: $this->earliestDeadline('cac:ParticipationRequestReceptionPeriod');
 
         $p->procedures = [];
         $procedureCode = $this->text('cac:TenderingProcess/cbc:ProcedureCode');
@@ -418,6 +414,23 @@ class DOMEforms
         }
 
         return $p;
+    }
+
+    /**
+     * @param string $period  element of the lots' tendering process with cbc:EndDate and cbc:EndTime
+     * @return Carbon|null  the earliest of the lots
+     */
+    protected function earliestDeadline($period) {
+        $earliest = null;
+
+        foreach ($this->nodes(self::LOT . '/cac:TenderingProcess/' . $period) as $node) {
+            $deadline = $this->dateTime($this->text('cbc:EndDate', $node), $this->text('cbc:EndTime', $node));
+            if ($deadline && (!$earliest || $deadline->lessThan($earliest))) {
+                $earliest = $deadline;
+            }
+        }
+
+        return $earliest;
     }
 
     /**

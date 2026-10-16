@@ -227,6 +227,30 @@ class DOMEformsTest extends TestCase
         $this->assertFalse($data->additionalCoreData->belowThreshold);
     }
 
+    /**
+     * Two-stage procedures have a deadline for requests to participate instead of one for tenders.
+     */
+    public function testParticipationDeadlineIsUsedWithoutTenderDeadline()
+    {
+        $xml = str_replace('TenderSubmissionDeadlinePeriod>', 'ParticipationRequestReceptionPeriod>', Eforms::xml('cn-standard'));
+
+        $deadline = $this->parse($xml)->procedure->dateTimeReceiptTenders;
+
+        $this->assertSame('2026-02-15 12:00 Europe/Vienna', $deadline->format('Y-m-d H:i e'));
+    }
+
+    public function testTenderDeadlineComesFirst()
+    {
+        $xml = Eforms::xml('cn-standard', [
+            '<cac:TenderSubmissionDeadlinePeriod>
+                <cbc:EndDate>2026-02-15+01:00</cbc:EndDate>' => '<cac:ParticipationRequestReceptionPeriod><cbc:EndDate>2026-01-30+01:00</cbc:EndDate></cac:ParticipationRequestReceptionPeriod>
+            <cac:TenderSubmissionDeadlinePeriod>
+                <cbc:EndDate>2026-02-15+01:00</cbc:EndDate>',
+        ]);
+
+        $this->assertSame('2026-02-15', $this->parse($xml)->procedure->dateTimeReceiptTenders->format('Y-m-d'));
+    }
+
     public function testRestrictedDocumentsAreFlagged()
     {
         $cb = $this->parse(Eforms::xml('cn-standard', [
