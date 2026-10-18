@@ -103,7 +103,8 @@ class Process
     protected function getRawKerndatenRecords($offset = null, $limit = null) {
         $ids = array_slice($this->recordIds,$offset,$limit);
 
-        $data = ScraperKerndaten::whereIn('id',$ids)->get();
+        // eager load the source, process() reads rel_quelle->id for every record
+        $data = ScraperKerndaten::with('rel_quelle')->whereIn('id',$ids)->get();
 
         return $data;
     }
