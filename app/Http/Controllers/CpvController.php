@@ -72,6 +72,29 @@ class CpvController extends Controller
         // add key value dictionary for cpv lookup by trimmed_code (for usage in javascript)
         $cpvMap = $this->cpvMap($result);
 
+        // Datasets koennen CPV Codes tragen, die es in der cpvs Tabelle nicht gibt (z.B. 38527, der
+        // offiziellen Hierarchie fehlt 38527000). Diese Gruppen bleiben sichtbar und nehmen Name
+        // und Code des naechsten vorhandenen uebergeordneten Codes, ohne Drilldown.
+        $missing = $result->filter(fn($i) => !$cpvMap->has($i->cpv));
+        if ($missing->isNotEmpty()) {
+            $candidates = $missing->flatMap(fn($i) => array_map(
+                fn($len) => substr($i->cpv, 0, $len), range(2, strlen($i->cpv) - 1)))->unique()->all();
+            $ancestors = CPV::whereIn('trimmed_code', $candidates)->get()->keyBy('trimmed_code');
+
+            foreach ($missing as $i) {
+                $parent = null;
+                for ($len = strlen($i->cpv) - 1; $len >= 2 && !$parent; $len--) {
+                    $parent = $ancestors->get(substr($i->cpv, 0, $len));
+                }
+                $cpvMap->put($i->cpv, (object) [
+                    'code'    => CPV::zeroFill($i->cpv),
+                    'name'    => $parent ? $parent->name : 'Unbekannter CPV-Code',
+                    'unknown' => true,
+                ]);
+                $i->isUnknown = 1;
+            }
+        }
+
         $items = $result;
 
         // 2020-04-14: Damit in der Liste die Zahlen für den Root Node (falls vorhanden)

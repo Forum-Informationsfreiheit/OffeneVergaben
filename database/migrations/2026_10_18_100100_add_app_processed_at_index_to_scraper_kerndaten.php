@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Schema;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Database\Migrations\Migration;
@@ -22,6 +23,13 @@ class AddAppProcessedAtIndexToScraperKerndaten extends Migration
     public function up()
     {
         // !!! USE DIFFERENT DB CONNECTION: mysql_scraper !!!
+        // The scraper DB is not managed by this repo (dumps may already carry the index).
+        $exists = DB::connection('mysql_scraper')
+            ->select("SHOW INDEX FROM `kerndaten` WHERE Key_name = 'kerndaten_app_processed_at_idx'");
+        if (!empty($exists)) {
+            return;
+        }
+
         Schema::connection('mysql_scraper')->table('kerndaten', function (Blueprint $table) {
             $table->index('app_processed_at', 'kerndaten_app_processed_at_idx');
         });

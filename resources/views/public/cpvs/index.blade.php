@@ -62,7 +62,9 @@
                         <td class="code">
                             @if($item->isRoot)
                                 {{ $item->cpv }}
-                                @else
+                            @elseif(!empty($item->isUnknown))
+                                <a title="Aufträge mit CPV Code {{ $item->cpv }} anzeigen" href="{{ route('public::auftraege',[ 'cpv' => $item->cpv, 'cpv_like' => 1 ]) }}">{{ $item->cpv }}</a>
+                            @else
                                 <a href="{{ route('public::branchen',[ 'node' => $cpvMap[$item->cpv]->code ]) }}">{{ $item->cpv }}</a>
                             @endif
                         </td>
@@ -202,7 +204,7 @@
 
                             //html += cpv.name + ' <small>('+d.data.cpv+')</small>';
                             html += cpv.name;
-                            html += d.data.isRoot ? '<br><small>nicht genauer definiert</small>' : '';
+                            html += (d.data.isRoot || d.data.isUnknown) ? '<br><small>nicht genauer definiert</small>' : '';
 
                             return html;
                         });
@@ -219,7 +221,7 @@
             }
 
             function clickedNode(d) {
-                if (d.data.isRoot || d.data.isLeaf) {
+                if (d.data.isRoot || d.data.isLeaf || d.data.isUnknown) {
                     return; // no further navigation possible
                 }
 
