@@ -1,4 +1,4 @@
-# OffeneVergaben.at — Laravel 9 / PHP 8.4 on Apache
+# OffeneVergaben.at — Laravel 11 / PHP 8.4 on Apache
 #
 # Stages:
 #   base   PHP extensions, Apache and php.ini, shared by dev and prod

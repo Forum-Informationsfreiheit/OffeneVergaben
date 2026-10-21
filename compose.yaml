@@ -1,6 +1,6 @@
 name: offenevergaben
 
-# Local development stack for OffeneVergaben.at (Laravel 9 / PHP 8.4).
+# Local development stack for OffeneVergaben.at (Laravel 11 / PHP 8.4).
 #
 #   docker compose up --build          # or: podman-compose up --build
 #   open http://localhost:8000
