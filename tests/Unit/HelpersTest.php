@@ -2,6 +2,7 @@
 
 namespace Tests\Unit;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class HelpersTest extends TestCase
@@ -14,14 +15,12 @@ class HelpersTest extends TestCase
         $this->assertSame(".", contains_decimal("1,0.0"));
     }
 
-    /**
-     * @dataProvider convertNumberToCentsProvider
-     */
+    #[DataProvider('convertNumberToCentsProvider')]
     public function testConvertNumberToCents($value, $expected) {
         $this->assertSame($expected, convert_number_to_cents($value));
     }
 
-    public function convertNumberToCentsProvider() {
+    public static function convertNumberToCentsProvider() {
         return [
             'integer'                 => ['100', 10000],
             'one decimal (comma)'     => ['100,5', 10050],
@@ -36,14 +35,12 @@ class HelpersTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider uiShortProvider
-     */
+    #[DataProvider('uiShortProvider')]
     public function testUiShorten($text, $length, $expected) {
         $this->assertSame($expected, ui_shorten($text, $length));
     }
 
-    public function uiShortProvider() {
+    public static function uiShortProvider() {
         return [
             'null is returned unchanged'           => [null, 45, null],
             'empty string is returned unchanged'   => ['', 45, ''],
@@ -70,14 +67,12 @@ class HelpersTest extends TestCase
         $this->assertSame("1.000,00", ui_format_money("100000"));        
     }
 
-    /**
-     * @dataProvider uiHighlightTokensProvider
-     */
+    #[DataProvider('uiHighlightTokensProvider')]
     public function testUiHighlightTokens($text, $tokens, $expected) {
         $this->assertSame($expected, ui_highlight_tokens($text, $tokens, 'strong'));
     }
 
-    public function uiHighlightTokensProvider()
+    public static function uiHighlightTokensProvider()
     {
         return [
             'no tokens'                    => ['Stadt Wien', [], 'Stadt Wien'],
@@ -101,14 +96,12 @@ class HelpersTest extends TestCase
     }
 
 
-    /**
-     * @dataProvider nlToBrProvider
-     */
+    #[DataProvider('nlToBrProvider')]
     public function testNlToBr($text, $expected) {
         $this->assertSame($expected, nl_to_br($text));
     }
 
-    public function nlToBrProvider() {
+    public static function nlToBrProvider() {
         return [
             "contains \\n"    => ["test\nhello", "test<br />hello"],
             "contains \\r"    => ["test\rhello", "test<br />hello"],
@@ -118,14 +111,12 @@ class HelpersTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider producerLabelProvider
-     */
+    #[DataProvider('producerLabelProvider')]
     public function testProducerLabel($procedures, $expected) {
         $this->assertSame($expected, procedure_label($procedures));
     }
 
-    public function producerLabelProvider() {
+    public static function producerLabelProvider() {
         return [
             "nothing matches"            => ["test", "test"],
             "nothing matches 2"          => [["test", "hello"], "test, hello"],

@@ -80,8 +80,11 @@ class DownloadController extends Controller
 
     /**
      * Public pages have no session, so errors are rendered directly instead of flashed on a redirect.
+     *
+     * The cache.headers middleware of the route leaves error responses alone (since Laravel 11), so no-store is set here.
      */
     protected function errorView($messageKey, $status) {
-        return response()->view('public.downloads.error', ['message' => Msg::text($messageKey)], $status);
+        return response()->view('public.downloads.error', ['message' => Msg::text($messageKey)], $status)
+            ->header('Cache-Control', 'no-store, private');
     }
 }

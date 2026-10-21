@@ -2,9 +2,23 @@
 
 Steps needed on existing installations when updating the app. Newest changes first.
 
-## 2026-10: PHP 8.4
+## 2026-10: Laravel 12, laravel-filemanager 2
 
-The Docker base image is now `php:8.4-apache-bookworm` (was 8.1), and `composer.json` requires `php ^8.4` with `config.platform.php` 8.4.0. Laravel and all other packages stay on the versions locked before; only the lock file's content hash and platform entry changed.
+`laravel/framework` is now 12.x (was 11.x) and `unisharp/laravel-filemanager` 2.15 (was 1.9, with `intervention/image` 4 instead of 2). Laravel 11 no longer receives security fixes; the update closes the open advisories of both packages (filemanager: CVE-2021-23814, CVE-2022-40734, CVE-2024-21546; Laravel: CRLF injection in the `email` rule, temporary signed URL path confusion, XSS on the debug page). Run `composer install` (the dev entrypoint does it if `vendor/` is stale; production images are built by CI as before).
+
+Nothing has to be moved: the file manager keeps its URL `/admin/lfm` and its files in `public/uploads` (`images/<user id>`, `images/shares`, `files/...`), now through the filesystem disk `lfm` in `config/filesystems.php`. Images of existing posts and pages are unchanged.
+
+`config/lfm.php` is the 2.x format (`folder_categories`, `disk`, ...); a 1.x config would silently fall back to the package defaults (`storage/app/public/photos`). The published assets in `public/vendor/laravel-filemanager` are those of 2.15 (`lfm.js` is now `stand-alone-button.js`).
+
+Behaviour changes in the admin area:
+
+- Uploads are checked against the allowed MIME types (1.x had `should_validate_mime` off): images JPEG, PNG and GIF; files additionally PDF. SVG is no longer accepted (it can carry scripts); PHP and HTML files are always rejected.
+- The file manager window is the new 2.x UI. It loads jQuery and Bootstrap from cdn.jsdelivr.net.
+- The teaser image of a post is stored with the path of the chosen URL only (`uploads/images/4`), independent of the host, so `APP_URL` may differ from the URL the admin area is opened with.
+
+## 2026-10: PHP 8.3
+
+The Docker base image is now `php:8.3-apache-bookworm` (was 8.1), and `composer.json` requires `php ^8.3` with `config.platform.php` 8.3.0. The Symfony components are locked to 7.4 LTS, since Symfony 8 requires PHP 8.4.
 
 ### Rebuild the image
 
@@ -12,7 +26,7 @@ The Docker base image is now `php:8.4-apache-bookworm` (was 8.1), and `composer.
 docker compose build --pull app
 ```
 
-Production images are built by CI as before. Nothing else has to be done: extensions (`exif`, `gd`, `opcache`, `pdo_mysql`, `zip`) and the `php.ini` files are unchanged and work on 8.4. Xdebug is bumped to 3.4.5, since 3.2.x does not support 8.4. Run `composer install` in dev containers (the entrypoint does it if `vendor/` is stale). Any local PHP outside Docker must be 8.4 or newer.
+Production images are built by CI as before. Nothing else has to be done: extensions (`exif`, `gd`, `opcache`, `pdo_mysql`, `zip`) and the `php.ini` files are unchanged and work on 8.3. Xdebug is bumped to 3.4.5, since 3.2.x does not support 8.3. Run `composer install` in dev containers (the entrypoint does it if `vendor/` is stale). Any local PHP outside Docker must be 8.3 or newer.
 
 `NationalIdParser` assigned an undeclared property `$isBlackListed` (deprecated since 8.2, an error in a future PHP version) while `isBlackListed()` reads `$blackListed`; it now sets `$blackListed`, so `isBlackListed()` reports `true` for blacklisted ids (`false` otherwise) instead of always `null`.
 

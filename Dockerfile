@@ -1,4 +1,4 @@
-# OffeneVergaben.at — Laravel 11 / PHP 8.4 on Apache
+# OffeneVergaben.at — Laravel 12 / PHP 8.3 on Apache
 #
 # Stages:
 #   base   PHP extensions, Apache and php.ini, shared by dev and prod
@@ -7,10 +7,10 @@
 #   prod   code + vendor/ baked in, runs as www-data (default target, built by CI)
 
 # ------------------------------------------------------------------------------------------------
-FROM php:8.4-apache-bookworm AS base
+FROM php:8.3-apache-bookworm AS base
 
 # Bookworm instead of bullseye: bullseye reached end of life on 2026-08-31 and there is no
-# php:8.4-apache-bullseye image either, so the snapshot.debian.org sources.list pinning the 7.4
+# php:8.3-apache-bullseye image either, so the snapshot.debian.org sources.list pinning the 7.4
 # image needed is gone with it — bookworm is still served by the regular mirrors.
 #
 # Only the build dependencies of the extensions below: libpng/libjpeg for gd, libzip for zip.
@@ -51,7 +51,7 @@ RUN set -eux; \
 # ------------------------------------------------------------------------------------------------
 FROM base AS dev
 
-# Xdebug for PHPUnit code coverage. 3.4+ is needed for PHP 8.4 (3.2.x stops at 8.3).
+# Xdebug for PHPUnit code coverage. 3.3+ is needed for PHP 8.3 (3.2.x stops at 8.2).
 # Installed but NOT enabled, so Apache runs without the overhead; load it per run with
 # `php -d zend_extension=xdebug -d xdebug.mode=coverage`.
 RUN set -eux; \

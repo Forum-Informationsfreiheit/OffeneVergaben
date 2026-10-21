@@ -7,6 +7,7 @@ use App\Http\Filters\DatasetFilter;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\DatabaseTestCase;
 
 /**
@@ -30,9 +31,7 @@ class DatasetFilterTest extends DatabaseTestCase
         ]);
     }
 
-    /**
-     * @dataProvider typesProvider
-     */
+    #[DataProvider('typesProvider')]
     public function testTypes($query, array $expected)
     {
         $datasets = [
@@ -43,7 +42,7 @@ class DatasetFilterTest extends DatabaseTestCase
         $this->assertEqualsCanonicalizing($expected, $this->matching($query, $datasets));
     }
 
-    public function typesProvider()
+    public static function typesProvider()
     {
         return [
             'Aufträge'                => ['types[]=auftrag', ['auftrag']],
@@ -53,9 +52,7 @@ class DatasetFilterTest extends DatabaseTestCase
         ];
     }
 
-    /**
-     * @dataProvider contractTypesProvider
-     */
+    #[DataProvider('contractTypesProvider')]
     public function testContractTypes($query, array $expected)
     {
         $datasets = [
@@ -69,7 +66,7 @@ class DatasetFilterTest extends DatabaseTestCase
         $this->assertEqualsCanonicalizing($expected, $this->matching($query, $datasets));
     }
 
-    public function contractTypesProvider()
+    public static function contractTypesProvider()
     {
         return [
             'works'                     => ['contract_types[]=works', ['works']],
@@ -87,9 +84,8 @@ class DatasetFilterTest extends DatabaseTestCase
 
     /**
      * volume_from and volume_to are given in euros, val_total is stored in cents.
-     *
-     * @dataProvider volumeProvider
      */
+    #[DataProvider('volumeProvider')]
     public function testVolume($query, array $expected)
     {
         $datasets = [
@@ -101,7 +97,7 @@ class DatasetFilterTest extends DatabaseTestCase
         $this->assertEqualsCanonicalizing($expected, $this->matching($query, $datasets));
     }
 
-    public function volumeProvider()
+    public static function volumeProvider()
     {
         return [
             'from'                     => ['volume_from=1000', ['1.500 €']],
@@ -112,9 +108,7 @@ class DatasetFilterTest extends DatabaseTestCase
         ];
     }
 
-    /**
-     * @dataProvider tendersProvider
-     */
+    #[DataProvider('tendersProvider')]
     public function testTenders($query, array $expected)
     {
         $datasets = [
@@ -126,7 +120,7 @@ class DatasetFilterTest extends DatabaseTestCase
         $this->assertEqualsCanonicalizing($expected, $this->matching($query, $datasets));
     }
 
-    public function tendersProvider()
+    public static function tendersProvider()
     {
         return [
             'from'                   => ['tenders_from=2', ['five tenders']],
@@ -136,9 +130,7 @@ class DatasetFilterTest extends DatabaseTestCase
         ];
     }
 
-    /**
-     * @dataProvider cpvProvider
-     */
+    #[DataProvider('cpvProvider')]
     public function testCpv($query, array $expected)
     {
         // TODO: matching() returns the numeric string keys ('99100000') as integers, and sorting integers together
@@ -159,7 +151,7 @@ class DatasetFilterTest extends DatabaseTestCase
         $this->assertEqualsCanonicalizing($expected, $this->matching($query, $datasets));
     }
 
-    public function cpvProvider()
+    public static function cpvProvider()
     {
         return [
             'trimmed code matches exactly'   => ['cpv=991', ['99100000']],
@@ -172,9 +164,8 @@ class DatasetFilterTest extends DatabaseTestCase
 
     /**
      * date_type selects the date column, date_from and date_to are whole days.
-     *
-     * @dataProvider dateProvider
      */
+    #[DataProvider('dateProvider')]
     public function testDates($query, array $expected)
     {
         $datasets = [
@@ -187,7 +178,7 @@ class DatasetFilterTest extends DatabaseTestCase
         $this->assertEqualsCanonicalizing($expected, $this->matching($query, $datasets));
     }
 
-    public function dateProvider()
+    public static function dateProvider()
     {
         $all = ['31.03.', '01.04.', '30.04.', '01.05.'];
 
@@ -217,9 +208,8 @@ class DatasetFilterTest extends DatabaseTestCase
     /**
      * NUTS region codes are matched by their first 4 characters, NAT means everything outside of Austria, AT Austria
      * without region.
-     *
-     * @dataProvider nutsProvider
      */
+    #[DataProvider('nutsProvider')]
     public function testNuts($query, array $expected)
     {
         DB::table('nuts')->insertOrIgnore([
@@ -239,7 +229,7 @@ class DatasetFilterTest extends DatabaseTestCase
         $this->assertEqualsCanonicalizing($expected, $this->matching($query, $datasets));
     }
 
-    public function nutsProvider()
+    public static function nutsProvider()
     {
         return [
             'one region'                  => ['nuts[]=AT13', ['Wien']],
@@ -303,9 +293,7 @@ class DatasetFilterTest extends DatabaseTestCase
         $this->assertSame([], $this->applyFilter('search=Bau')->getAppliedFilters());
     }
 
-    /**
-     * @dataProvider sortProvider
-     */
+    #[DataProvider('sortProvider')]
     public function testSort($sort, array $expected)
     {
         $this->createCpv('99100000');
@@ -332,7 +320,7 @@ class DatasetFilterTest extends DatabaseTestCase
         $this->assertSame($expected, $this->matching('sort='.$sort, $datasets));
     }
 
-    public function sortProvider()
+    public static function sortProvider()
     {
         return [
             'title'                           => ['title', ['x', 'y', 'z']],

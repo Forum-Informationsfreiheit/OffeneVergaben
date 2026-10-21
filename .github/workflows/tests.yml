@@ -14,7 +14,7 @@ jobs:
   phpunit:
     # Only dev -> master. This also skips Dependabot PRs, whose token may not write comments.
     if: github.head_ref == 'dev'
-    # Pinned so a newer ubuntu-latest cannot break the PHP 8.4 / Xdebug setup.
+    # Pinned so a newer ubuntu-latest cannot break the PHP 8.3 / Xdebug setup.
     runs-on: ubuntu-24.04
 
     env:
@@ -50,7 +50,7 @@ jobs:
 
       - uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.4"
+          php-version: "8.3"
           extensions: exif, gd, pdo_mysql, zip
           coverage: xdebug
 

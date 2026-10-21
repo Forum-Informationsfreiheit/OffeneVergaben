@@ -67,11 +67,9 @@ class PostController extends Controller
         if ($request->has('image_filepath') && $request->input('image_filepath')) {
             $path = $request->input('image_filepath');
 
-            // need to manipulate the image path, we are given the full url, but we need a relative path
-            // starting from within the public directory (does not start with public/f1/f2... but with f1/f2)
-            if (Str::startsWith($path,url('/'))) {
-                $path = ltrim($path,url('/'));
-            }
+            // the file manager sends the full url of the image, but we need the path within the public directory,
+            // e.g. uploads/images/4/foto.jpg (independent of the host, so APP_URL may differ from the request)
+            $path = ltrim(parse_url($path, PHP_URL_PATH) ?: $path, '/');
 
             $post->image_filepath = dirname($path);
             $post->image_filename = basename($path);
@@ -135,11 +133,9 @@ class PostController extends Controller
         if ($request->has('image_filepath') && $request->input('image_filepath')) {
             $path = $request->input('image_filepath');
 
-            // need to manipulate the image path, we are given the full url, but we need a relative path
-            // starting from within the public directory (does not start with public/f1/f2... but with f1/f2)
-            if (Str::startsWith($path,url('/'))) {
-                $path = ltrim($path,url('/'));
-            }
+            // the file manager sends the full url of the image, but we need the path within the public directory,
+            // e.g. uploads/images/4/foto.jpg (independent of the host, so APP_URL may differ from the request)
+            $path = ltrim(parse_url($path, PHP_URL_PATH) ?: $path, '/');
 
             $post->image_filepath = dirname($path);
             $post->image_filename = basename($path);

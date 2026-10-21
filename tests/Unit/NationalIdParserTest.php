@@ -3,13 +3,12 @@
 namespace Tests\Unit;
 
 use App\NationalIdParser;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class NationalIdParserTest extends TestCase
 {
-    /**
-     * @dataProvider typeProvider
-     */
+    #[DataProvider('typeProvider')]
     public function testParsesType($id, $type, $formattedId)
     {
         $parser = $this->parse($id);
@@ -23,7 +22,7 @@ class NationalIdParserTest extends TestCase
         $this->assertSame($formattedId, $parser->getFormattedId());
     }
 
-    public function typeProvider()
+    public static function typeProvider()
     {
         return [
             // Firmenbuchnummer: up to 6 digits and a check letter, optionally with prefix FN
@@ -46,9 +45,7 @@ class NationalIdParserTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidIdProvider
-     */
+    #[DataProvider('invalidIdProvider')]
     public function testInvalidIds($id)
     {
         $parser = $this->parse($id);
@@ -57,7 +54,7 @@ class NationalIdParserTest extends TestCase
         $this->assertNull($parser->getFormattedId());
     }
 
-    public function invalidIdProvider()
+    public static function invalidIdProvider()
     {
         return [
             'too short'           => ['1234'],
@@ -81,9 +78,7 @@ class NationalIdParserTest extends TestCase
         $this->assertSame('12-34', NationalIdParser::cleanId('1_2-3_4', ['_']));
     }
 
-    /**
-     * @dataProvider invalidArgumentProvider
-     */
+    #[DataProvider('invalidArgumentProvider')]
     public function testRejectsInvalidArguments(callable $call)
     {
         $this->expectException(\InvalidArgumentException::class);
@@ -91,7 +86,7 @@ class NationalIdParserTest extends TestCase
         $call();
     }
 
-    public function invalidArgumentProvider()
+    public static function invalidArgumentProvider()
     {
         return [
             'parser without id'            => [function () { new NationalIdParser(null); }],

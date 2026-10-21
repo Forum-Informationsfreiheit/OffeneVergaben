@@ -8,6 +8,7 @@ use App\Models\ScraperKerndaten;
 use App\Models\ScraperQuelle;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Fixtures\Eforms;
 use Tests\Fixtures\Kerndaten;
 
@@ -258,9 +259,7 @@ class ProcessTest extends JobTestCase
         );
     }
 
-    /**
-     * @dataProvider invalidRecordProvider
-     */
+    #[DataProvider('invalidRecordProvider')]
     public function testInvalidRecordIsSkipped($type, array $replacements)
     {
         $record = $this->makeRecord(Kerndaten::xml($type, $replacements));
@@ -531,7 +530,7 @@ class ProcessTest extends JobTestCase
         $this->assertTrue($record->saved);
     }
 
-    public function invalidRecordProvider()
+    public static function invalidRecordProvider()
     {
         return [
             'both document flags' => ['KD_8_2_Z1', [

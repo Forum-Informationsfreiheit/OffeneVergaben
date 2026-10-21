@@ -8,7 +8,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.4",
+        "php": "^8.3",
         "barryvdh/laravel-ide-helper": "^3.0",
         "doctrine/dbal": "^3.9",
         "guzzlehttp/guzzle": "^7.9",
@@ -16,7 +16,7 @@
         "laracasts/flash": "^3.2",
         "laracasts/utilities": "^3.2",
         "larastan/larastan": "^3.0",
-        "laravel/framework": "^11.0",
+        "laravel/framework": "^12.0",
         "laravel/helpers": "^1.8",
         "laravel/tinker": "^2.10",
         "laravel/ui": "^4.6",
@@ -25,7 +25,7 @@
         "phpunit/phpunit": "^11.0",
         "sentry/sentry-laravel": "^4",
         "spatie/laravel-sitemap": "^7.0",
-        "unisharp/laravel-filemanager": "~1.9"
+        "unisharp/laravel-filemanager": "^2.15"
     },
     "require-dev": {
         "fakerphp/faker": "^1.24",
@@ -37,7 +37,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "platform": {
-            "php": "8.4.27"
+            "php": "8.3.0"
         }
     },
     "extra": {

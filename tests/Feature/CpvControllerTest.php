@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class CpvControllerTest extends PublicTestCase
 {
@@ -90,9 +91,7 @@ class CpvControllerTest extends PublicTestCase
         $this->getJson(route('public::ajax-cpv-search', ['query' => '991']))->assertForbidden();
     }
 
-    /**
-     * @dataProvider codeQueryProvider
-     */
+    #[DataProvider('codeQueryProvider')]
     public function testSearchFindsCpvsByCodePrefix($query)
     {
         $cpv = $this->createCpv('99100000');
@@ -120,7 +119,7 @@ class CpvControllerTest extends PublicTestCase
         $this->ajaxSearch('')->assertExactJson([]);
     }
 
-    public function codeQueryProvider()
+    public static function codeQueryProvider()
     {
         return [
             'code prefix'                 => ['991'],

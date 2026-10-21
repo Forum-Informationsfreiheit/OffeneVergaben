@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Post;
 use App\Models\Role;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PostControllerTest extends PublicTestCase
 {
@@ -63,9 +64,7 @@ class PostControllerTest extends PublicTestCase
         $this->get(route('public::show-post', 'unbekannt-'.Str::lower(Str::random(8))))->assertNotFound();
     }
 
-    /**
-     * @dataProvider visitorProvider
-     */
+    #[DataProvider('visitorProvider')]
     public function testUnpublishedPostIsForbiddenForVisitors($roleId)
     {
         $post = $this->createPost();

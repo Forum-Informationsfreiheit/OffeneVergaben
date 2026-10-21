@@ -7,6 +7,7 @@ use App\Models\User;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 /**
@@ -88,9 +89,8 @@ class AuthenticationTest extends TestCase
     /**
      * An empty token must count as no token: ConvertEmptyStringsToNull turns ?api_token= into null,
      * and where('api_token', null) would match every user without a token.
-     *
-     * @dataProvider emptyTokenProvider
      */
+    #[DataProvider('emptyTokenProvider')]
     public function testEmptyTokenGetsUnauthorized($uri, $headers)
     {
         $this->createUser();
@@ -137,7 +137,7 @@ class AuthenticationTest extends TestCase
         $response->assertExactJson(['message' => 'Unauthenticated.']);
     }
 
-    public function emptyTokenProvider()
+    public static function emptyTokenProvider()
     {
         return [
             'empty query parameter' => ['/api/user?api_token=', []],

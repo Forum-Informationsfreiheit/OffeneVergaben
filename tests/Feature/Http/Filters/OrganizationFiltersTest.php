@@ -7,6 +7,7 @@ use App\Http\Filters\OrganizationAsOfferorFilter;
 use App\Models\Organization;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\DatabaseTestCase;
 
 /**
@@ -15,9 +16,7 @@ use Tests\Feature\DatabaseTestCase;
  */
 class OrganizationFiltersTest extends DatabaseTestCase
 {
-    /**
-     * @dataProvider filterProvider
-     */
+    #[DataProvider('filterProvider')]
     public function testSortsByNameCountAndVolume($filterClass, $countColumn, $volumeColumn)
     {
         $organizations = [
@@ -48,9 +47,7 @@ class OrganizationFiltersTest extends DatabaseTestCase
         $this->assertSame(['b', 'a', 'c'], $sorted('-sum'));
     }
 
-    /**
-     * @dataProvider filterProvider
-     */
+    #[DataProvider('filterProvider')]
     public function testIsSortedBy($filterClass)
     {
         $this->assertSame('asc', $this->applyFilter($filterClass, 'sort=name')->isSortedBy('name'));
@@ -60,9 +57,7 @@ class OrganizationFiltersTest extends DatabaseTestCase
         $this->assertFalse($this->applyFilter($filterClass, 'sort=national_id')->isSortedBy('national_id'));
     }
 
-    /**
-     * @dataProvider filterProvider
-     */
+    #[DataProvider('filterProvider')]
     public function testHasAndMakeSortUrl($filterClass)
     {
         $filter = $this->applyFilter($filterClass, 'page=2&sort=name');
@@ -72,7 +67,7 @@ class OrganizationFiltersTest extends DatabaseTestCase
         $this->assertSame(url()->current().'?page=2&sort=-count', $filter->makeSortUrl('count', 'desc'));
     }
 
-    public function filterProvider()
+    public static function filterProvider()
     {
         return [
             'Auftraggeber' => [OrganizationAsOfferorFilter::class, 'count_offeror', 'val_total_auftrag_offeror'],

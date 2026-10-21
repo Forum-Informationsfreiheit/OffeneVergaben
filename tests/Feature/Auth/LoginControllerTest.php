@@ -4,6 +4,7 @@ namespace Tests\Feature\Auth;
 
 use App\Http\Middleware\VerifyCsrfToken;
 use App\Models\Role;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\PublicTestCase;
 
 class LoginControllerTest extends PublicTestCase
@@ -27,9 +28,7 @@ class LoginControllerTest extends PublicTestCase
         $response->assertViewIs('auth.login');
     }
 
-    /**
-     * @dataProvider redirectAfterLoginProvider
-     */
+    #[DataProvider('redirectAfterLoginProvider')]
     public function testLoginRedirectsByRole($roleId, $target)
     {
         $user = $this->createUser($roleId);
@@ -88,7 +87,7 @@ class LoginControllerTest extends PublicTestCase
         $this->assertGuest();
     }
 
-    public function redirectAfterLoginProvider()
+    public static function redirectAfterLoginProvider()
     {
         return [
             'registered' => [Role::REGISTERED, '/'],

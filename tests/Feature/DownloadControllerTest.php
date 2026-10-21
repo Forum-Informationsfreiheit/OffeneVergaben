@@ -3,6 +3,7 @@
 namespace Tests\Feature;
 
 use App\Jobs\MakeDatasetsCsvDumpJob;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class DownloadControllerTest extends PublicTestCase
 {
@@ -70,6 +71,8 @@ class DownloadControllerTest extends PublicTestCase
 
         $response->assertStatus(200);
         $response->assertViewIs('public.downloads.show');
+        // every request creates a new link: never cached (see routes/public.php)
+        $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
 
         $link = $response->viewData('link');
         $this->assertStringStartsWith(url('tmp/'.self::LINK_PREFIX), $link);
@@ -89,9 +92,7 @@ class DownloadControllerTest extends PublicTestCase
         $this->assertEmpty(glob(public_path('tmp/'.self::LINK_PREFIX.'*.zip')));
     }
 
-    /**
-     * @dataProvider invalidFormatProvider
-     */
+    #[DataProvider('invalidFormatProvider')]
     public function testMissingOrUnsupportedFormatShowsError(array $format)
     {
         $this->cacheCurrentDump();
@@ -105,7 +106,7 @@ class DownloadControllerTest extends PublicTestCase
         $this->assertEmpty(glob(public_path('tmp/'.self::LINK_PREFIX.'*.zip')));
     }
 
-    public function invalidFormatProvider()
+    public static function invalidFormatProvider()
     {
         return [
             'format missing'     => [[]],

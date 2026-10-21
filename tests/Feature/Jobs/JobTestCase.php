@@ -57,6 +57,6 @@ abstract class JobTestCase extends DatabaseTestCase
         mkdir($this->temporaryPath.'/public', 0777, true);
 
         $this->app->useStoragePath($this->temporaryPath.'/storage');
-        $this->app->instance('path.public', $this->temporaryPath.'/public');
+        $this->app->usePublicPath($this->temporaryPath.'/public');
     }
 }

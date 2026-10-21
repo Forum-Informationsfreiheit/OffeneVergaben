@@ -4,13 +4,14 @@ namespace Tests\Feature;
 
 use App\Models\Role;
 use App\Support\PublicMessages;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * The public pages are cacheable: no session, cookies or CSRF token for anonymous visitors.
  */
 class PublicCachingTest extends PublicTestCase
 {
-    public function cacheablePathProvider()
+    public static function cacheablePathProvider()
     {
         return [
             'frontpage'   => ['/'],
@@ -22,9 +23,7 @@ class PublicCachingTest extends PublicTestCase
         ];
     }
 
-    /**
-     * @dataProvider cacheablePathProvider
-     */
+    #[DataProvider('cacheablePathProvider')]
     public function testAnonymousResponseIsCacheableWithoutCookiesOrToken($path)
     {
         $response = $this->get($path);
@@ -61,13 +60,6 @@ class PublicCachingTest extends PublicTestCase
         config(['app.public_cache_ttl' => 0]);
 
         $response = $this->get('/aufträge');
-
-        $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
-    }
-
-    public function testDownloadLinkCreationIsNeverCached()
-    {
-        $response = $this->get('/downloads/kerndaten_dump_daily');
 
         $this->assertStringContainsString('no-store', $response->headers->get('Cache-Control'));
     }

@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Role;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class DatasetControllerTest extends PublicTestCase
 {
@@ -178,9 +179,7 @@ class DatasetControllerTest extends PublicTestCase
         $this->get(route('public::auftrag', 0))->assertNotFound();
     }
 
-    /**
-     * @dataProvider visitorProvider
-     */
+    #[DataProvider('visitorProvider')]
     public function testDisabledDatasetIsHiddenFromVisitors($roleId)
     {
         $id = $this->createDataset(['disabled_at' => now()]);
