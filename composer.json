@@ -8,7 +8,7 @@
     ],
     "license": "MIT",
     "require": {
-        "php": "^8.2",
+        "php": "^8.4",
         "doctrine/dbal": "^3.9",
         "guzzlehttp/guzzle": "^7.9",
         "kblais/query-filter": "^3.3",
@@ -37,7 +37,7 @@
         "preferred-install": "dist",
         "sort-packages": true,
         "platform": {
-            "php": "8.2.34"
+            "php": "8.4.0"
         }
     },
     "extra": {
