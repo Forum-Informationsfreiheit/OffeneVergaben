@@ -2,6 +2,20 @@
 
 Steps needed on existing installations when updating the app. Newest changes first.
 
+## 2026-10: PHP 8.2
+
+The Docker base image is now `php:8.2-apache-bookworm` (was 8.1), and `composer.json` requires `php ^8.2` with `config.platform.php` 8.2.34. Laravel and all other packages stay on the versions locked before; only the lock file's content hash and platform entry changed.
+
+### Rebuild the image
+
+```sh
+docker compose build --pull app
+```
+
+Production images are built by CI as before. Nothing else has to be done: extensions (`exif`, `gd`, `opcache`, `pdo_mysql`, `zip`), the `php.ini` files and Xdebug 3.2.2 are unchanged and work on 8.2. Run `composer install` in dev containers (the entrypoint does it if `vendor/` is stale). Any local PHP outside Docker must be 8.2 or newer.
+
+`NationalIdParser` assigned an undeclared property `$isBlackListed` (deprecated since 8.2) while `isBlackListed()` reads `$blackListed`; it now sets `$blackListed`, so `isBlackListed()` reports `true` for blacklisted ids (`false` otherwise) instead of always `null`.
+
 ## 2026-10: eForms notices
 
 Since October 2026 some publishers (so far vemap and Monopolverwaltung) publish EU eForms notices instead of Kerndaten. `fif:process` now reads both formats (`app/DOMEforms.php` next to `app/DOMKerndaten.php`) and stores them in the same tables.

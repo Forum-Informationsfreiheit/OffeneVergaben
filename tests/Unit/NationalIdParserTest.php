@@ -68,14 +68,8 @@ class NationalIdParserTest extends TestCase
         ];
     }
 
-    /**
-     * TODO: bug — NationalIdParser::validateId() stores the result in $this->isBlackListed, but isBlackListed() returns
-     * $this->blackListed, which is never set. Use the same property, then remove markTestIncomplete() here.
-     */
     public function testIsBlackListed()
     {
-        $this->markTestIncomplete('NationalIdParser::validateId() and isBlackListed() use different properties.');
-
         $this->assertTrue($this->parse('unbekannt')->isBlackListed());
         $this->assertFalse($this->parse('90001')->isBlackListed());
     }

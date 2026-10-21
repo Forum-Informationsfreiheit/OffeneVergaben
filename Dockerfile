@@ -1,4 +1,4 @@
-# OffeneVergaben.at — Laravel 8 / PHP 8.1 on Apache
+# OffeneVergaben.at — Laravel 9 / PHP 8.2 on Apache
 #
 # Stages:
 #   base   PHP extensions, Apache and php.ini, shared by dev and prod
@@ -7,11 +7,11 @@
 #   prod   code + vendor/ baked in, runs as www-data (default target, built by CI)
 
 # ------------------------------------------------------------------------------------------------
-FROM php:8.1-apache-bookworm AS base
+FROM php:8.2-apache-bookworm AS base
 
 # Bookworm instead of bullseye: bullseye reached end of life on 2026-08-31 and there is no
-# php:8.1-apache-bullseye image past 8.1.33, so the snapshot.debian.org sources.list pinning the
-# 7.4 image needed is gone with it — bookworm is still served by the regular mirrors.
+# php:8.2-apache-bullseye image either, so the snapshot.debian.org sources.list pinning the 7.4
+# image needed is gone with it — bookworm is still served by the regular mirrors.
 #
 # Only the build dependencies of the extensions below: libpng/libjpeg for gd, libzip for zip.
 RUN set -eux; \
