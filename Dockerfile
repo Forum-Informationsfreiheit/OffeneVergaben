@@ -59,7 +59,7 @@ RUN set -eux; \
     rm -rf /tmp/pear
 
 # Fully qualified so podman does not have to guess the registry for the build stage.
-COPY --from=docker.io/library/composer:2.2 /usr/bin/composer /usr/local/bin/composer
+COPY --from=docker.io/library/composer:2.10 /usr/bin/composer /usr/local/bin/composer
 
 COPY docker/php-dev.ini /usr/local/etc/php/conf.d/zz-dev.ini
 COPY docker/entrypoint.sh /usr/local/bin/entrypoint.sh
@@ -86,7 +86,7 @@ FROM base AS build
 
 ENV COMPOSER_ALLOW_SUPERUSER=1
 
-COPY --from=docker.io/library/composer:2.2 /usr/bin/composer /usr/local/bin/composer
+COPY --from=docker.io/library/composer:2.10 /usr/bin/composer /usr/local/bin/composer
 
 # Dependencies first: this layer stays cached as long as composer.json/composer.lock don't change.
 COPY composer.json composer.lock ./
