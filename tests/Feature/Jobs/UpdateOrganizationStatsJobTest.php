@@ -12,7 +12,7 @@ use Illuminate\Support\Facades\Log;
 class UpdateOrganizationStatsJobTest extends JobTestCase
 {
     // dataset type with dataset_types.end = 0 ("Ausschreibung")
-    const TYPE_AUSSCHREIBUNG = 'KD_8_2_Z1';
+    const TYPE_AUSSCHREIBUNG = 'TEST_AUSSCHR';
 
     protected function setUp(): void
     {

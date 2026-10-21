@@ -5,6 +5,7 @@ namespace Tests\Feature;
 use App\Models\Page;
 use App\Models\Role;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class PageControllerTest extends PublicTestCase
 {
@@ -92,9 +93,7 @@ class PageControllerTest extends PublicTestCase
         $response->assertDontSee('Nicht veröffentlicht!');
     }
 
-    /**
-     * @dataProvider visitorProvider
-     */
+    #[DataProvider('visitorProvider')]
     public function testUnpublishedPageIsForbiddenForVisitors($roleId)
     {
         $page = $this->createPage();
@@ -120,9 +119,7 @@ class PageControllerTest extends PublicTestCase
         $this->get(route('public::show-page', 'unbekannt-'.Str::lower(Str::random(8))))->assertNotFound();
     }
 
-    /**
-     * @dataProvider reservedSlugProvider
-     */
+    #[DataProvider('reservedSlugProvider')]
     public function testReservedUrlShowsPageWithThatSlug($slug)
     {
         // the dev database may already have this page: change it instead of adding a second one
@@ -147,7 +144,7 @@ class PageControllerTest extends PublicTestCase
         $this->get('/faq')->assertRedirect('/frequently-asked-questions');
     }
 
-    public function reservedSlugProvider()
+    public static function reservedSlugProvider()
     {
         return [
             'impressum'                  => ['impressum'],

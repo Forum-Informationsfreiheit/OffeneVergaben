@@ -42,8 +42,8 @@ class ScraperKerndaten extends Model
 
     protected $table = 'kerndaten';
 
-    protected $dates = [
-        'app_processed_at'
+    protected $casts = [
+        'app_processed_at' => 'datetime',
     ];
 
     public $timestamps = false;

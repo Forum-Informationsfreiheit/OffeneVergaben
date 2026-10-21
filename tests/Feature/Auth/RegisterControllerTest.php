@@ -7,6 +7,7 @@ use App\Models\Role;
 use App\Models\User;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\PublicTestCase;
 
 /**
@@ -43,9 +44,7 @@ class RegisterControllerTest extends PublicTestCase
         $this->assertAuthenticatedAs($user);
     }
 
-    /**
-     * @dataProvider invalidRegistrationProvider
-     */
+    #[DataProvider('invalidRegistrationProvider')]
     public function testRegistrationValidatesInput(array $input, $field)
     {
         $response = $this->from(route('register'))->post(route('register'), $this->registrationInput($input));
@@ -55,7 +54,7 @@ class RegisterControllerTest extends PublicTestCase
         $this->assertGuest();
     }
 
-    public function invalidRegistrationProvider()
+    public static function invalidRegistrationProvider()
     {
         return [
             'name missing'           => [['name' => ''], 'name'],

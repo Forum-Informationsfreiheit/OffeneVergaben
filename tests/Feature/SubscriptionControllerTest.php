@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Notification;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 /**
  * Tests of the public subscription routes in routes/web.php: the subscribe form and the signed links in
@@ -90,9 +91,7 @@ class SubscriptionControllerTest extends PublicTestCase
         Notification::assertNothingSent();
     }
 
-    /**
-     * @dataProvider invalidInputProvider
-     */
+    #[DataProvider('invalidInputProvider')]
     public function testSubscribeValidatesInput($input, $field)
     {
         $input = $this->subscribeInput($input);
@@ -109,9 +108,8 @@ class SubscriptionControllerTest extends PublicTestCase
     /**
      * The query must be exactly what DatasetFilter makes of it (see DatasetController@index), so the
      * duplicate check can compare query strings.
-     *
-     * @dataProvider invalidQueryProvider
      */
+    #[DataProvider('invalidQueryProvider')]
     public function testSubscribeRejectsInvalidQuery($query)
     {
         $input = $this->subscribeInput(['query' => $query]);
@@ -180,9 +178,7 @@ class SubscriptionControllerTest extends PublicTestCase
         $this->assertStringNotContainsString('public', $response->headers->get('Cache-Control'));
     }
 
-    /**
-     * @dataProvider signedRoutesProvider
-     */
+    #[DataProvider('signedRoutesProvider')]
     public function testSubscriptionLinksAreNeverCached($routeName)
     {
         $subscriber   = $this->createUser(Role::SUBSCRIBER);
@@ -245,9 +241,7 @@ class SubscriptionControllerTest extends PublicTestCase
         $this->assertNull($subscription->fresh()->verified_at);
     }
 
-    /**
-     * @dataProvider signedRoutesProvider
-     */
+    #[DataProvider('signedRoutesProvider')]
     public function testUnsignedLinkIsForbidden($routeName)
     {
         $subscriber   = $this->createUser(Role::SUBSCRIBER);
@@ -261,9 +255,8 @@ class SubscriptionControllerTest extends PublicTestCase
 
     /**
      * The signature covers the whole URL, so a link can't be changed to point to another subscription.
-     *
-     * @dataProvider signedRoutesProvider
      */
+    #[DataProvider('signedRoutesProvider')]
     public function testLinkWithChangedIdIsForbidden($routeName)
     {
         $subscriber = $this->createUser(Role::SUBSCRIBER);
@@ -279,9 +272,8 @@ class SubscriptionControllerTest extends PublicTestCase
 
     /**
      * Links in old mails can point to a deleted subscription (unsubscribed, or not verified in time).
-     *
-     * @dataProvider signedRoutesProvider
      */
+    #[DataProvider('signedRoutesProvider')]
     public function testLinkToDeletedSubscriptionReturnsNotFound($routeName)
     {
         $subscriber   = $this->createUser(Role::SUBSCRIBER);
@@ -395,7 +387,7 @@ class SubscriptionControllerTest extends PublicTestCase
         $response->assertNotFound();
     }
 
-    public function invalidInputProvider()
+    public static function invalidInputProvider()
     {
         return [
             'title missing'         => [['title' => ''], 'title'],
@@ -407,7 +399,7 @@ class SubscriptionControllerTest extends PublicTestCase
         ];
     }
 
-    public function invalidQueryProvider()
+    public static function invalidQueryProvider()
     {
         return [
             'unknown filter'     => ['foo=bar'],
@@ -416,7 +408,7 @@ class SubscriptionControllerTest extends PublicTestCase
         ];
     }
 
-    public function signedRoutesProvider()
+    public static function signedRoutesProvider()
     {
         return [
             'verify'      => ['public::verify-subscription'],

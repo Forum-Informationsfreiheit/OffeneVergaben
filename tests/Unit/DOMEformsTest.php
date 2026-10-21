@@ -5,6 +5,7 @@ namespace Tests\Unit;
 use App\DOMEforms;
 use DOMDocument;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Tests\Fixtures\Eforms;
@@ -49,9 +50,7 @@ class DOMEformsTest extends TestCase
         }, $data->furtherInformation['groups'])));
     }
 
-    /**
-     * @dataProvider endpointProvider
-     */
+    #[DataProvider('endpointProvider')]
     public function testEndpointIsNoIdentifierOtherwise($companyId, $endpoint, $expected)
     {
         $data = $this->parse(Eforms::xml('can-standard', [
@@ -63,7 +62,7 @@ class DOMEformsTest extends TestCase
         $this->assertSame($expected, $data->contractingBody->address->nationalId);
     }
 
-    public function endpointProvider()
+    public static function endpointProvider()
     {
         return [
             'identifier given'       => ['99999', 'FN 999999 z', '99999'],
@@ -123,9 +122,7 @@ class DOMEformsTest extends TestCase
         $this->assertNull($acd->nbSmeContractor);
     }
 
-    /**
-     * @dataProvider companySizeProvider
-     */
+    #[DataProvider('companySizeProvider')]
     public function testSmeContractorDependsOnCompanySize($size, $expected)
     {
         // both winners get the same size
@@ -134,7 +131,7 @@ class DOMEformsTest extends TestCase
         $this->assertSame($expected, $this->parse($xml)->awardContract->nbSmeContractor);
     }
 
-    public function companySizeProvider()
+    public static function companySizeProvider()
     {
         return [
             'micro'  => ['micro', true],
@@ -261,9 +258,7 @@ class DOMEformsTest extends TestCase
         $this->assertFalse($cb->urlDocumentIsFull);
     }
 
-    /**
-     * @dataProvider procedureProvider
-     */
+    #[DataProvider('procedureProvider')]
     public function testMapsProcedureTypesToKerndatenCombinations($procedureCode, $expected)
     {
         $data = $this->parse(Eforms::xml('cn-standard', ['>open</cbc:ProcedureCode>' => ">$procedureCode</cbc:ProcedureCode>"]));
@@ -271,7 +266,7 @@ class DOMEformsTest extends TestCase
         $this->assertSame($expected, $data->procedure->procedures);
     }
 
-    public function procedureProvider()
+    public static function procedureProvider()
     {
         return [
             'open'        => ['open', ['PT_OPEN']],

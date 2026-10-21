@@ -47,7 +47,7 @@ use Illuminate\Support\Str;
  */
 class Post extends Model
 {
-    protected $dates = ['published_at'];
+    protected $casts = ['published_at' => 'datetime'];
 
     // RELATIONS -------------------------------------------------------------------------------------------------------
     public function author() {

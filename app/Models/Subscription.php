@@ -44,8 +44,8 @@ class Subscription extends Model
     // will be removed from the database
     const VERIFY_SUBSCRIPTION_IN_MINUTES = 60;
 
-    protected $dates = [
-        'verified_at'
+    protected $casts = [
+        'verified_at' => 'datetime',
     ];
 
     // RELATIONS -------------------------------------------------------------------------------------------------------

@@ -6,6 +6,7 @@ use App\DOMKerndaten;
 use DOMDocument;
 use Illuminate\Support\Facades\Log;
 use Mockery;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Psr\Log\LoggerInterface;
 use Psr\Log\NullLogger;
 use Symfony\Component\VarDumper\VarDumper;
@@ -286,15 +287,13 @@ class DOMKerndatenTest extends TestCase
         $this->assertSame('KD_8_2_Z1', $this->parse($xml)->type);
     }
 
-    /**
-     * @dataProvider fixtureProvider
-     */
+    #[DataProvider('fixtureProvider')]
     public function testFixturesHaveNoUnparsedElements($type)
     {
         $this->assertSame([], (new DOMKerndaten(Kerndaten::xml($type), new NullLogger()))->getUnparsed());
     }
 
-    public function fixtureProvider()
+    public static function fixtureProvider()
     {
         return [['KD_8_2_Z1'], ['KD_8_2_Z2'], ['KD_8_2_Z3']];
     }

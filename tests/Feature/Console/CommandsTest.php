@@ -11,6 +11,7 @@ use App\Jobs\UpdateOrganizationStatsJob;
 use Illuminate\Support\Facades\Bus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\Feature\Jobs\JobTestCase;
 use Tests\Fixtures\Eforms;
 
@@ -26,9 +27,7 @@ class CommandsTest extends JobTestCase
         Bus::fake();
     }
 
-    /**
-     * @dataProvider jobCommandProvider
-     */
+    #[DataProvider('jobCommandProvider')]
     public function testCommandStartsJob($command, $job)
     {
         $this->artisan($command)->assertExitCode(0)->run();
@@ -36,7 +35,7 @@ class CommandsTest extends JobTestCase
         Bus::assertDispatched($job);
     }
 
-    public function jobCommandProvider()
+    public static function jobCommandProvider()
     {
         return [
             'fif:dump-datasets'             => ['fif:dump-datasets', MakeDatasetsCsvDumpJob::class],

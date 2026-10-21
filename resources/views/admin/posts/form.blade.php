@@ -19,7 +19,7 @@
             <label>Teaser Bild</label>
             <div class="input-group">
                 <span class="input-group-btn">
-                    <a style="display: {{ $post && $post->thumb ? 'none' : 'block' }};" id="lfm" href="#" data-input="image_filepath" data-preview="lfm_holder" class="btn btn-primary btn-sm">
+                    <a style="display: {{ $post && $post->thumb ? 'none' : 'block' }};" id="lfm" href="#" data-input="image_filepath" class="btn btn-primary btn-sm">
                         <i class="fas fa-image"></i>&nbsp;auswählen
                     </a>
                 </span>
@@ -127,7 +127,7 @@
 <!-- Selectize init -->
 <link rel="stylesheet" href="{{ link_to_stylesheet('vendor/selectize/selectize.default') }}">
 <script src="{{ link_to_script('vendor/selectize/selectize.min') }}"></script>
-<script src="{{ url('vendor/laravel-filemanager/js/lfm.js') }}"></script>
+<script src="{{ url('vendor/laravel-filemanager/js/stand-alone-button.js') }}"></script>
 <script>
     // wait for page load (vars are bound to footer)
     $(document).ready(function() {
@@ -186,6 +186,10 @@
 
         var route_prefix = "{{ url(config('lfm.url_prefix', config('lfm.prefix'))) }}";
         $selectImage.filemanager('image',{ prefix: route_prefix });
+        // the file manager sets the url of the chosen image on the input, show the image in the preview
+        $('#image_filepath').on('change',function(){
+            $selectImageHolder.attr('src',$(this).val()).trigger('change');
+        });
         $selectImageHolder.on('change',function(){
             $resetImage.toggle($(this).attr('src'));
             $selectImage.toggle($(this).attr('src'));

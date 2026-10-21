@@ -84,7 +84,7 @@ class Organization extends Model
         $str = join(',',$orderedIds);
 
         return Organization::whereIn('id',$orderedIds)
-            ->orderByRaw(DB::raw("FIELD(id, $str)")) // https://stackoverflow.com/a/26704767/718980
+            ->orderByRaw("FIELD(id, $str)") // https://stackoverflow.com/a/26704767/718980
             ->get();
     }
 

@@ -17,7 +17,7 @@ class NationalIdParser
 
     protected $valid;
 
-    protected $blackListed;
+    protected $blackListed = false;
 
     protected $type;
 
@@ -97,7 +97,7 @@ class NationalIdParser
     protected function validateId($id) {
         // check blacklist
         if (in_array($id,$this->blackList)) {
-            $this->isBlackListed = true;
+            $this->blackListed = true;
             $this->valid = false;
 
             return false;

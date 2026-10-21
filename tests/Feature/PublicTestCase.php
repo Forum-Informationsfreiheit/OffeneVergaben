@@ -12,7 +12,7 @@ abstract class PublicTestCase extends DatabaseTestCase
     /**
      * Users who must not see unpublished posts and pages or disabled datasets. null is a guest.
      */
-    public function visitorProvider()
+    public static function visitorProvider()
     {
         return [
             'guest'      => [null],

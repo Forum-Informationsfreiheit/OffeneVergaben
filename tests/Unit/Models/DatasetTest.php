@@ -5,13 +5,12 @@ namespace Tests\Unit\Models;
 use App\Models\Dataset;
 use App\Models\DatasetType;
 use Carbon\Carbon;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class DatasetTest extends TestCase
 {
-    /**
-     * @dataProvider formattedTextProvider
-     */
+    #[DataProvider('formattedTextProvider')]
     public function testFormattedTextsConvertLineBreaks($attribute, $accessor)
     {
         $dataset = (new Dataset())->forceFill([$attribute => "Zeile 1\nZeile 2"]);
@@ -20,7 +19,7 @@ class DatasetTest extends TestCase
         $this->assertNull((new Dataset())->{$accessor});
     }
 
-    public function formattedTextProvider()
+    public static function formattedTextProvider()
     {
         return [
             'title'                 => ['title', 'title_formatted'],

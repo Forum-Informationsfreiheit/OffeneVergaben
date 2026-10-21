@@ -54,6 +54,23 @@ class PostControllerTest extends AdminTestCase
         $this->assertDatabaseHas('post_tag', ['post_id' => $post->id, 'tag_id' => $tag->id]);
     }
 
+    /**
+     * Only the path of the URL is stored, whatever the host is (APP_URL may differ from the request).
+     */
+    public function testStoreKeepsOnlyPathOfImageUrl()
+    {
+        $title = 'Beitrag '.Str::random(8);
+
+        $this->actingAs($this->createEditor())->post('/admin/posts/store', [
+            'title'          => $title,
+            'image_filepath' => 'https://cdn.example.test/uploads/images/4/foto.jpg',
+        ]);
+
+        $post = Post::where('title', $title)->first();
+        $this->assertSame('uploads/images/4', $post->image_filepath);
+        $this->assertSame('foto.jpg', $post->image_filename);
+    }
+
     public function testStoreRequiresTitleWithAtLeastThreeCharacters()
     {
         $response = $this->actingAs($this->createEditor())->post('/admin/posts/store', ['title' => 'ab']);

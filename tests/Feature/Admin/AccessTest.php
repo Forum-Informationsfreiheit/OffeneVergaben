@@ -3,15 +3,15 @@
 namespace Tests\Feature\Admin;
 
 use App\Models\Role;
+use PHPUnit\Framework\Attributes\DataProvider;
 
 class AccessTest extends AdminTestCase
 {
     /**
      * Guests get a 404 for every admin route, so the admin area is not revealed. The requested URL
      * is remembered for the redirect after login.
-     *
-     * @dataProvider adminRoutesProvider
      */
+    #[DataProvider('adminRoutesProvider')]
     public function testGuestGetsNotFound($method, $uri)
     {
         $response = $this->call($method, $uri);
@@ -20,9 +20,7 @@ class AccessTest extends AdminTestCase
         $response->assertSessionHas('url.failed_admin');
     }
 
-    /**
-     * @dataProvider rolesBelowEditorProvider
-     */
+    #[DataProvider('rolesBelowEditorProvider')]
     public function testUsersBelowEditorGetNotFound($roleId)
     {
         $response = $this->actingAs($this->createUser($roleId))->get('/admin');
@@ -30,9 +28,7 @@ class AccessTest extends AdminTestCase
         $response->assertNotFound();
     }
 
-    /**
-     * @dataProvider adminAreaRolesProvider
-     */
+    #[DataProvider('adminAreaRolesProvider')]
     public function testEditorsAndAdminsSeeTheDashboard($roleId)
     {
         $user = $this->createUser($roleId);
@@ -59,9 +55,8 @@ class AccessTest extends AdminTestCase
      * DELETE .../destroy routes instead. Remove the four routes, then remove markTestIncomplete()
      * here and the four .../delete/{id} entries from adminRoutesProvider() (without a route the
      * web middleware doesn't run, so url.failed_admin is not set).
-     *
-     * @dataProvider deleteRoutesProvider
      */
+    #[DataProvider('deleteRoutesProvider')]
     public function testDeleteRoutesDoNotExist($uri)
     {
         $this->markTestIncomplete('GET .../delete/{id} routes point to missing controller methods (HTTP 500); remove them from routes/web_admin.php.');
@@ -71,7 +66,7 @@ class AccessTest extends AdminTestCase
         $response->assertNotFound();
     }
 
-    public function adminRoutesProvider()
+    public static function adminRoutesProvider()
     {
         return [
             'GET /admin'                          => ['GET',    '/admin'],
@@ -118,10 +113,14 @@ class AccessTest extends AdminTestCase
             'GET /admin/subscriptions'            => ['GET',    '/admin/subscriptions'],
             'PATCH /admin/subscriptions/resend-…' => ['PATCH',  '/admin/subscriptions/resend-verification-notification'],
             'DELETE /admin/subscriptions/destroy' => ['DELETE', '/admin/subscriptions/destroy'],
+
+            'GET /admin/lfm'                      => ['GET',    '/admin/lfm'],
+            'GET /admin/lfm/jsonitems'            => ['GET',    '/admin/lfm/jsonitems'],
+            'POST /admin/lfm/upload'              => ['POST',   '/admin/lfm/upload'],
         ];
     }
 
-    public function rolesBelowEditorProvider()
+    public static function rolesBelowEditorProvider()
     {
         return [
             'registered' => [Role::REGISTERED],
@@ -129,7 +128,7 @@ class AccessTest extends AdminTestCase
         ];
     }
 
-    public function adminAreaRolesProvider()
+    public static function adminAreaRolesProvider()
     {
         return [
             'editor' => [Role::EDITOR],
@@ -137,7 +136,7 @@ class AccessTest extends AdminTestCase
         ];
     }
 
-    public function deleteRoutesProvider()
+    public static function deleteRoutesProvider()
     {
         return [
             'users' => ['/admin/users/delete/1'],

@@ -153,19 +153,16 @@ class Dataset extends Model
         'threshold' => 'boolean',
         // eForms only: [ 'sdk' => ..., 'groups' => [ [ 'title' => ..., 'entries' => [ [ 'field', 'label', 'value' ] ] ] ] ]
         'further_information' => 'array',
-    ];
-
-    protected $dates = [
-        'date_start',
-        'date_end',
-        'date_first_publication',
-        'date_conclusion_contract',
-        'deadline_standstill',
-        'datetime_receipt_tenders',
-        'datetime_last_change',
+        'date_start' => 'datetime',
+        'date_end' => 'datetime',
+        'date_first_publication' => 'datetime',
+        'date_conclusion_contract' => 'datetime',
+        'deadline_standstill' => 'datetime',
+        'datetime_receipt_tenders' => 'datetime',
+        'datetime_last_change' => 'datetime',
         // 2021-12-15 item_lastmod is timestamp with microseconds and not a date - use accessor/mutator
         //'item_lastmod',
-        'disabled_at'
+        'disabled_at' => 'datetime',
     ];
 
     // SCOPES ----------------------------------------------------------------------------------------------------------
@@ -471,7 +468,7 @@ class Dataset extends Model
         $str = join(',',$orderedIds);
 
         return Dataset::whereIn('id',$orderedIds)
-            ->orderByRaw(DB::raw("FIELD(id, $str)")); // https://stackoverflow.com/a/26704767/718980
+            ->orderByRaw("FIELD(id, $str)"); // https://stackoverflow.com/a/26704767/718980
     }
 
     /**

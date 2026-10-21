@@ -26,7 +26,7 @@ class ScheduleTest extends TestCase
             'fif:dump-datasets'             => '30 4 * * *',
             'fif:send-subscription-updates' => '0 7 * * *',
             'fif:clean-up-subscriptions'    => '0 * * * *',
-            'fif:clean-up-tmp-links'        => '0,30 * * * *',
+            'fif:clean-up-tmp-links'        => '*/30 * * * *',
             'fif:generate-sitemap'          => '0 3 * * *',
         ], $commands);
     }

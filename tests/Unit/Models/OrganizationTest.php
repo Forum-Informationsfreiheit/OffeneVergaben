@@ -3,15 +3,15 @@
 namespace Tests\Unit\Models;
 
 use App\Models\Organization;
+use PHPUnit\Framework\Attributes\DataProvider;
 use Tests\TestCase;
 
 class OrganizationTest extends TestCase
 {
     /**
      * The national id is the first of GLN, FN, GKZ and UKN that is set.
-     *
-     * @dataProvider nationalIdProvider
      */
+    #[DataProvider('nationalIdProvider')]
     public function testNationalIdAndLabel(array $identifiers, $nationalId, $label)
     {
         $organization = (new Organization())->forceFill($identifiers);
@@ -20,7 +20,7 @@ class OrganizationTest extends TestCase
         $this->assertSame($label, $organization->national_id_label);
     }
 
-    public function nationalIdProvider()
+    public static function nationalIdProvider()
     {
         return [
             'all identifiers' => [
