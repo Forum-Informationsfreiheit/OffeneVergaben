@@ -9,10 +9,18 @@ use Carbon\Carbon;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
 
 class SendSubscriptionUpdateNotificationsJob
 {
     use Dispatchable;
+
+    /**
+     * Subscribers whose notification could not be sent during this run.
+     *
+     * @var array<int, array{id: int, email: string, error: string}>
+     */
+    protected $failedRecipients = [];
 
     /**
      *
@@ -36,6 +44,13 @@ class SendSubscriptionUpdateNotificationsJob
 
         foreach($verifiedUsers as $subscriber) {
             $this->handleSubscriber($subscriber);
+        }
+
+        if (count($this->failedRecipients)) {
+            dump(count($this->failedRecipients).' notification(s) could not be sent', $this->failedRecipients);
+            Log::warning(count($this->failedRecipients).' SubscriptionUpdateSummaryNotification(s) could not be sent', [
+                'failed_recipients' => $this->failedRecipients,
+            ]);
         }
 
         Log::info('SendSubscriptionUpdateNotificationsJob finished at '.Carbon::now()->toDateTimeString('millisecond'));
@@ -83,18 +98,38 @@ class SendSubscriptionUpdateNotificationsJob
                 'new_datasets_count' => $numberOfUpdates
             ];
 
-            // store the current timestamp
+            // remember the end of the time frame; it is only stored once the
+            // notification went out, so a failed send is retried on the next run
             $subscription->last_notified_at = $now;
-            $subscription->save();
         }
 
         dump("$totalUpdates total updates for ".count($subscriptions)." subscriptions");
-        Log::info('No subscriptions found for subscriber (id:'.$subscriber->id.')');
+        Log::info("$totalUpdates total updates for ".count($subscriptions).' subscriptions of subscriber (id:'.$subscriber->id.')');
 
         if ($totalUpdates > 0) {
             dump('Sending SubscriptionUpdateSummaryNotification to subscriber (id:'.$subscriber->id.')');
             Log::info('Sending SubscriptionUpdateSummaryNotification to subscriber (id:'.$subscriber->id.')');
-            $subscriber->sendSubscriptionUpdateSummaryNotification($subscriptions, $updateInfo);
+
+            try {
+                $subscriber->sendSubscriptionUpdateSummaryNotification($subscriptions, $updateInfo);
+            } catch (TransportExceptionInterface $e) {
+                // e.g. "550 Recipient not found": skip this subscriber and keep going
+                // with the others; last_notified_at stays untouched
+                dump('Failed to send SubscriptionUpdateSummaryNotification to subscriber (id:'.$subscriber->id.'): '.$e->getMessage());
+                Log::warning('Failed to send SubscriptionUpdateSummaryNotification to subscriber (id:'.$subscriber->id.')', [
+                    'exception' => $e->getMessage(),
+                ]);
+                $this->failedRecipients[] = [
+                    'id'    => $subscriber->id,
+                    'email' => $subscriber->email,
+                    'error' => $e->getMessage(),
+                ];
+                return;
+            }
+        }
+
+        foreach ($subscriptions as $notifiedSubscription) {
+            $notifiedSubscription->save();
         }
     }
 
